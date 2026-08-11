@@ -35,8 +35,6 @@ export const ACTION_LABELS: Record<string, string> = {
   PAYMENT_REJECTED: "Payment rejected",
 };
 
-export const DAY_KEYS = ["Mon", "Tue", "Wed", "Thu", "Fri"] as const;
-
 export type NavItem = {
   label: string;
   href: string;

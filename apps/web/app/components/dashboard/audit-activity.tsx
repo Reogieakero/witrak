@@ -1,6 +1,10 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import { Activity, Banknote, CheckCheck, ShieldAlert, UserCog, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ACTION_LABELS, money } from "@/lib/constants/dashboard";
+import { Pagination } from "@/app/components/ui/pagination";
 import styles from "./audit-activity.module.css";
 
 export type AuditLog = {
@@ -14,8 +18,10 @@ export type AuditLog = {
 
 type AuditActivityProps = {
   logs: AuditLog[];
-  targetById: Map<string, string>;
+  targetById: Record<string, string>;
 };
+
+const PAGE_SIZE = 10;
 
 function auditStyle(action: string): { icon: LucideIcon; cls: string } {
   switch (action) {
@@ -62,6 +68,14 @@ function formatDateTime(d: Date): string {
 }
 
 export function AuditActivity({ logs, targetById }: AuditActivityProps) {
+  const [page, setPage] = useState(1);
+  const pageCount = Math.max(1, Math.ceil(logs.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const visibleLogs = useMemo(() => {
+    const start = (safePage - 1) * PAGE_SIZE;
+    return logs.slice(start, start + PAGE_SIZE);
+  }, [logs, safePage]);
+
   return (
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
@@ -82,14 +96,14 @@ export function AuditActivity({ logs, targetById }: AuditActivityProps) {
             </tr>
           </thead>
           <tbody>
-            {logs.length === 0 ? (
+            {visibleLogs.length === 0 ? (
               <tr>
                 <td colSpan={6} className={styles.emptyCell}>
                   No activity recorded yet.
                 </td>
               </tr>
             ) : (
-              logs.map((log) => {
+              visibleLogs.map((log) => {
                 const style = auditStyle(log.action);
                 const Icon = style.icon;
                 return (
@@ -105,7 +119,7 @@ export function AuditActivity({ logs, targetById }: AuditActivityProps) {
                     </td>
                     <td className={styles.detailCell}>{detailText(log.details)}</td>
                     <td className={styles.targetCell}>
-                      {log.targetId ? targetById.get(log.targetId) ?? "—" : "—"}
+                      {log.targetId ? targetById[log.targetId] ?? "—" : "—"}
                     </td>
                     <td className={styles.actorCell}>{log.actor.name}</td>
                     <td className={styles.whenCell}>{formatDateTime(log.timestamp)}</td>
@@ -117,10 +131,13 @@ export function AuditActivity({ logs, targetById }: AuditActivityProps) {
         </table>
       </div>
 
-      <div className={styles.panelFooter}>
-        <span>All SA actions logged</span>
-        <span className={styles.panelLink}>Open log</span>
-      </div>
+      <Pagination
+        page={safePage}
+        pageCount={pageCount}
+        total={logs.length}
+        pageSize={PAGE_SIZE}
+        onPageChange={setPage}
+      />
     </div>
   );
 }
