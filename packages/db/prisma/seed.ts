@@ -157,16 +157,18 @@ const LAST_NAMES = [
 ];
 
 const PROGRAMS = [
-  { code: "BSCS", name: "BS Computer Science" },
-  { code: "BSIT", name: "BS Information Technology" },
-  { code: "BSED", name: "BS Secondary Education" },
-  { code: "BSCRIM", name: "BS Criminology" },
-  { code: "BSBA", name: "BS Business Administration" },
-  { code: "BSPSY", name: "BS Psychology" },
-  { code: "BSHM", name: "BS Hospitality Management" },
-  { code: "BSACC", name: "BS Accountancy" },
-  { code: "BSCOM", name: "BS Communication" },
-  { code: "BSELX", name: "BS Electronics Engineering" },
+  {
+    code: "AB-POLSCI",
+    name: "AB Political Science",
+  },
+  {
+    code: "BSPSYCH",
+    name: "BS Psychology",
+  },
+  {
+    code: "BS-DEVCOM",
+    name: "BS Development Communication",
+  },
 ];
 
 const EVENTS = [
@@ -317,6 +319,7 @@ async function wipeMockData(): Promise<void> {
   await prisma.sanctionRule.deleteMany({});
   await prisma.attendance.deleteMany({});
   await prisma.event.deleteMany({});
+  await prisma.academicTerm.deleteMany({});
   await prisma.roleRequest.deleteMany({});
   await prisma.userRole.deleteMany({});
   await prisma.user.deleteMany({});
@@ -529,13 +532,13 @@ async function seedRoleRequests(
     { userIdx: 1, status: RequestStatus.PENDING, scope: ScopeType.SECTION, target: sections[8] },
     { userIdx: 2, status: RequestStatus.PENDING, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[10] },
     { userIdx: 3, status: RequestStatus.PENDING, scope: ScopeType.SECTION, target: sections[12] },
-    { userIdx: 4, status: RequestStatus.PENDING, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[15] },
+    { userIdx: 4, status: RequestStatus.PENDING, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[11] },
     { userIdx: 5, status: RequestStatus.APPROVED, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[3] },
     { userIdx: 0, status: RequestStatus.APPROVED, scope: ScopeType.SECTION, target: sections[1] },
     { userIdx: 2, status: RequestStatus.APPROVED, scope: ScopeType.SECTION, target: sections[0] },
     { userIdx: 3, status: RequestStatus.REJECTED, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[8] },
     { userIdx: 4, status: RequestStatus.REJECTED, scope: ScopeType.SECTION, target: sections[6] },
-    { userIdx: 5, status: RequestStatus.REJECTED, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[12] },
+    { userIdx: 5, status: RequestStatus.REJECTED, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[7] },
     { userIdx: 1, status: RequestStatus.REJECTED, scope: ScopeType.SECTION, target: sections[4] },
   ] as const;
 
@@ -660,22 +663,22 @@ async function seedSanctions(
   sections: Awaited<ReturnType<typeof prisma.section.findMany>>,
 ): Promise<void> {
   const byCode = new Map(programs.map((p) => [p.code, p]));
-  const bscs2 = yearLevels.find((y) => y.level === 2 && y.programId === byCode.get("BSCS")!.id)!;
-  const bsit3 = yearLevels.find((y) => y.level === 3 && y.programId === byCode.get("BSIT")!.id)!;
-  const bsed1a = sections.find((s) => s.name === "A" && s.programYearId === yearLevels.find((y) => y.level === 1 && y.programId === byCode.get("BSED")!.id)!.id)!;
-  const bcrim1b = sections.find((s) => s.name === "B" && s.programYearId === yearLevels.find((y) => y.level === 1 && y.programId === byCode.get("BSCRIM")!.id)!.id)!;
+  const polSci2 = yearLevels.find((y) => y.level === 2 && y.programId === byCode.get("AB-POLSCI")!.id)!;
+  const psych3 = yearLevels.find((y) => y.level === 3 && y.programId === byCode.get("BSPSYCH")!.id)!;
+  const devcom1a = sections.find((s) => s.name === "A" && s.programYearId === yearLevels.find((y) => y.level === 1 && y.programId === byCode.get("BS-DEVCOM")!.id)!.id)!;
+  const psych1b = sections.find((s) => s.name === "B" && s.programYearId === yearLevels.find((y) => y.level === 1 && y.programId === byCode.get("BSPSYCH")!.id)!.id)!;
 
   const ruleSpecs = [
     { scopeType: ScopeType.FACULTY, threshold: 3, period: PeriodType.SEMESTER },
     { scopeType: ScopeType.FACULTY, threshold: 5, period: PeriodType.SEMESTER },
     { scopeType: ScopeType.FACULTY, threshold: 7, period: PeriodType.SEMESTER },
     { scopeType: ScopeType.FACULTY, threshold: 2, period: PeriodType.EVENT_SERIES },
-    { scopeType: ScopeType.PROGRAM, programId: byCode.get("BSCS")!.id, threshold: 4, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.PROGRAM, programId: byCode.get("BSIT")!.id, threshold: 4, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.PROGRAM_YEAR, programYearId: bscs2.id, threshold: 3, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.PROGRAM_YEAR, programYearId: bsit3.id, threshold: 3, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.SECTION, sectionId: bsed1a.id, threshold: 2, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.SECTION, sectionId: bcrim1b.id, threshold: 2, period: PeriodType.SEMESTER },
+    { scopeType: ScopeType.PROGRAM, programId: byCode.get("AB-POLSCI")!.id, threshold: 4, period: PeriodType.SEMESTER },
+    { scopeType: ScopeType.PROGRAM, programId: byCode.get("BSPSYCH")!.id, threshold: 4, period: PeriodType.SEMESTER },
+    { scopeType: ScopeType.PROGRAM_YEAR, programYearId: polSci2.id, threshold: 3, period: PeriodType.SEMESTER },
+    { scopeType: ScopeType.PROGRAM_YEAR, programYearId: psych3.id, threshold: 3, period: PeriodType.SEMESTER },
+    { scopeType: ScopeType.SECTION, sectionId: devcom1a.id, threshold: 2, period: PeriodType.SEMESTER },
+    { scopeType: ScopeType.SECTION, sectionId: psych1b.id, threshold: 2, period: PeriodType.SEMESTER },
   ];
 
   await prisma.sanctionRule.createMany({

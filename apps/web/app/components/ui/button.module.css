@@ -23,7 +23,7 @@
 }
 
 .secondary {
-  background: #fff;
+  background: var(--surface-card);
   border-color: var(--line);
   color: var(--ink-700);
 }
@@ -34,7 +34,7 @@
 }
 
 .white {
-  background: #fff;
+  background: var(--surface-card);
   color: var(--brand-700);
 }
 

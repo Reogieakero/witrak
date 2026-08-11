@@ -17,6 +17,7 @@
     "next-auth": "beta",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "recharts": "^3.10.1",
     "swagger-ui-react": "^5.32.13"
   },
   "devDependencies": {

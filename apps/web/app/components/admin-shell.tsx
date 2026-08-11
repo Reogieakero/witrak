@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bell, ChevronDown, GraduationCap, Menu, Search, X } from "lucide-react";
+import { Bell, GraduationCap, Menu, Search, X } from "lucide-react";
 import { MAIN_NAV, SYSTEM_NAV } from "@/lib/constants/dashboard";
-import { SignOutButton } from "./sign-out-button";
+import { UserMenu } from "./user-menu";
 import styles from "./admin-shell.module.css";
 
 function initials(name: string): string {
@@ -82,7 +82,6 @@ export function AdminShell({ userName, roleLabel, children }: AdminShellProps) {
               <span className={styles.userRole}>{roleLabel}</span>
             </span>
           </div>
-          <SignOutButton />
         </div>
       </aside>
 
@@ -112,10 +111,7 @@ export function AdminShell({ userName, roleLabel, children }: AdminShellProps) {
               <span className={styles.bellDot} />
             </button>
             <span className={styles.divider} />
-            <div className={styles.headerUser}>
-              <span className={styles.userAvatar}>{initials(userName)}</span>
-              <ChevronDown size={14} />
-            </div>
+            <UserMenu userName={userName} roleLabel={roleLabel} />
           </div>
         </header>
 

@@ -1,0 +1,72 @@
+.infoButton {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  background: var(--surface-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.infoButton:hover {
+  border-color: #93c5fd;
+  color: #2563eb;
+  background: var(--brand-50);
+}
+
+.intro {
+  margin: 0 0 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.itemIcon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: var(--brand-50);
+  color: #2563eb;
+}
+
+.itemText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.itemTitle {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.itemDesc {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}

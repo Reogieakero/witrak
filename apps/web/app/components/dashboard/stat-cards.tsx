@@ -12,13 +12,15 @@ import {
   Users,
 } from "lucide-react";
 import { money } from "@/lib/constants/dashboard";
+import { Tooltip } from "@/app/components/ui/tooltip";
 import styles from "./stat-cards.module.css";
 
 export type StatCardsData = {
   totalStudents: number;
+  totalUsers: number;
   programCount: number;
-  studentsWithSection: number;
-  placementRate: number;
+  completedProfileCount: number;
+  profileRate: number;
   eventCount: number;
   upcomingCount: number;
   presentRate: number;
@@ -35,20 +37,23 @@ type MiniStatProps = {
   value: string;
   sub: React.ReactNode;
   tone?: "brand" | "amber" | "red";
+  hint: React.ReactNode;
 };
 
-function MiniStat({ label, icon, value, sub, tone = "brand" }: MiniStatProps) {
+function MiniStat({ label, icon, value, sub, tone = "brand", hint }: MiniStatProps) {
   const toneCls =
     tone === "amber" ? styles.miniAmber : tone === "red" ? styles.miniRed : styles.miniBrand;
   return (
-    <div className={`${styles.miniStat} ${toneCls}`}>
-      <div className={styles.miniHeader}>
-        <span>{label}</span>
-        <span className={styles.miniIcon}>{icon}</span>
+    <Tooltip content={hint}>
+      <div className={`${styles.miniStat} ${toneCls}`}>
+        <div className={styles.miniHeader}>
+          <span>{label}</span>
+          <span className={styles.miniIcon}>{icon}</span>
+        </div>
+        <div className={styles.miniValue}>{value}</div>
+        <div className={styles.miniSub}>{sub}</div>
       </div>
-      <div className={styles.miniValue}>{value}</div>
-      <div className={styles.miniSub}>{sub}</div>
-    </div>
+    </Tooltip>
   );
 }
 
@@ -70,6 +75,16 @@ function StatCard({ title, icon, children }: StatCardProps) {
   );
 }
 
+function Hint({ title, body, source }: { title: string; body: string; source: string }) {
+  return (
+    <>
+      <span className={styles.hintTitle}>{title}</span>
+      <span>{body}</span>
+      <span className={styles.hintSource}>{source}</span>
+    </>
+  );
+}
+
 export function StatCards({ data }: { data: StatCardsData }) {
   return (
     <>
@@ -84,12 +99,26 @@ export function StatCards({ data }: { data: StatCardsData }) {
               {data.programCount} programs
             </span>
           }
+          hint={
+            <Hint
+              title="Total Students"
+              body="All registered students across every program."
+              source="Source: Student table"
+            />
+          }
         />
         <MiniStat
-          label="Assigned"
+          label="Profiled"
           icon={<UserCheck size={14} />}
-          value={data.studentsWithSection.toLocaleString()}
-          sub={`${data.placementRate}% rate`}
+          value={data.completedProfileCount.toLocaleString()}
+          sub={`${data.profileRate}% complete`}
+          hint={
+            <Hint
+              title="Completed Profiles"
+              body={`User accounts that finished profiling (linked student with a section assigned), out of ${data.totalUsers} total accounts.`}
+              source="Source: User · Student · Section tables"
+            />
+          }
         />
       </StatCard>
 
@@ -104,12 +133,26 @@ export function StatCards({ data }: { data: StatCardsData }) {
               {data.upcomingCount} upcoming
             </span>
           }
+          hint={
+            <Hint
+              title="Total Events"
+              body="All scheduled events, with the count of upcoming ones still ahead."
+              source="Source: Event table"
+            />
+          }
         />
         <MiniStat
           label="Present"
           icon={<UserCheck size={14} />}
           value={`${data.presentRate}%`}
           sub="avg rate"
+          hint={
+            <Hint
+              title="Average Attendance Rate"
+              body="Share of QR-scanned logs marked present or late across all events."
+              source="Source: Attendance table"
+            />
+          }
         />
       </StatCard>
 
@@ -124,12 +167,26 @@ export function StatCards({ data }: { data: StatCardsData }) {
               {data.collectedRate}% target
             </span>
           }
+          hint={
+            <Hint
+              title="Fees Collected"
+              body="Total amount from verified fee payments, compared against the overall fee target."
+              source="Source: Fee · FeeProof tables"
+            />
+          }
         />
         <MiniStat
           label="Proofs"
           icon={<FileClock size={14} />}
           value={data.pendingFeeProofCount.toLocaleString()}
           sub="needs review"
+          hint={
+            <Hint
+              title="Proofs Pending Review"
+              body="Fee proof submissions that still need to be verified by the treasurer."
+              source="Source: FeeProof table (status = PENDING)"
+            />
+          }
         />
       </StatCard>
 
@@ -140,6 +197,13 @@ export function StatCards({ data }: { data: StatCardsData }) {
           value={data.pendingRoleRequestCount.toLocaleString()}
           sub="needs approval"
           tone="amber"
+          hint={
+            <Hint
+              title="Pending Role Requests"
+              body="Role requests from students that are still waiting for approval."
+              source="Source: RoleRequest table (status = PENDING)"
+            />
+          }
         />
         <MiniStat
           label="Flags"
@@ -147,6 +211,13 @@ export function StatCards({ data }: { data: StatCardsData }) {
           value={data.pendingFlagCount.toLocaleString()}
           sub="follow-up"
           tone="red"
+          hint={
+            <Hint
+              title="Open Sanction Flags"
+              body="Sanction flags triggered by absence rules that still need follow-up."
+              source="Source: SanctionFlag table (status = PENDING)"
+            />
+          }
         />
       </StatCard>
     </>

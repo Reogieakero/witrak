@@ -1,0 +1,55 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.info {
+  white-space: nowrap;
+}
+
+.info strong {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  background: var(--surface-card);
+  color: var(--text-subtle);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.button:hover:not(:disabled) {
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
