@@ -37,18 +37,6 @@
   color: var(--text-muted);
 }
 
-.badgeBrand {
-  flex: none;
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: #2563eb;
-  background: var(--brand-50);
-  border: 1px solid var(--brand-100);
-  border-radius: 999px;
-  padding: 0.125rem 0.5rem;
-  white-space: nowrap;
-}
-
 .analyticsBody {
   display: flex;
   flex-direction: column;

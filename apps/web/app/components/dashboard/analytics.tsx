@@ -4,6 +4,7 @@ import { EventTrendChart } from "@/app/components/dashboard/event-trend-chart";
 import type { EventTrendPoint } from "@/app/components/dashboard/event-trend-chart";
 import { SectionPerformanceChart } from "@/app/components/dashboard/section-performance-chart";
 import type { YearBar } from "@/app/components/dashboard/section-performance-chart";
+import { Badge } from "@/app/components/ui/badge";
 import styles from "./analytics.module.css";
 
 type AnalyticsProps = {
@@ -37,7 +38,7 @@ export function Analytics({
             Comprehensive view of event attendance trends, section heatmap, and breakdowns
           </p>
         </div>
-        <span className={styles.badgeBrand}>{termName}</span>
+        <Badge tone="brand">{termName}</Badge>
       </div>
 
       <div className={styles.analyticsBody}>

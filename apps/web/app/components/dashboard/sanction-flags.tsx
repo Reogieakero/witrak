@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import { initials, shortName, studentSectionLabel } from "@/lib/dashboard-utils";
 import type { ScopedSection } from "@/lib/dashboard-utils";
+import { Badge } from "@/app/components/ui/badge";
 import styles from "./sanction-flags.module.css";
 
 export type SanctionFlag = {
@@ -53,9 +54,9 @@ export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
         <h3 className={styles.panelTitle}>Sanction Flags</h3>
-        <span className={styles.badgeRed}>
+        <Badge tone="red">
           {count} Flag{count === 1 ? "" : "s"}
-        </span>
+        </Badge>
       </div>
 
       <div

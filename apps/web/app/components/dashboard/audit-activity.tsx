@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Activity, Banknote, CheckCheck, ShieldAlert, UserCog, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ACTION_LABELS, money } from "@/lib/constants/dashboard";
+import { Badge } from "@/app/components/ui/badge";
 import { Pagination } from "@/app/components/ui/pagination";
 import styles from "./audit-activity.module.css";
 
@@ -80,7 +81,7 @@ export function AuditActivity({ logs, targetById }: AuditActivityProps) {
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
         <h3 className={styles.panelTitle}>Recent Audit Activity</h3>
-        <span className={styles.badgeBrand}>Append-only</span>
+        <Badge tone="brand">Append-only</Badge>
       </div>
 
       <div className={styles.tableWrap}>
