@@ -22,17 +22,6 @@
   color: var(--text-strong);
 }
 
-.badgeAmber {
-  flex: none;
-  font-size: 0.625rem;
-  font-weight: 600;
-  color: var(--amber-600);
-  background: var(--amber-50);
-  border: 1px solid var(--amber-100);
-  border-radius: 999px;
-  padding: 0.125rem 0.5rem;
-}
-
 .panelBody {
   margin: 0.75rem 0;
   display: flex;

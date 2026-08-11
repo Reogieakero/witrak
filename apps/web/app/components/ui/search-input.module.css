@@ -1,0 +1,40 @@
+.wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #2563eb;
+  pointer-events: none;
+  flex: none;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+  font-size: 0.75rem;
+  color: var(--text-strong);
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  appearance: none;
+}
+
+.input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input:focus {
+  border-color: #2563eb;
+  background: var(--surface-card);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}

@@ -1,0 +1,237 @@
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: var(--surface-card);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -10px rgba(15, 23, 42, 0.14);
+  border-color: var(--brand-200);
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.dateBox {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  padding: 0.375rem 0;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.dateBox[data-tone="brand"] {
+  background: var(--brand-50);
+  border-color: var(--brand-100);
+}
+
+.dateBox[data-tone="amber"] {
+  background: var(--amber-50);
+  border-color: var(--amber-100);
+}
+
+.dateBox[data-tone="gray"] {
+  background: var(--surface-muted);
+  border-color: var(--border-default);
+}
+
+.dateMonth {
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.dateBox[data-tone="brand"] .dateMonth {
+  color: #2563eb;
+}
+
+.dateBox[data-tone="amber"] .dateMonth {
+  color: var(--amber-600);
+}
+
+.dateBox[data-tone="gray"] .dateMonth {
+  color: var(--text-faint);
+}
+
+.dateDay {
+  margin-top: 0.125rem;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--text-strong);
+  line-height: 1;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.liveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 9999px;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: var(--green-600);
+  background: var(--green-50);
+  border: 1px solid var(--green-100);
+}
+
+.liveDot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: var(--green-600);
+  animation: pulse 1.6s ease-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0);
+  }
+}
+
+.eventIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  color: #2563eb;
+  background: var(--brand-50);
+}
+
+.title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.metaLine {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaLine svg {
+  flex: none;
+  color: var(--text-faint);
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+}
+
+.metricText {
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--text-faint);
+}
+
+.metricBar {
+  height: 0.3125rem;
+  width: 100%;
+  border-radius: 9999px;
+  background: var(--surface-muted);
+  overflow: hidden;
+}
+
+.metricFill {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--brand-gradient);
+}
+
+.metricFill[data-tone="green"] {
+  background: var(--green-600);
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.createdBy {
+  font-size: 0.625rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  flex: none;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.actionBtn:hover {
+  background: var(--brand-50);
+  color: #2563eb;
+}
+
+.actionBtn[data-danger]:hover {
+  background: var(--red-50);
+  color: var(--red-500);
+}

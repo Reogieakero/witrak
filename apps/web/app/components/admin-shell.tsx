@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Bell, GraduationCap, Menu, Search, X } from "lucide-react";
 import { MAIN_NAV, SYSTEM_NAV } from "@/lib/constants/dashboard";
 import { UserMenu } from "./user-menu";
@@ -25,6 +26,10 @@ type AdminShellProps = {
 
 export function AdminShell({ userName, roleLabel, children }: AdminShellProps) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) =>
+    href !== "#" && (pathname === href || pathname.startsWith(`${href}/`));
 
   return (
     <div className={styles.shell}>
@@ -50,11 +55,12 @@ export function AdminShell({ userName, roleLabel, children }: AdminShellProps) {
           <div className={styles.navSection}>Main</div>
           {MAIN_NAV.map((item) => {
             const Icon = item.icon;
+            const active = item.active ?? isActive(item.href);
             return (
               <Link
                 key={item.label}
                 href={item.href}
-                className={item.active ? styles.navLinkActive : styles.navLink}
+                className={active ? styles.navLinkActive : styles.navLink}
               >
                 <Icon size={16} />
                 <span>{item.label}</span>

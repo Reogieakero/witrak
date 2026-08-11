@@ -1,6 +1,7 @@
 import { UserPlus } from "lucide-react";
 import { scopeLabel, shortName } from "@/lib/dashboard-utils";
 import type { ScopedSection, ScopedYearLevel } from "@/lib/dashboard-utils";
+import { Badge } from "@/app/components/ui/badge";
 import styles from "./role-requests.module.css";
 
 export type RoleRequest = {
@@ -24,7 +25,7 @@ export function RoleRequests({ count, requests, sectionById, yearById }: RoleReq
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
         <h3 className={styles.panelTitle}>Role Requests</h3>
-        <span className={styles.badgeAmber}>{count} Pending</span>
+        <Badge tone="amber">{count} Pending</Badge>
       </div>
 
       <div className={styles.panelBody}>
@@ -44,7 +45,7 @@ export function RoleRequests({ count, requests, sectionById, yearById }: RoleReq
                   {scopeLabel(rr, sectionById, yearById)} · {rr.requestedRole.name}
                 </span>
               </span>
-              <span className={styles.reqTag}>Pending</span>
+              <Badge tone="amber" className={styles.reqTag}>Pending</Badge>
             </div>
           ))
         )}
