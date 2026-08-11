@@ -5,6 +5,7 @@ import type { NextRequest } from "next/server";
 const PUBLIC_PREFIXES = ["/login", "/api/auth", "/api/openapi", "/docs", "/_next", "/favicon.ico"];
 
 function isPublic(pathname: string): boolean {
+  if (pathname === "/") return true;
   return PUBLIC_PREFIXES.some(
     (p) => pathname === p || pathname.startsWith(p + "/"),
   );

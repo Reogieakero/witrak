@@ -1,0 +1,42 @@
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.sectionHead {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.sectionTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--brand-600);
+}
+
+.sectionTitle {
+  margin-top: 0.5rem;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.sectionText {
+  margin-top: 0.75rem;
+  color: var(--ink-500);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.dotGrid {
+  background-image: radial-gradient(#bfdbfe 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
+}

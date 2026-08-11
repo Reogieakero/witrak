@@ -1,0 +1,36 @@
+.section {
+  background: var(--brand-800);
+  color: #fff;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  text-align: center;
+}
+
+.value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.label {
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--brand-200);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+    text-align: left;
+  }
+}

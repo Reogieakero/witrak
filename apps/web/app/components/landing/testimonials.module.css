@@ -1,0 +1,72 @@
+.section {
+  padding: 5rem 0;
+  border-top: 1px solid var(--line);
+  background: var(--brand-50);
+}
+
+.grid {
+  margin-top: 3rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.stars {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.star {
+  color: #f59e0b;
+  fill: #f59e0b;
+}
+
+.quote {
+  margin-top: 0.875rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ink-600);
+}
+
+.footer {
+  margin-top: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--brand-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.role {
+  font-size: 0.78rem;
+  color: var(--ink-500);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

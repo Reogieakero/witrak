@@ -1,0 +1,96 @@
+.section {
+  padding: 5rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.grid {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+}
+
+.items {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.item {
+  display: flex;
+  gap: 0.875rem;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--brand-50);
+  color: var(--brand-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.itemTitle {
+  font-size: 0.925rem;
+  font-weight: 700;
+}
+
+.itemText {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--ink-500);
+  line-height: 1.55;
+}
+
+.panel {
+  background: var(--brand-800);
+  color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.views {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.view {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.viewRole {
+  font-weight: 600;
+}
+
+.viewAccess {
+  color: var(--brand-200);
+  font-weight: 700;
+  text-align: right;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+}

@@ -1,0 +1,164 @@
+.wrap {
+  position: relative;
+}
+
+.frame {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 20px 50px -20px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+
+.chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.75rem 1rem;
+  background: var(--brand-50);
+  border-bottom: 1px solid var(--line);
+}
+
+.dotRed,
+.dotAmber,
+.dotGreen {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.dotRed {
+  background: #fecaca;
+}
+
+.dotAmber {
+  background: #fde68a;
+}
+
+.dotGreen {
+  background: #bbf7d0;
+}
+
+.url {
+  margin-left: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--ink-500);
+  font-weight: 600;
+}
+
+.body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.greetingTitle {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.greetingSub {
+  font-size: 0.72rem;
+  color: var(--ink-500);
+  margin-top: 0.125rem;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--brand-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.tile {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.tileIcon {
+  color: var(--brand-600);
+}
+
+.tileValue {
+  font-size: 1.125rem;
+  font-weight: 800;
+  margin-top: 0.375rem;
+}
+
+.tileLabel {
+  font-size: 0.7rem;
+  color: var(--ink-500);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.625rem 0.75rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.attendance {
+  background: #3b82f6;
+}
+
+.fees {
+  background: #f59e0b;
+}
+
+.transparency {
+  background: #10b981;
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.rowMeta {
+  font-size: 0.68rem;
+  color: var(--ink-500);
+}
+
+.check {
+  color: var(--brand-500);
+  flex-shrink: 0;
+}
