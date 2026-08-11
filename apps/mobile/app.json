@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "FhusoCom Mobile",
+    "slug": "fhusocom-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "fhusocom",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.fhusocom.mobile"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
