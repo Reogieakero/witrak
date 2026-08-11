@@ -2,7 +2,7 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_PREFIXES = ["/login", "/api/auth", "/_next", "/favicon.ico"];
+const PUBLIC_PREFIXES = ["/login", "/api/auth", "/api/openapi", "/docs", "/_next", "/favicon.ico"];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PREFIXES.some(
@@ -26,5 +26,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api/auth|_next/static|_next/image|favicon.ico|login).*)"],
+  matcher: ["/((?!api/auth|api/openapi|docs|_next/static|_next/image|favicon.ico|login).*)"],
 };

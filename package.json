@@ -14,7 +14,8 @@
     "db:generate": "npm run generate -w @fhusocom/db",
     "db:validate": "npm run validate -w @fhusocom/db",
     "db:migrate": "npm run migrate -w @fhusocom/db",
-    "db:seed": "npm run seed -w @fhusocom/db"
+    "db:seed": "npm run seed -w @fhusocom/db",
+    "test": "npm run test -w @fhusocom/web"
   },
   "engines": {
     "node": ">=20"
