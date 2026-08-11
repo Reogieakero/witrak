@@ -1,0 +1,83 @@
+.quickWrap {
+  padding: 1rem;
+}
+
+.quickTitle {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.quickGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.quickTile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: inherit;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.quickTile:hover {
+  background: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+}
+
+.quickIcon {
+  flex: none;
+  padding: 0.375rem;
+  border-radius: 6px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.quickTile:hover .quickIcon {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.quickMeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.quickLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quickSub {
+  font-size: 0.625rem;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 560px) {
+  .quickGrid {
+    grid-template-columns: 1fr;
+  }
+}

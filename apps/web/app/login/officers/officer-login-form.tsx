@@ -9,7 +9,7 @@ import styles from "./officers.module.css";
 
 export function OfficerLoginForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl");
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +44,10 @@ export function OfficerLoginForm() {
     }
 
     setPending(false);
-    window.location.href = callbackUrl;
+    const isSuperAdmin = (session?.access?.permissions ?? []).includes(
+      "users_manage_roles",
+    );
+    window.location.href = callbackUrl ?? (isSuperAdmin ? "/admin/dashboard" : "/dashboard");
   }
 
   return (

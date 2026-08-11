@@ -15,7 +15,10 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (isPublic(pathname)) return NextResponse.next();
 
-  const token = await getToken({ req: request });
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  });
   if (!token) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

@@ -1,15 +1,18 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import styles from "./sign-out-button.module.css";
+import { LogOut } from "lucide-react";
+import { Button } from "./ui/button";
 
 export function SignOutButton() {
   return (
-    <button
+    <Button
+      variant="secondary"
+      size="sm"
       onClick={() => signOut({ redirectTo: "/login" })}
-      className={styles.button}
     >
+      <LogOut size={14} />
       Sign out
-    </button>
+    </Button>
   );
 }

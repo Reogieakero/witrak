@@ -1,0 +1,136 @@
+.statCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  transition: box-shadow 0.15s ease;
+}
+
+.statCard:hover {
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.statHeaderIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+}
+
+.miniGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.miniStat {
+  border-radius: 8px;
+  padding: 0.625rem;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color 0.15s ease;
+}
+
+.miniBrand {
+  background: #eff6ff;
+  border-color: #dbeafe;
+}
+
+.miniBrand:hover {
+  border-color: #bfdbfe;
+}
+
+.miniAmber {
+  background: #fffbeb;
+  border-color: #fef3c7;
+}
+
+.miniAmber:hover {
+  border-color: #fde68a;
+}
+
+.miniRed {
+  background: #fef2f2;
+  border-color: #fee2e2;
+}
+
+.miniRed:hover {
+  border-color: #fecaca;
+}
+
+.miniHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.miniBrand .miniIcon {
+  color: #2563eb;
+}
+
+.miniAmber .miniIcon {
+  color: #d97706;
+}
+
+.miniRed .miniIcon {
+  color: #ef4444;
+}
+
+.miniIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.miniValue {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #111827;
+}
+
+.miniSub {
+  font-size: 0.625rem;
+  color: #6b7280;
+  margin-top: 0.125rem;
+}
+
+.trendText {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+@media (max-width: 560px) {
+  .miniGrid {
+    grid-template-columns: 1fr;
+  }
+}

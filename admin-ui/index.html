@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50/50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHUSOCOM - Super Admin Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#2563eb',
+                            secondary: '#3b82f6',
+                            light: '#93c5fd',
+                            subtle: '#eff6ff',
+                        }
+                    },
+                    backgroundImage: {
+                        'brand-gradient': 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --brand-primary: #2563eb;
+            --brand-secondary: #3b82f6;
+            --brand-light: #93c5fd;
+            --brand-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d1d5db;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-gray-900 bg-gray-50/50 antialiased selection:bg-brand-primary selection:text-white">
+
+    <div class="min-h-screen flex flex-col">
+
+        <div id="sidebarBackdrop" class="fixed inset-0 z-40 bg-gray-900/20 backdrop-blur-xs hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 bottom-0 left-0 z-50 w-[180px] bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ease-in-out -translate-x-full lg:translate-x-0">
+            <div class="h-16 px-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-6 h-6 rounded bg-brand-gradient flex items-center justify-center text-white shadow-xs">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-white"></i>
+                    </div>
+                    <span class="font-bold text-sm tracking-tight text-gray-900">FHUSOCOM</span>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden p-1 rounded hover:bg-brand-50 text-brand-primary transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-brand-primary"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-2 space-y-0.5">
+                <div class="px-2 pt-2 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Main</div>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg bg-brand-subtle text-brand-primary font-semibold text-xs transition-colors group">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="calendar-check-2" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Events</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="qr-code" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Attendance</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="folder-open" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Transparency</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Sanctions</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="hand-coins" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Fees</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="megaphone" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Announcements</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="users" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Members</span>
+                </a>
+
+                <div class="px-2 pt-4 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">System</div>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="user-cog" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Users &amp; Roles</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="scroll-text" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Audit Log</span>
+                </a>
+            </div>
+
+            <div class="p-2 border-t border-gray-100 bg-gray-50/50">
+                <div class="flex items-center gap-2 p-1.5 rounded-lg">
+                    <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                        P
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-gray-900 block truncate">President</span>
+                        <span class="text-[10px] text-gray-500 block truncate">Super Admin</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="lg:pl-[180px] flex-1 flex flex-col min-w-0">
+
+            <header class="h-16 bg-white border-b border-gray-200 px-4 flex items-center justify-between sticky top-0 z-30">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg hover:bg-brand-subtle text-brand-primary transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5 text-brand-primary"></i>
+                    </button>
+                    <span class="text-xs font-medium text-gray-500">FHUSOCOM Admin</span>
+                    <span class="text-gray-300 text-xs">/</span>
+                    <span class="text-xs font-semibold text-gray-900">Dashboard</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="relative hidden sm:block w-48 lg:w-64">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-primary"></i>
+                        <input type="text" placeholder="Search..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white transition-all">
+                    </div>
+
+                    <button class="p-1.5 text-brand-primary hover:bg-brand-subtle rounded-lg transition-colors relative" title="Notifications">
+                        <i data-lucide="bell" class="w-4 h-4 text-brand-primary"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-brand-primary rounded-full"></span>
+                    </button>
+                    <div class="h-4 w-px bg-gray-200"></div>
+                    <div class="flex items-center gap-2 cursor-pointer p-1 rounded-lg hover:bg-brand-subtle transition-colors">
+                        <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                            P
+                        </div>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    </div>
+                </div>
+            </header>
+
+            <main class="w-full p-4 space-y-4">
+
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-gray-900">Dashboard</h1>
+                    <p class="text-xs text-gray-500 mt-0.5">Monitor events, fees, and student government operations from a centralized dashboard.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                    <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-2xs hover:shadow-xs transition-shadow">
+                        <div class="text-xs font-semibold text-gray-700 mb-2.5 flex items-center justify-between border-b border-gray-100 pb-2">
+                            <span>Student Body</span>
+                            <i data-lucide="users" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="p-2.5 rounded-lg bg-brand-subtle/60 border border-brand-100/70 hover:border-brand-200 transition-colors">
+                                <div class="flex items-center justify-between text-gray-500 mb-1">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Total</span>
+                                    <i data-lucide="users" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                </div>
+                                <div class="text-lg font-bold text-gray-900 tracking-tight">1,248</div>
+                                <div class="text-[10px] text-brand-primary font-medium mt-0.5 flex items-center gap-0.5">
+                                    <i data-lucide="trending-up" class="w-2.5 h-2.5 text-brand-primary"></i>
+                                    <span>+3.2%</span>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-brand-subtle/60 border border-brand-100/70 hover:border-brand-200 transition-colors">
+                                <div class="flex items-center justify-between text-gray-500 mb-1">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Assigned</span>
+                                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                </div>
+                                <div class="text-lg font-bold text-gray-900 tracking-tight">1,074</div>
+                                <div class="text-[10px] text-gray-500 font-medium mt-0.5">86% rate</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-2xs hover:shadow-xs transition-shadow">
+                        <div class="text-xs font-semibold text-gray-700 mb-2.5 flex items-center justify-between border-b border-gray-100 pb-2">
+                            <span>Events &amp; Attendance</span>
+                            <i data-lucide="calendar-check-2" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="p-2.5 rounded-lg bg-brand-subtle/60 border border-brand-100/70 hover:border-brand-200 transition-colors">
+                                <div class="flex items-center justify-between text-gray-500 mb-1">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Events</span>
+                                    <i data-lucide="calendar-plus" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                </div>
+                                <div class="text-lg font-bold text-gray-900 tracking-tight">24</div>
+                                <div class="text-[10px] text-brand-primary font-medium mt-0.5 flex items-center gap-0.5">
+                                    <i data-lucide="trending-up" class="w-2.5 h-2.5 text-brand-primary"></i>
+                                    <span>3 upcoming</span>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-brand-subtle/60 border border-brand-100/70 hover:border-brand-200 transition-colors">
+                                <div class="flex items-center justify-between text-gray-500 mb-1">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Present</span>
+                                    <i data-lucide="user-check" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                </div>
+                                <div class="text-lg font-bold text-gray-900 tracking-tight">94.5%</div>
+                                <div class="text-[10px] text-gray-500 font-medium mt-0.5">avg rate</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-2xs hover:shadow-xs transition-shadow">
+                        <div class="text-xs font-semibold text-gray-700 mb-2.5 flex items-center justify-between border-b border-gray-100 pb-2">
+                            <span>Fees</span>
+                            <i data-lucide="hand-coins" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="p-2.5 rounded-lg bg-brand-subtle/60 border border-brand-100/70 hover:border-brand-200 transition-colors">
+                                <div class="flex items-center justify-between text-gray-500 mb-1">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Collected</span>
+                                    <i data-lucide="banknote" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                </div>
+                                <div class="text-lg font-bold text-gray-900 tracking-tight">₱184.5k</div>
+                                <div class="text-[10px] text-brand-primary font-medium mt-0.5 flex items-center gap-0.5">
+                                    <i data-lucide="trending-up" class="w-2.5 h-2.5 text-brand-primary"></i>
+                                    <span>88% target</span>
+                                </div>
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-brand-subtle/60 border border-brand-100/70 hover:border-brand-200 transition-colors">
+                                <div class="flex items-center justify-between text-gray-500 mb-1">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Proofs</span>
+                                    <i data-lucide="file-clock" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                </div>
+                                <div class="text-lg font-bold text-gray-900 tracking-tight">7</div>
+                                <div class="text-[10px] text-gray-500 font-medium mt-0.5">needs review</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl border border-gray-200 p-3 shadow-2xs hover:shadow-xs transition-shadow">
+                        <div class="text-xs font-semibold text-gray-700 mb-2.5 flex items-center justify-between border-b border-gray-100 pb-2">
+                            <span>Pending Review</span>
+                            <i data-lucide="alert-circle" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="p-2.5 rounded-lg bg-amber-50/60 border border-amber-100/70 hover:border-amber-200 transition-colors">
+                                <div class="flex items-center justify-between text-gray-500 mb-1">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Role Req.</span>
+                                    <i data-lucide="clock" class="w-3.5 h-3.5 text-amber-600"></i>
+                                </div>
+                                <div class="text-lg font-bold text-gray-900 tracking-tight">4</div>
+                                <div class="text-[10px] text-amber-600 font-medium mt-0.5">needs approval</div>
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-red-50/60 border border-red-100/70 hover:border-red-200 transition-colors">
+                                <div class="flex items-center justify-between text-gray-500 mb-1">
+                                    <span class="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Flags</span>
+                                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-red-500"></i>
+                                </div>
+                                <div class="text-lg font-bold text-gray-900 tracking-tight">2</div>
+                                <div class="text-[10px] text-red-500 font-medium mt-0.5">follow-up</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+
+                    <div class="lg:col-span-1 h-full flex flex-col gap-4">
+
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-semibold text-gray-900">Sanction Flags</h3>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-600 border border-red-100">2 Flags</span>
+                            </div>
+
+                            <div class="my-3 space-y-2">
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-red-50/40 border border-red-100/60 hover:border-red-200 transition-colors">
+                                    <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-[10px] font-semibold shrink-0">
+                                        JV
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">J. Villanueva</span>
+                                        <span class="text-[10px] text-gray-500 block truncate">BSCS-2-B &middot; 5 absences</span>
+                                    </div>
+                                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-red-500 shrink-0"></i>
+                                </div>
+
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-red-50/40 border border-red-100/60 hover:border-red-200 transition-colors">
+                                    <div class="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-[10px] font-semibold shrink-0">
+                                        RS
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">R. Salazar</span>
+                                        <span class="text-[10px] text-gray-500 block truncate">BSIT-3-A &middot; 3 absences</span>
+                                    </div>
+                                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-red-500 shrink-0"></i>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                                <span>Threshold: &gt;3 absences</span>
+                                <span class="font-medium text-brand-primary cursor-pointer hover:underline">View all</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-semibold text-gray-900">Role Requests</h3>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-600 border border-amber-100">4 Pending</span>
+                            </div>
+
+                            <div class="my-3 space-y-2">
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-amber-50/40 border border-amber-100/60 hover:border-amber-200 transition-colors">
+                                    <div class="p-1.5 rounded-md bg-amber-100 text-amber-600 shrink-0">
+                                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">A. Santos</span>
+                                        <span class="text-[10px] text-gray-500 block truncate">BSED-2 &middot; Year Rep</span>
+                                    </div>
+                                    <span class="text-[9px] font-semibold text-amber-600 shrink-0">Pending</span>
+                                </div>
+
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-amber-50/40 border border-amber-100/60 hover:border-amber-200 transition-colors">
+                                    <div class="p-1.5 rounded-md bg-amber-100 text-amber-600 shrink-0">
+                                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">M. Cruz</span>
+                                        <span class="text-[10px] text-gray-500 block truncate">BSCRIM-1-B &middot; Section Rep</span>
+                                    </div>
+                                    <span class="text-[9px] font-semibold text-amber-600 shrink-0">Pending</span>
+                                </div>
+
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-amber-50/40 border border-amber-100/60 hover:border-amber-200 transition-colors">
+                                    <div class="p-1.5 rounded-md bg-amber-100 text-amber-600 shrink-0">
+                                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">J. Dela Cruz</span>
+                                        <span class="text-[10px] text-gray-500 block truncate">BSCS-3 &middot; Year Rep</span>
+                                    </div>
+                                    <span class="text-[9px] font-semibold text-amber-600 shrink-0">Pending</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                                <span>Awaiting scope assignment</span>
+                                <span class="font-medium text-brand-primary cursor-pointer hover:underline">Review all</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4">
+                            <h3 class="text-sm font-semibold text-gray-900 mb-3">Quick Actions</h3>
+                            <div class="grid grid-cols-2 gap-2">
+
+                                <a href="#" class="flex items-center gap-2 p-2 rounded-lg border border-gray-200/80 bg-gray-50/50 hover:bg-white hover:border-brand-primary hover:shadow-xs transition-all duration-200 group">
+                                    <div class="p-1.5 rounded-md bg-brand-subtle border border-brand-100 text-brand-primary group-hover:bg-brand-primary group-hover:text-white group-hover:border-brand-primary transition-colors shrink-0">
+                                        <i data-lucide="user-cog" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">Assign Role</span>
+                                        <span class="text-[10px] text-gray-400 block truncate">Officers</span>
+                                    </div>
+                                </a>
+
+                                <a href="#" class="flex items-center gap-2 p-2 rounded-lg border border-gray-200/80 bg-gray-50/50 hover:bg-white hover:border-brand-primary hover:shadow-xs transition-all duration-200 group">
+                                    <div class="p-1.5 rounded-md bg-brand-subtle border border-brand-100 text-brand-primary group-hover:bg-brand-primary group-hover:text-white group-hover:border-brand-primary transition-colors shrink-0">
+                                        <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">Approve Req.</span>
+                                        <span class="text-[10px] text-gray-400 block truncate">Role requests</span>
+                                    </div>
+                                </a>
+
+                                <a href="#" class="flex items-center gap-2 p-2 rounded-lg border border-gray-200/80 bg-gray-50/50 hover:bg-white hover:border-brand-primary hover:shadow-xs transition-all duration-200 group">
+                                    <div class="p-1.5 rounded-md bg-brand-subtle border border-brand-100 text-brand-primary group-hover:bg-brand-primary group-hover:text-white group-hover:border-brand-primary transition-colors shrink-0">
+                                        <i data-lucide="calendar-plus" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">New Event</span>
+                                        <span class="text-[10px] text-gray-400 block truncate">Schedule</span>
+                                    </div>
+                                </a>
+
+                                <a href="#" class="flex items-center gap-2 p-2 rounded-lg border border-gray-200/80 bg-gray-50/50 hover:bg-white hover:border-brand-primary hover:shadow-xs transition-all duration-200 group">
+                                    <div class="p-1.5 rounded-md bg-brand-subtle border border-brand-100 text-brand-primary group-hover:bg-brand-primary group-hover:text-white group-hover:border-brand-primary transition-colors shrink-0">
+                                        <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">Scan Attendance</span>
+                                        <span class="text-[10px] text-gray-400 block truncate">Log entry</span>
+                                    </div>
+                                </a>
+
+                                <a href="#" class="flex items-center gap-2 p-2 rounded-lg border border-gray-200/80 bg-gray-50/50 hover:bg-white hover:border-brand-primary hover:shadow-xs transition-all duration-200 group">
+                                    <div class="p-1.5 rounded-md bg-brand-subtle border border-brand-100 text-brand-primary group-hover:bg-brand-primary group-hover:text-white group-hover:border-brand-primary transition-colors shrink-0">
+                                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">Upload Doc</span>
+                                        <span class="text-[10px] text-gray-400 block truncate">Transparency</span>
+                                    </div>
+                                </a>
+
+                                <a href="#" class="flex items-center gap-2 p-2 rounded-lg border border-gray-200/80 bg-gray-50/50 hover:bg-white hover:border-brand-primary hover:shadow-xs transition-all duration-200 group">
+                                    <div class="p-1.5 rounded-md bg-brand-subtle border border-brand-100 text-brand-primary group-hover:bg-brand-primary group-hover:text-white group-hover:border-brand-primary transition-colors shrink-0">
+                                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">Export Reports</span>
+                                        <span class="text-[10px] text-gray-400 block truncate">PDF / CSV</span>
+                                    </div>
+                                </a>
+
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-gray-200 p-4 flex flex-col justify-between flex-1 min-h-0">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-semibold text-gray-900">Recent Audit Activity</h3>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-subtle text-brand-primary border border-brand-100">Append-only</span>
+                            </div>
+
+                            <div class="my-3 space-y-2 flex-1 overflow-y-auto">
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80 hover:border-gray-200 transition-colors">
+                                    <div class="p-1.5 rounded-md bg-brand-subtle text-brand-primary shrink-0">
+                                        <i data-lucide="user-cog" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">Role assigned</span>
+                                        <span class="text-[10px] text-gray-500 block truncate">Secretary &middot; K. Ramirez</span>
+                                    </div>
+                                    <span class="text-[9px] text-gray-400 shrink-0">08:41</span>
+                                </div>
+
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80 hover:border-gray-200 transition-colors">
+                                    <div class="p-1.5 rounded-md bg-red-50 text-red-500 shrink-0">
+                                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">Request rejected</span>
+                                        <span class="text-[10px] text-gray-500 block truncate">Treasurer &middot; D. Ortega</span>
+                                    </div>
+                                    <span class="text-[9px] text-gray-400 shrink-0">08:20</span>
+                                </div>
+
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80 hover:border-gray-200 transition-colors">
+                                    <div class="p-1.5 rounded-md bg-emerald-50 text-emerald-600 shrink-0">
+                                        <i data-lucide="banknote" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">Fee verified</span>
+                                        <span class="text-[10px] text-gray-500 block truncate">M. Tan &middot; ₱1,850</span>
+                                    </div>
+                                    <span class="text-[9px] text-gray-400 shrink-0">15:02</span>
+                                </div>
+
+                                <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80 hover:border-gray-200 transition-colors">
+                                    <div class="p-1.5 rounded-md bg-amber-50 text-amber-600 shrink-0">
+                                        <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-xs font-semibold text-gray-900 block truncate">Sanction created</span>
+                                        <span class="text-[10px] text-gray-500 block truncate">L. Bautista &middot; flag →</span>
+                                    </div>
+                                    <span class="text-[9px] text-gray-400 shrink-0">14:47</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                                <span>All SA actions logged</span>
+                                <span class="font-medium text-brand-primary cursor-pointer hover:underline">Open log</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="lg:col-span-3 bg-white rounded-xl border border-gray-200 p-4 space-y-4 shadow-2xs">
+
+                        <div class="flex items-center justify-between pb-3 border-b border-gray-100">
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                    <i data-lucide="bar-chart-3" class="w-4 h-4 text-brand-primary"></i>
+                                    Attendance Analytics
+                                </h3>
+                                <p class="text-[11px] text-gray-500">Comprehensive view of event attendance trends, section heatmap, and breakdowns</p>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-subtle text-brand-primary border border-brand-100">
+                                Term 1 · 2025-2026
+                            </span>
+                        </div>
+
+                        <div class="space-y-4">
+
+                            <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
+
+                                <div class="bg-gray-50/40 rounded-xl border border-gray-200/80 p-4 space-y-3 flex flex-col justify-between">
+                                    <div class="flex items-center justify-between pb-2 border-b border-gray-200/60">
+                                        <div>
+                                            <h4 class="text-xs font-semibold text-gray-900 flex items-center gap-1.5">
+                                                <i data-lucide="trending-up" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                                Monthly Attendance Trend
+                                            </h4>
+                                            <p class="text-[10px] text-gray-500">Average Rate: 94.8% (10 Months)</p>
+                                        </div>
+                                        <a href="#" class="text-[11px] font-medium text-brand-primary hover:underline">
+                                            Report
+                                        </a>
+                                    </div>
+
+                                    <div class="relative pt-2">
+                                        <svg class="w-full h-36 overflow-visible" viewBox="0 0 340 100" fill="none">
+                                            <defs>
+                                                <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stop-color="#2563eb" stop-opacity="0.25"/>
+                                                    <stop offset="100%" stop-color="#2563eb" stop-opacity="0.0"/>
+                                                </linearGradient>
+                                            </defs>
+
+                                            <line x1="0" y1="10" x2="340" y2="10" stroke="#e5e7eb" stroke-dasharray="3 3"/>
+                                            <line x1="0" y1="35" x2="340" y2="35" stroke="#e5e7eb" stroke-dasharray="3 3"/>
+                                            <line x1="0" y1="60" x2="340" y2="60" stroke="#e5e7eb" stroke-dasharray="3 3"/>
+                                            <line x1="0" y1="85" x2="340" y2="85" stroke="#d1d5db"/>
+
+                                            <line x1="0" y1="25" x2="340" y2="25" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="4 2"/>
+
+                                            <path d="M0,65 L37,50 L75,38 L113,25 L151,15 L189,22 L227,32 L265,18 L303,12 L340,20 L340,85 L0,85 Z" fill="url(#chartGradient)"/>
+
+                                            <path d="M0,65 L37,50 L75,38 L113,25 L151,15 L189,22 L227,32 L265,18 L303,12 L340,20" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+                                            <circle cx="0" cy="65" r="3" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                                            <circle cx="37" cy="50" r="3" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                                            <circle cx="75" cy="38" r="3" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                                            <circle cx="113" cy="25" r="3" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                                            <circle cx="151" cy="15" r="3.5" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
+                                            <circle cx="189" cy="22" r="3" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                                            <circle cx="227" cy="32" r="3" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                                            <circle cx="265" cy="18" r="3" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                                            <circle cx="303" cy="12" r="3.5" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
+                                            <circle cx="340" cy="20" r="3" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+                                        </svg>
+
+                                        <div class="flex justify-between text-[10px] font-medium text-gray-400 mt-1 px-0.5">
+                                            <span>Jun</span>
+                                            <span>Jul</span>
+                                            <span>Aug</span>
+                                            <span>Sep</span>
+                                            <span>Oct</span>
+                                            <span>Nov</span>
+                                            <span>Dec</span>
+                                            <span>Jan</span>
+                                            <span>Feb</span>
+                                            <span>Mar</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-2 flex items-center gap-4 text-[10px] text-gray-500">
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full bg-brand-primary"></span>
+                                            Monthly Rate
+                                        </span>
+                                        <span class="flex items-center gap-1.5 text-gray-400">
+                                            <span class="w-2.5 h-0.5 bg-brand-light"></span>
+                                            95% Target
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gray-50/40 rounded-xl border border-gray-200/80 p-4 space-y-3 flex flex-col justify-between items-center text-center">
+                                    <div class="w-full flex items-center justify-between pb-2 border-b border-gray-200/60">
+                                        <div class="text-left">
+                                            <h4 class="text-xs font-semibold text-gray-900 flex items-center gap-1.5">
+                                                <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                                Section Attendance Heatmap
+                                            </h4>
+                                            <p class="text-[10px] text-gray-500">Weekly event log intensity by section (Mon – Fri)</p>
+                                        </div>
+                                        <span class="text-[10px] font-semibold text-brand-primary bg-brand-subtle px-2 py-0.5 rounded border border-brand-100">
+                                            98.2% peak
+                                        </span>
+                                    </div>
+
+                                    <div class="w-full flex flex-col items-center justify-center my-auto py-3">
+                                        <div class="inline-flex gap-2.5 items-start justify-center pb-10 pt-2">
+                                            <div class="grid grid-rows-5 gap-1.5 text-[9px] text-gray-400 font-medium pr-1 pt-0.5 justify-items-end">
+                                                <span>Mon</span>
+                                                <span>Tue</span>
+                                                <span>Wed</span>
+                                                <span>Thu</span>
+                                                <span>Fri</span>
+                                            </div>
+
+                                            <div class="flex gap-2.5 justify-center">
+                                                <div class="relative flex flex-col items-center group">
+                                                    <div class="grid grid-rows-5 gap-1.5">
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light/70" title="Mon: 93%"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary" title="Tue: 95%"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-primary" title="Wed: 98%"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary" title="Thu: 97%"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light" title="Fri: 94%"></div>
+                                                    </div>
+                                                    <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[9px] font-semibold text-gray-600 whitespace-nowrap pointer-events-none">
+                                                        BSCS-2-A
+                                                    </div>
+                                                </div>
+
+                                                <div class="relative flex flex-col items-center group">
+                                                    <div class="grid grid-rows-5 gap-1.5">
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light/50" title="Mon: 90%"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light" title="Tue: 93%"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary" title="Wed: 95%"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-primary" title="Thu: 98%"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light/70" title="Fri: 92%"></div>
+                                                    </div>
+                                                    <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[9px] font-semibold text-gray-600 whitespace-nowrap pointer-events-none">
+                                                        BSCS-2-B
+                                                    </div>
+                                                </div>
+
+                                                <div class="relative flex flex-col items-center group">
+                                                    <div class="grid grid-rows-5 gap-1.5">
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-primary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                    </div>
+                                                    <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[9px] font-semibold text-gray-600 whitespace-nowrap pointer-events-none">
+                                                        BSIT-1-A
+                                                    </div>
+                                                </div>
+
+                                                <div class="relative flex flex-col items-center group">
+                                                    <div class="grid grid-rows-5 gap-1.5">
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light/70"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light/70"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light/50"></div>
+                                                    </div>
+                                                    <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[9px] font-semibold text-gray-600 whitespace-nowrap pointer-events-none">
+                                                        BSIT-3-A
+                                                    </div>
+                                                </div>
+
+                                                <div class="relative flex flex-col items-center group">
+                                                    <div class="grid grid-rows-5 gap-1.5">
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-primary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-primary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-primary"></div>
+                                                    </div>
+                                                    <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[9px] font-semibold text-gray-600 whitespace-nowrap pointer-events-none">
+                                                        BSED-2-A
+                                                    </div>
+                                                </div>
+
+                                                <div class="relative flex flex-col items-center group">
+                                                    <div class="grid grid-rows-5 gap-1.5">
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light/70"></div>
+                                                    </div>
+                                                    <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[9px] font-semibold text-gray-600 whitespace-nowrap pointer-events-none">
+                                                        BSED-1-B
+                                                    </div>
+                                                </div>
+
+                                                <div class="relative flex flex-col items-center group">
+                                                    <div class="grid grid-rows-5 gap-1.5">
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-primary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-primary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-primary"></div>
+                                                    </div>
+                                                    <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[9px] font-semibold text-gray-600 whitespace-nowrap pointer-events-none">
+                                                        BSCRIM-1-B
+                                                    </div>
+                                                </div>
+
+                                                <div class="relative flex flex-col items-center group">
+                                                    <div class="grid grid-rows-5 gap-1.5">
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light/70"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-secondary"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light"></div>
+                                                        <div class="w-3 h-3 rounded-xs bg-brand-light/70"></div>
+                                                    </div>
+                                                    <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[9px] font-semibold text-gray-600 whitespace-nowrap pointer-events-none">
+                                                        BSCRIM-2-A
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full pt-2 flex items-center justify-between text-[10px] text-gray-500 border-t border-gray-200/60">
+                                        <span>Mon – Fri event logs</span>
+                                        <div class="flex items-center gap-1 text-[9px] text-gray-400">
+                                            <span>Less</span>
+                                            <span class="w-2 h-2 rounded-xs bg-brand-light/50"></span>
+                                            <span class="w-2 h-2 rounded-xs bg-brand-light"></span>
+                                            <span class="w-2 h-2 rounded-xs bg-brand-secondary"></span>
+                                            <span class="w-2 h-2 rounded-xs bg-brand-primary"></span>
+                                            <span>More</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="bg-gray-50/40 rounded-xl border border-gray-200/80 p-4 space-y-4">
+                                <div class="flex items-center justify-between pb-2 border-b border-gray-200/60">
+                                    <div>
+                                        <h4 class="text-xs font-semibold text-gray-900 flex items-center gap-1.5">
+                                            <i data-lucide="bar-chart-2" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                            Section Performance Breakdown
+                                        </h4>
+                                        <p class="text-[10px] text-gray-500">Section attendance rate comparison with angled X-axis section labels</p>
+                                    </div>
+                                    <span class="text-[11px] font-medium text-brand-primary cursor-pointer hover:underline">
+                                        View All
+                                    </span>
+                                </div>
+
+                                <div class="pt-2 pb-12 px-1">
+                                    <div class="relative h-36 w-full flex items-end justify-between gap-2 border-b border-gray-300">
+
+                                        <div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                                            <div class="border-b border-dashed border-gray-200 w-full"></div>
+                                            <div class="border-b border-dashed border-gray-200 w-full"></div>
+                                            <div class="border-b border-dashed border-gray-200 w-full"></div>
+                                            <div class="border-b border-dashed border-gray-200 w-full"></div>
+                                        </div>
+
+                                        <div class="relative flex-1 flex flex-col items-center h-full justify-end group">
+                                            <div class="w-full max-w-[28px] bg-brand-primary rounded-t-sm transition-all duration-300 group-hover:bg-brand-secondary" style="height: 96%">
+                                                <span class="opacity-0 group-hover:opacity-100 absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-gray-900 text-white px-1 rounded transition-opacity pointer-events-none">96%</span>
+                                            </div>
+                                            <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                                                BSCS-2-A
+                                            </div>
+                                        </div>
+
+                                        <div class="relative flex-1 flex flex-col items-center h-full justify-end group">
+                                            <div class="w-full max-w-[28px] bg-brand-primary/80 rounded-t-sm transition-all duration-300 group-hover:bg-brand-primary" style="height: 92%">
+                                                <span class="opacity-0 group-hover:opacity-100 absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-gray-900 text-white px-1 rounded transition-opacity pointer-events-none">92%</span>
+                                            </div>
+                                            <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                                                BSCS-2-B
+                                            </div>
+                                        </div>
+
+                                        <div class="relative flex-1 flex flex-col items-center h-full justify-end group">
+                                            <div class="w-full max-w-[28px] bg-brand-primary rounded-t-sm transition-all duration-300 group-hover:bg-brand-secondary" style="height: 95%">
+                                                <span class="opacity-0 group-hover:opacity-100 absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-gray-900 text-white px-1 rounded transition-opacity pointer-events-none">95%</span>
+                                            </div>
+                                            <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                                                BSIT-1-A
+                                            </div>
+                                        </div>
+
+                                        <div class="relative flex-1 flex flex-col items-center h-full justify-end group">
+                                            <div class="w-full max-w-[28px] bg-brand-primary/70 rounded-t-sm transition-all duration-300 group-hover:bg-brand-primary" style="height: 89%">
+                                                <span class="opacity-0 group-hover:opacity-100 absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-gray-900 text-white px-1 rounded transition-opacity pointer-events-none">89%</span>
+                                            </div>
+                                            <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                                                BSIT-3-A
+                                            </div>
+                                        </div>
+
+                                        <div class="relative flex-1 flex flex-col items-center h-full justify-end group">
+                                            <div class="w-full max-w-[28px] bg-brand-primary rounded-t-sm transition-all duration-300 group-hover:bg-brand-secondary" style="height: 97%">
+                                                <span class="opacity-0 group-hover:opacity-100 absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-gray-900 text-white px-1 rounded transition-opacity pointer-events-none">97%</span>
+                                            </div>
+                                            <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                                                BSED-2-A
+                                            </div>
+                                        </div>
+
+                                        <div class="relative flex-1 flex flex-col items-center h-full justify-end group">
+                                            <div class="w-full max-w-[28px] bg-brand-primary/85 rounded-t-sm transition-all duration-300 group-hover:bg-brand-primary" style="height: 94%">
+                                                <span class="opacity-0 group-hover:opacity-100 absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-gray-900 text-white px-1 rounded transition-opacity pointer-events-none">94%</span>
+                                            </div>
+                                            <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                                                BSED-1-B
+                                            </div>
+                                        </div>
+
+                                        <div class="relative flex-1 flex flex-col items-center h-full justify-end group">
+                                            <div class="w-full max-w-[28px] bg-brand-primary rounded-t-sm transition-all duration-300 group-hover:bg-brand-secondary" style="height: 98%">
+                                                <span class="opacity-0 group-hover:opacity-100 absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-gray-900 text-white px-1 rounded transition-opacity pointer-events-none">98%</span>
+                                            </div>
+                                            <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                                                BSCRIM-1-B
+                                            </div>
+                                        </div>
+
+                                        <div class="relative flex-1 flex flex-col items-center h-full justify-end group">
+                                            <div class="w-full max-w-[28px] bg-brand-primary/80 rounded-t-sm transition-all duration-300 group-hover:bg-brand-primary" style="height: 93%">
+                                                <span class="opacity-0 group-hover:opacity-100 absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold bg-gray-900 text-white px-1 rounded transition-opacity pointer-events-none">93%</span>
+                                            </div>
+                                            <div class="absolute top-full mt-2 right-1/2 transform -rotate-45 origin-top-right text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                                                BSCRIM-2-A
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="pt-6 flex items-center justify-between text-[10px] text-gray-500 border-t border-gray-200/60">
+                                    <div class="flex items-center gap-3">
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="w-2.5 h-2.5 rounded-xs bg-brand-primary"></span>
+                                            Attendance Rate
+                                        </span>
+                                    </div>
+                                    <span class="text-gray-400">Hover bars to view exact percentages</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="pt-3 border-t border-gray-100">
+                            <p class="text-[11px] text-gray-500 leading-relaxed">
+                                Data is aggregated from QR event attendance logs across all sections for Academic Term 1, 2025-2026. Figures update automatically at the end of each event and are used to flag at-risk students and sections falling below the 95% target.
+                            </p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

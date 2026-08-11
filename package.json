@@ -20,6 +20,10 @@
   "engines": {
     "node": ">=20"
   },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
   "allowScripts": {
     "prisma@6.19.3": true,
     "@prisma/client@6.19.3": true,
