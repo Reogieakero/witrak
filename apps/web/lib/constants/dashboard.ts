@@ -45,7 +45,7 @@ export type NavItem = {
 export const MAIN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { label: "Events", href: "/admin/events", icon: CalendarCheck2 },
-  { label: "Attendance", href: "#", icon: QrCode },
+  { label: "Attendance", href: "/admin/attendance", icon: QrCode },
   { label: "Transparency", href: "#", icon: FolderOpen },
   { label: "Sanctions", href: "#", icon: ShieldAlert },
   { label: "Fees", href: "#", icon: HandCoins },

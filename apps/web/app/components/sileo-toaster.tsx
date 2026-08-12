@@ -3,5 +3,5 @@
 import { Toaster } from "sileo";
 
 export function SileoToaster() {
-  return <Toaster position="top-right" theme="system" />;
+  return <Toaster position="top-left" theme="system" />;
 }

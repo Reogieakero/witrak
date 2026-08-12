@@ -1,0 +1,277 @@
+.titleWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.titleIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  flex: none;
+  background: var(--brand-50);
+  color: #2563eb;
+}
+
+.titleLine {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+  line-height: 1.2;
+}
+
+.subtitle {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 16rem;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.625rem 0.25rem;
+  border-radius: 0.625rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+}
+
+.statValue {
+  font-size: 1.125rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.statValue[data-tone="green"] {
+  color: var(--green-600);
+}
+
+.statValue[data-tone="amber"] {
+  color: var(--amber-600);
+}
+
+.statValue[data-tone="red"] {
+  color: var(--red-500);
+}
+
+.statLabel {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+
+.rateRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.rateBar {
+  height: 0.375rem;
+  width: 100%;
+  border-radius: 9999px;
+  background: var(--surface-muted);
+  overflow: hidden;
+}
+
+.rateBar span {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--brand-gradient);
+}
+
+.schedule {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.scheduleItem {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-subtle);
+}
+
+.searchRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pagination {
+  margin-top: 0.875rem;
+}
+
+.records {
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+}
+
+.table {
+  width: 100%;
+  min-width: 38rem;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table thead th {
+  padding: 0.5rem 0.75rem;
+  background: var(--surface-muted);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.thRight {
+  text-align: right;
+}
+
+.right {
+  text-align: right;
+}
+
+.table tbody tr {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.table tbody td {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.6875rem;
+}
+
+.studentName {
+  font-weight: 700;
+  color: var(--text-strong);
+  white-space: nowrap;
+}
+
+.statusEdit {
+  position: relative;
+  display: inline-flex;
+}
+
+.statusEditBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3125rem 0.625rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.5rem;
+  background: var(--surface-card);
+  color: var(--text-muted);
+  font-size: 0.625rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.statusEditBtn:hover:not(:disabled) {
+  border-color: var(--brand-200);
+  background: var(--brand-50);
+  color: var(--brand-700);
+}
+
+.statusEditBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.statusMenu {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  z-index: 20;
+  min-width: 8rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.625rem;
+  background: var(--surface-card);
+  box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.18);
+  display: flex;
+  flex-direction: column;
+}
+
+.statusMenu button {
+  padding: 0.4375rem 0.625rem;
+  border: 0;
+  border-radius: 0.375rem;
+  background: transparent;
+  color: var(--text-subtle);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.statusMenu button:hover {
+  background: var(--brand-50);
+  color: var(--brand-700);
+}
+
+.timeCell {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
+.cellMuted {
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 0.6875rem;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.625rem;
+}

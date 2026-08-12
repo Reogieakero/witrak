@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50/50" data-role="super-admin">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHUSOCOM - Attendance</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#2563eb',
+                            secondary: '#3b82f6',
+                            light: '#93c5fd',
+                            subtle: '#eff6ff',
+                        },
+                        ink: {
+                            DEFAULT: '#0f172a',
+                            soft: '#334155',
+                            muted: '#64748b',
+                            faint: '#94a3b8',
+                        },
+                        line: { DEFAULT: '#e2e8f0', soft: '#eef2f7' },
+                    },
+                    boxShadow: {
+                        soft: '0 1px 2px rgba(15,23,42,0.04)',
+                        lift: '0 8px 24px -8px rgba(15,23,42,0.12), 0 2px 6px rgba(15,23,42,0.04)',
+                        ring: '0 0 0 4px rgba(37,99,235,0.12)',
+                    },
+                    backgroundImage: {
+                        'brand-gradient': 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                        'brand-soft': 'linear-gradient(135deg, rgba(37,99,235,0.10), rgba(59,130,246,0.06))',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --brand-primary: #2563eb;
+            --brand-secondary: #3b82f6;
+            --brand-light: #93c5fd;
+            --brand-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up { animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+        @keyframes pulseDot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.45); }
+            50%      { box-shadow: 0 0 0 4px rgba(16,185,129,0); }
+        }
+        .pulse-dot { animation: pulseDot 1.8s ease-out infinite; }
+
+        .row-hover {
+            transition: background 0.15s ease;
+        }
+        .row-hover:hover {
+            background: #f8fafc;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-gray-900 bg-gray-50/50 antialiased selection:bg-brand-primary selection:text-white">
+
+    <div class="min-h-screen flex flex-col">
+
+        <div id="sidebarBackdrop" class="fixed inset-0 z-40 bg-gray-900/20 backdrop-blur-xs hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 bottom-0 left-0 z-50 w-[180px] bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ease-in-out -translate-x-full lg:translate-x-0">
+            <div class="h-16 px-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-6 h-6 rounded-lg bg-brand-gradient flex items-center justify-center text-white shadow-xs">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-white"></i>
+                    </div>
+                    <span class="font-extrabold text-sm tracking-tight text-gray-900">FHUSOCOM</span>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden p-1 rounded hover:bg-brand-50 text-brand-primary transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-brand-primary"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-2 space-y-0.5">
+                <div class="px-2 pt-2 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Main</div>
+
+                <a href="index.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="events.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="calendar-check-2" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Events</span>
+                </a>
+
+                <a href="attendance.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg bg-brand-subtle text-brand-primary font-semibold text-xs transition-colors group">
+                    <i data-lucide="qr-code" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Attendance</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="folder-open" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Transparency</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Sanctions</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="hand-coins" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Fees</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="megaphone" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Announcements</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="users" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Members</span>
+                </a>
+
+                <div class="px-2 pt-4 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">System</div>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="user-cog" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Users &amp; Roles</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="scroll-text" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Audit Log</span>
+                </a>
+            </div>
+
+            <div class="p-2 border-t border-gray-100 bg-gray-50/50">
+                <div class="flex items-center gap-2 p-1.5 rounded-lg">
+                    <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                        P
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-gray-900 block truncate">President</span>
+                        <span class="text-[10px] text-gray-500 block truncate" id="roleLabel">Super Admin</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="lg:pl-[180px] flex-1 flex flex-col min-w-0">
+
+            <header class="h-16 bg-white/90 backdrop-blur border-b border-gray-200 px-4 flex items-center justify-between sticky top-0 z-30">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg hover:bg-brand-subtle text-brand-primary transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5 text-brand-primary"></i>
+                    </button>
+                    <span class="text-xs font-medium text-gray-500">FHUSOCOM Admin</span>
+                    <span class="text-gray-300 text-xs">/</span>
+                    <span class="text-xs font-semibold text-gray-900">Attendance</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="relative hidden md:block">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-primary"></i>
+                        <input id="globalSearch" type="text" placeholder="Search records..." class="w-52 lg:w-64 pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                    </div>
+
+                    <div class="relative hidden lg:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-50 border border-gray-200" title="Preview the page as a role (see ROLES-AND-MODULES.md)">
+                        <i data-lucide="eye" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Preview as</span>
+                        <select id="roleSelect" class="text-[11px] font-semibold text-brand-primary bg-transparent focus:outline-none cursor-pointer">
+                            <option value="super-admin">Super Admin</option>
+                            <option value="secretary">Secretary</option>
+                            <option value="treasurer">Treasurer</option>
+                            <option value="discipline">Disc. Officer</option>
+                            <option value="year-rep">Year Rep</option>
+                        </select>
+                    </div>
+
+                    <button class="p-1.5 text-brand-primary hover:bg-brand-subtle rounded-lg transition-colors relative" title="Notifications">
+                        <i data-lucide="bell" class="w-4 h-4 text-brand-primary"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-brand-primary rounded-full"></span>
+                    </button>
+                    <div class="h-4 w-px bg-gray-200"></div>
+                    <div class="flex items-center gap-2 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                            P
+                        </div>
+                        <div class="hidden xl:block leading-tight">
+                            <span class="text-[11px] font-semibold text-gray-900 block">President</span>
+                            <span class="text-[9px] text-gray-400 block" id="headerRoleLabel">Super Admin</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    </div>
+                </div>
+            </header>
+
+            <main class="w-full p-4 lg:p-5 flex flex-col lg:flex-row gap-4 items-start">
+
+                <div class="flex-1 min-w-0 space-y-4">
+
+                    <div class="flex flex-wrap items-end justify-between gap-3 animate-fade-up">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h1 class="text-2xl font-extrabold tracking-tight text-gray-900">Attendance</h1>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-subtle text-brand-primary border border-brand-100">Term 1 · 2025–2026</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Track check-ins per event via QR scan, review records, and correct entries.</p>
+                        </div>
+                        <button data-action="scan" onclick="openScanModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md hover:-translate-y-0.5 transition-all">
+                            <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+                            Scan Attendance
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2.5 shadow-soft animate-fade-up" style="animation-delay: 40ms">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Manage access</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">Scan / View / Correct &middot; Super Admin, Secretary</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-50 text-violet-700 border border-violet-100">Scan scoped + View scoped &middot; Year Rep</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-50 text-gray-500 border border-gray-200">View (evidence only) &middot; Disc. Officer</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-50 text-gray-500 border border-gray-200">No access &middot; Treasurer</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 animate-fade-up" style="animation-delay: 80ms">
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-brand-soft text-brand-primary flex items-center justify-center">
+                                    <i data-lucide="scan-line" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">+18%</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">1,248</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Total Records</div>
+                            <div class="mt-1 text-[10px] text-gray-400">across 7 attended events</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <i data-lucide="badge-check" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">on track</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">94.5<span class="text-base">%</span></div>
+                            <div class="text-[11px] text-gray-500 font-medium">Present Rate</div>
+                            <div class="mt-1.5 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                                <div class="h-full w-[94.5%] rounded-full bg-brand-gradient"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                                    <i data-lucide="timer" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">live</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">312</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Scanned Today</div>
+                            <div class="mt-1 text-[10px] text-gray-400">General Assembly · 09:00–12:00</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
+                                    <i data-lucide="file-warning" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-violet-600 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">needs review</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">7</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Pending Proofs</div>
+                            <div class="mt-1 text-[10px] text-gray-400">absences flagged for proof</div>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft animate-fade-up" style="animation-delay: 120ms">
+                        <div class="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
+                            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100">
+                                <button data-view="event" onclick="setView('event')" id="viewEventBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white text-gray-900 shadow-soft transition-all">
+                                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                                    By Event
+                                </button>
+                                <button data-view="student" onclick="setView('student')" id="viewStudentBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all">
+                                    <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                                    By Student
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-1.5">
+                                <button data-status="all" onclick="setStatusFilter('all')" class="status-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-brand-subtle text-brand-primary border border-brand-100 transition-colors">All</button>
+                                <button data-status="present" onclick="setStatusFilter('present')" class="status-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold text-gray-500 hover:bg-gray-50 border border-transparent transition-colors">Present</button>
+                                <button data-status="late" onclick="setStatusFilter('late')" class="status-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold text-gray-500 hover:bg-gray-50 border border-transparent transition-colors">Late</button>
+                                <button data-status="absent" onclick="setStatusFilter('absent')" class="status-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold text-gray-500 hover:bg-gray-50 border border-transparent transition-colors">Absent</button>
+                            </div>
+                        </div>
+
+                        <div id="eventView" class="p-4">
+                            <div class="overflow-x-auto rounded-xl border border-gray-100">
+                                <table class="w-full text-left border-collapse min-w-[680px]">
+                                    <thead>
+                                        <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                            <th class="px-3 py-2.5">Event</th>
+                                            <th class="px-3 py-2.5">Date</th>
+                                            <th class="px-3 py-2.5 text-right">Present</th>
+                                            <th class="px-3 py-2.5 text-right">Late</th>
+                                            <th class="px-3 py-2.5 text-right">Absent</th>
+                                            <th class="px-3 py-2.5">Rate</th>
+                                            <th class="px-3 py-2.5 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        <tr class="row-hover" data-status="live">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center">
+                                                        <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">General Assembly</span>
+                                                        <span class="block text-[10px] text-gray-400">Scan open &middot; Gymnasium</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Aug 12</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-emerald-600">298</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-amber-600">14</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-red-500">98</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span>
+                                                    76%
+                                                </span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button onclick="openScanModal()" data-action="scan" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="Scan"><i data-lucide="qr-code" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="view" onclick="openEventDrawer('General Assembly')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover" data-status="past">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-8 h-8 rounded-lg bg-brand-soft text-brand-primary flex items-center justify-center">
+                                                        <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">Council Orientation</span>
+                                                        <span class="block text-[10px] text-gray-400">Gymnasium</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Aug 05</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-emerald-600">382</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-amber-600">9</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-red-500">19</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="inline-flex items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">95%</span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="view" onclick="openEventDrawer('Council Orientation')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover" data-status="past">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center">
+                                                        <i data-lucide="trophy" class="w-3.5 h-3.5"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">Intramurals Opening</span>
+                                                        <span class="block text-[10px] text-gray-400">Field</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Aug 18</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-emerald-600">355</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-amber-600">21</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-red-500">34</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="inline-flex items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">92%</span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="view" onclick="openEventDrawer('Intramurals Opening')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover" data-status="past">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+                                                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">Foundation Day</span>
+                                                        <span class="block text-[10px] text-gray-400">Main Quad</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Jul 27</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-emerald-600">288</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-amber-600">12</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-red-500">30</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="inline-flex items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">91%</span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="view" onclick="openEventDrawer('Foundation Day')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover" data-status="past">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center">
+                                                        <i data-lucide="flag" class="w-3.5 h-3.5"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">Leadership Summit</span>
+                                                        <span class="block text-[10px] text-gray-400">AVR 1</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Jul 09</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-emerald-600">203</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-amber-600">7</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-red-500">19</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="inline-flex items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">92%</span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="view" onclick="openEventDrawer('Leadership Summit')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="eventEmpty" class="hidden flex-col items-center justify-center py-10 text-center">
+                                <div class="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center">
+                                    <i data-lucide="qr-code" class="w-5 h-5 text-gray-300"></i>
+                                </div>
+                                <p class="mt-2 text-sm font-semibold text-gray-700">No records found</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5">Try a different status filter.</p>
+                            </div>
+                        </div>
+
+                        <div id="studentView" class="hidden p-4">
+                            <div class="overflow-x-auto rounded-xl border border-gray-100">
+                                <table class="w-full text-left border-collapse min-w-[680px]">
+                                    <thead>
+                                        <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                            <th class="px-3 py-2.5">Student</th>
+                                            <th class="px-3 py-2.5">Section</th>
+                                            <th class="px-3 py-2.5">Student No.</th>
+                                            <th class="px-3 py-2.5 text-right">Present</th>
+                                            <th class="px-3 py-2.5 text-right">Late</th>
+                                            <th class="px-3 py-2.5 text-right">Absent</th>
+                                            <th class="px-3 py-2.5">Rate</th>
+                                            <th class="px-3 py-2.5 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        <tr class="row-hover">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-[10px] font-bold">JM</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">Juan M. Dela Cruz</span>
+                                                        <span class="block text-[10px] text-gray-400">Year 3</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSIT-3A</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">2023-11234</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-emerald-600">5</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-amber-600">1</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-red-500">0</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="inline-flex items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">100%</span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button onclick="openStudentDrawer('Juan M. Dela Cruz')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-violet-500 text-white flex items-center justify-center text-[10px] font-bold">MR</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">Maria R. Santos</span>
+                                                        <span class="block text-[10px] text-gray-400">Year 2</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSA-2C</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">2024-09871</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-emerald-600">4</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-amber-600">0</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-red-500">1</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="inline-flex items-center text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 rounded-full px-1.5 py-0.5">80%</span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button onclick="openStudentDrawer('Maria R. Santos')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold">CP</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">Carlos P. Aquino</span>
+                                                        <span class="block text-[10px] text-gray-400">Year 1</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSCE-1A</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">2025-03456</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-emerald-600">3</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-amber-600">2</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-red-500">0</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="inline-flex items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">100%</span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button onclick="openStudentDrawer('Carlos P. Aquino')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">LT</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">Liza T. Bautista</span>
+                                                        <span class="block text-[10px] text-gray-400">Year 4</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSBA-4B</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">2022-07643</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-emerald-600">2</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-amber-600">0</td>
+                                            <td class="px-3 py-2.5 text-right text-[11px] font-bold text-red-500">2</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="inline-flex items-center text-[10px] font-bold text-red-500 bg-red-50 border border-red-100 rounded-full px-1.5 py-0.5">50%</span>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button onclick="openStudentDrawer('Liza T. Bautista')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between px-4 pb-4 text-xs text-gray-500">
+                            <span>Showing <span id="visibleCount">5</span> records</span>
+                            <div class="flex items-center gap-1">
+                                <button class="p-1 rounded-lg text-gray-300 cursor-not-allowed"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+                                <span class="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-brand-subtle text-brand-primary">1</span>
+                                <button class="p-1 rounded-lg text-brand-primary hover:bg-brand-subtle transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-1 animate-fade-up" style="animation-delay: 160ms">
+                        <p class="text-[11px] text-gray-500 leading-relaxed">
+                            Permission model per <span class="font-semibold text-gray-600">ROLES-AND-MODULES.md §2</span> — Attendance: scan &amp; view &amp; correct = Super Admin and Secretary;
+                            Year Reps scan and view within their <span class="font-semibold text-gray-600">assigned scope</span> only;
+                            Disc. Officer has view access (faculty-wide) strictly to inspect evidence behind sanction flags;
+                            Treasurer has no attendance surface.
+                        </p>
+                    </div>
+
+                </div>
+
+                <aside class="w-full lg:w-80 shrink-0 space-y-4 lg:sticky lg:top-20">
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft p-4 animate-fade-up" style="animation-delay: 100ms">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                <i data-lucide="scan-line" class="w-4 h-4 text-brand-primary"></i>
+                                Today's Scan
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">live</span>
+                        </div>
+                        <div class="rounded-xl border border-amber-100 bg-amber-50/60 p-3">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="block text-[11px] font-bold text-gray-900">General Assembly</span>
+                                    <span class="block text-[10px] text-gray-400">09:00 – 12:00 &middot; Gymnasium</span>
+                                </div>
+                                <span class="inline-flex items-center gap-1 text-[8px] font-bold text-emerald-600 whitespace-nowrap">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot"></span>LIVE
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-end justify-between">
+                            <div>
+                                <span class="text-3xl font-extrabold text-gray-900 tracking-tight">312<span class="text-base">/410</span></span>
+                                <span class="text-[11px] text-gray-500 font-medium block mt-0.5">checked in</span>
+                            </div>
+                            <span class="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">76%</span>
+                        </div>
+                        <div class="mt-3 h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+                            <div class="h-full w-[76%] rounded-full bg-brand-gradient"></div>
+                        </div>
+                        <div class="mt-3 grid grid-cols-2 gap-2 pt-3 border-t border-gray-100">
+                            <div class="text-center">
+                                <div class="text-base font-extrabold text-emerald-600">298</div>
+                                <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Present</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-base font-extrabold text-amber-600">14</div>
+                                <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Late</div>
+                            </div>
+                        </div>
+                        <button data-action="scan" onclick="openScanModal()" class="mt-3 w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">
+                            <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+                            Scan Attendance
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft p-4 animate-fade-up" style="animation-delay: 140ms">
+                        <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
+                            <i data-lucide="trending-up" class="w-4 h-4 text-brand-primary"></i>
+                            This Term
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="rounded-xl bg-gray-50 border border-gray-100 p-2.5">
+                                <div class="text-lg font-extrabold text-gray-900">6,410</div>
+                                <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Expected</div>
+                            </div>
+                            <div class="rounded-xl bg-gray-50 border border-gray-100 p-2.5">
+                                <div class="text-lg font-extrabold text-gray-900">6,057</div>
+                                <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Attended</div>
+                            </div>
+                            <div class="rounded-xl bg-gray-50 border border-gray-100 p-2.5">
+                                <div class="text-lg font-extrabold text-amber-600">353</div>
+                                <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Absences</div>
+                            </div>
+                            <div class="rounded-xl bg-gray-50 border border-gray-100 p-2.5">
+                                <div class="text-lg font-extrabold text-emerald-600">7</div>
+                                <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Events</div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <div class="flex items-center justify-between text-[10px] text-gray-400 mb-1">
+                                <span>Term average</span>
+                                <span class="font-bold text-gray-600">94.5%</span>
+                            </div>
+                            <div class="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                                <div class="h-full w-[94.5%] rounded-full bg-brand-gradient"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft p-4 animate-fade-up" style="animation-delay: 180ms">
+                        <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
+                            <i data-lucide="zap" class="w-4 h-4 text-brand-primary"></i>
+                            Quick Actions
+                        </h3>
+                        <div class="space-y-2">
+                            <button data-action="scan" onclick="openScanModal()" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">
+                                <i data-lucide="qr-code" class="w-3.5 h-3.5"></i>
+                                Scan Attendance
+                            </button>
+                            <button data-action="correct" onclick="openCorrectModal()" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-colors">
+                                <i data-lucide="pencil-line" class="w-3.5 h-3.5"></i>
+                                Correct Record
+                            </button>
+                            <button data-action="export" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                                Export Report
+                            </button>
+                        </div>
+                    </div>
+
+                </aside>
+            </main>
+        </div>
+    </div>
+
+    <div id="scanModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeScanModal()"></div>
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 mx-auto w-[calc(100%-2rem)] max-w-sm bg-white rounded-2xl border border-gray-200 shadow-lift animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-brand-soft text-brand-primary flex items-center justify-center">
+                        <i data-lucide="qr-code" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Scan Attendance</h3>
+                        <p class="text-[10px] text-gray-400">Point the camera at a student QR</p>
+                    </div>
+                </div>
+                <button onclick="closeScanModal()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <div class="rounded-2xl border-2 border-dashed border-brand-200 bg-brand-subtle/50 h-40 flex flex-col items-center justify-center text-center">
+                    <i data-lucide="scan-line" class="w-8 h-8 text-brand-primary"></i>
+                    <p class="mt-2 text-[11px] font-bold text-brand-primary">Camera feed</p>
+                    <p class="text-[10px] text-gray-400">Waiting for QR code…</p>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Event</label>
+                    <select class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                        <option>General Assembly (live)</option>
+                        <option>Student Council Orientation</option>
+                        <option>Intramurals Opening</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Event passcode</label>
+                    <input type="password" placeholder="6-digit code from the event" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeScanModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button class="px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">Start Scanning</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="correctModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeCorrectModal()"></div>
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 mx-auto w-[calc(100%-2rem)] max-w-md bg-white rounded-2xl border border-gray-200 shadow-lift animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="pencil-line" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Correct Record</h3>
+                        <p class="text-[10px] text-gray-400">Fix a mistaken check-in or status</p>
+                    </div>
+                </div>
+                <button onclick="closeCorrectModal()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Student</label>
+                    <input type="text" placeholder="Search by name or student no." class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Event</label>
+                    <select class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                        <option>General Assembly</option>
+                        <option>Council Orientation</option>
+                        <option>Intramurals Opening</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Status</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button class="px-2 py-2 text-[11px] font-bold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">Present</button>
+                        <button class="px-2 py-2 text-[11px] font-bold rounded-lg bg-gray-50 text-gray-500 border border-gray-200">Late</button>
+                        <button class="px-2 py-2 text-[11px] font-bold rounded-lg bg-gray-50 text-gray-500 border border-gray-200">Absent</button>
+                    </div>
+                </div>
+                <p class="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2">
+                    <i data-lucide="info" class="w-3 h-3 inline"></i>
+                    Corrections are audit-logged. Only Super Admin and Secretary can edit records.
+                </p>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeCorrectModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button class="px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">Save Correction</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="eventDrawer" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeDrawer()"></div>
+        <div class="absolute top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-lift flex flex-col animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-brand-soft text-brand-primary flex items-center justify-center">
+                        <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Event Records</h3>
+                        <p class="text-[10px] text-gray-400" id="drawerEventName">General Assembly</p>
+                    </div>
+                </div>
+                <button onclick="closeDrawer()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
+                        <div class="text-lg font-extrabold text-emerald-600">298</div>
+                        <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Present</div>
+                    </div>
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
+                        <div class="text-lg font-extrabold text-amber-600">14</div>
+                        <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Late</div>
+                    </div>
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
+                        <div class="text-lg font-extrabold text-red-500">98</div>
+                        <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Absent</div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-gray-400 mb-1">
+                    <span>Present rate</span>
+                    <span class="font-bold text-gray-600">76%</span>
+                </div>
+                <div class="h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                    <div class="h-full w-[76%] rounded-full bg-brand-gradient"></div>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-gray-100">
+                    <table class="w-full text-left border-collapse min-w-[360px]">
+                        <thead>
+                            <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                <th class="px-3 py-2">Student</th>
+                                <th class="px-3 py-2">Section</th>
+                                <th class="px-3 py-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Juan M. Dela Cruz</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">BSIT-3A</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">Present</span></td>
+                            </tr>
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Maria R. Santos</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">BSA-2C</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 rounded-full px-1.5 py-0.5">Late</span></td>
+                            </tr>
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Carlos P. Aquino</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">BSCE-1A</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">Present</span></td>
+                            </tr>
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Liza T. Bautista</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">BSBA-4B</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-red-500 bg-red-50 border border-red-100 rounded-full px-1.5 py-0.5">Absent</span></td>
+                            </tr>
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Pedro G. Reyes</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">BSIT-3A</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">Present</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeDrawer()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Close</button>
+                <button data-action="scan" onclick="openScanModal(); closeDrawer();" class="px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">Scan More</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="studentDrawer" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeDrawer()"></div>
+        <div class="absolute top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-lift flex flex-col animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-bold" id="studentDrawerAvatar">JM</div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900" id="studentDrawerName">Juan M. Dela Cruz</h3>
+                        <p class="text-[10px] text-gray-400" id="studentDrawerMeta">BSIT-3A &middot; 2023-11234</p>
+                    </div>
+                </div>
+                <button onclick="closeDrawer()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
+                        <div class="text-lg font-extrabold text-emerald-600">5</div>
+                        <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Present</div>
+                    </div>
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
+                        <div class="text-lg font-extrabold text-amber-600">1</div>
+                        <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Late</div>
+                    </div>
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
+                        <div class="text-lg font-extrabold text-red-500">0</div>
+                        <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Absent</div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-gray-100">
+                    <table class="w-full text-left border-collapse min-w-[300px]">
+                        <thead>
+                            <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                <th class="px-3 py-2">Event</th>
+                                <th class="px-3 py-2">Date</th>
+                                <th class="px-3 py-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">General Assembly</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">Aug 12</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">Present</span></td>
+                            </tr>
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Council Orientation</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">Aug 05</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">Present</span></td>
+                            </tr>
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Intramurals Opening</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">Aug 18</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 rounded-full px-1.5 py-0.5">Late</span></td>
+                            </tr>
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Foundation Day</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">Jul 27</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-1.5 py-0.5">Present</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeDrawer()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        const ROLE_PERMS = {
+            'super-admin': { scan: true, correct: true, view: true, label: 'Super Admin' },
+            'secretary':   { scan: true, correct: true, view: true, label: 'Secretary' },
+            'treasurer':   { scan: false, correct: false, view: false, label: 'Treasurer' },
+            'discipline':  { scan: false, correct: false, view: true, label: 'Disc. Officer' },
+            'year-rep':    { scan: true, correct: false, view: true, label: 'Year Rep' },
+        };
+
+        function applyRole(role) {
+            const perms = ROLE_PERMS[role] || ROLE_PERMS['super-admin'];
+            document.documentElement.dataset.role = role;
+            document.getElementById('roleLabel').textContent = perms.label;
+            document.getElementById('headerRoleLabel').textContent = perms.label;
+
+            document.querySelectorAll('[data-action="scan"]').forEach(el => el.classList.toggle('hidden', !perms.scan));
+            document.querySelectorAll('[data-action="correct"]').forEach(el => el.classList.toggle('hidden', !perms.correct));
+            document.querySelectorAll('[data-action="view"]').forEach(el => el.classList.toggle('hidden', !perms.view));
+        }
+
+        document.getElementById('roleSelect').addEventListener('change', (e) => applyRole(e.target.value));
+        applyRole('super-admin');
+
+        function setView(view) {
+            const eventView = document.getElementById('eventView');
+            const studentView = document.getElementById('studentView');
+            const evBtn = document.getElementById('viewEventBtn');
+            const stBtn = document.getElementById('viewStudentBtn');
+            const on = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white text-gray-900 shadow-soft transition-all';
+            const off = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all';
+            if (view === 'event') {
+                eventView.classList.remove('hidden');
+                studentView.classList.add('hidden');
+                evBtn.className = on;
+                stBtn.className = off;
+                lucide.createIcons();
+            } else {
+                studentView.classList.remove('hidden');
+                eventView.classList.add('hidden');
+                stBtn.className = on;
+                evBtn.className = off;
+                lucide.createIcons();
+            }
+        }
+
+        let activeStatus = 'all';
+
+        function setStatusFilter(status) {
+            activeStatus = status;
+            document.querySelectorAll('.status-chip').forEach(chip => {
+                const on = chip.dataset.status === status;
+                chip.className = 'status-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-colors ' +
+                    (on ? 'bg-brand-subtle text-brand-primary border border-brand-100' : 'text-gray-500 hover:bg-gray-50 border border-transparent');
+            });
+            applyStatusFilter();
+        }
+
+        function applyStatusFilter() {
+            const rows = document.querySelectorAll('#eventView tbody tr');
+            let visible = 0;
+            rows.forEach(row => {
+                const status = row.dataset.status;
+                const show = activeStatus === 'all' || status === activeStatus;
+                row.classList.toggle('hidden', !show);
+                if (show) visible++;
+            });
+            document.getElementById('visibleCount').textContent = visible;
+            document.getElementById('eventEmpty').classList.toggle('hidden', visible !== 0);
+        }
+
+        function openScanModal() {
+            document.getElementById('scanModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeScanModal() {
+            document.getElementById('scanModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openCorrectModal() {
+            document.getElementById('correctModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCorrectModal() {
+            document.getElementById('correctModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openEventDrawer(name) {
+            document.getElementById('drawerEventName').textContent = name;
+            document.getElementById('eventDrawer').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openStudentDrawer(name) {
+            document.getElementById('studentDrawerName').textContent = name;
+            document.getElementById('studentDrawerMeta').textContent = 'BSIT-3A · 2023-11234';
+            document.getElementById('studentDrawerAvatar').textContent = name.split(' ').map(p => p[0]).slice(0, 2).join('');
+            document.getElementById('studentDrawer').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            document.getElementById('eventDrawer').classList.add('hidden');
+            document.getElementById('studentDrawer').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('globalSearch').addEventListener('input', (e) => {
+            const q = e.target.value.trim().toLowerCase();
+            document.querySelectorAll('#eventView tbody tr, #studentView tbody tr').forEach(row => {
+                const hay = (row.textContent || '').toLowerCase();
+                row.classList.toggle('hidden', q && !hay.includes(q));
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDrawer();
+                closeScanModal();
+                closeCorrectModal();
+            }
+        });
+    </script>
+</body>
+</html>

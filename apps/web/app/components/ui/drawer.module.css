@@ -26,6 +26,10 @@
   transition: transform 0.3s ease;
 }
 
+.panelWide {
+  max-width: 50vw;
+}
+
 .panelOpen {
   transform: translateX(0);
 }

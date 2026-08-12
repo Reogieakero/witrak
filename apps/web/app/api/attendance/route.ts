@@ -13,7 +13,14 @@ export async function GET() {
     const records = await prisma.attendance.findMany({
       where: { student: studentInScope(access) },
       include: {
-        student: { select: { firstName: true, lastName: true, studentNo: true } },
+        student: {
+          select: {
+            firstName: true,
+            lastName: true,
+            studentNo: true,
+            section: { select: { name: true } },
+          },
+        },
         event: { select: { title: true, startsAt: true } },
       },
       orderBy: { scannedAt: "desc" },

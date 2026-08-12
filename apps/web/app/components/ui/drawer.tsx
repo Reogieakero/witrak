@@ -10,20 +10,35 @@ type DrawerProps = {
   onClose: () => void;
   title?: React.ReactNode;
   footer?: React.ReactNode;
+  wide?: boolean;
   children: React.ReactNode;
 };
 
-export function Drawer({ open, onClose, title, footer, children }: DrawerProps) {
+export function Drawer({
+  open,
+  onClose,
+  title,
+  footer,
+  wide,
+  children,
+}: DrawerProps) {
   const [mounted, setMounted] = useState(open);
   const [visible, setVisible] = useState(open);
+  const [prevOpen, setPrevOpen] = useState(open);
+
+  if (prevOpen !== open) {
+    setPrevOpen(open);
+    if (!open) setVisible(false);
+  }
 
   useEffect(() => {
     if (open) {
-      setMounted(true);
-      const raf = requestAnimationFrame(() => setVisible(true));
+      const raf = requestAnimationFrame(() => {
+        setMounted(true);
+        setVisible(true);
+      });
       return () => cancelAnimationFrame(raf);
     }
-    setVisible(false);
     const t = setTimeout(() => setMounted(false), 300);
     return () => clearTimeout(t);
   }, [open]);
@@ -52,7 +67,9 @@ export function Drawer({ open, onClose, title, footer, children }: DrawerProps) 
       aria-hidden={!visible}
     >
       <div
-        className={`${styles.panel}${visible ? ` ${styles.panelOpen}` : ""}`}
+        className={`${styles.panel}${visible ? ` ${styles.panelOpen}` : ""}${
+          wide ? ` ${styles.panelWide}` : ""
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className={styles.header}>

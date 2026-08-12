@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TriangleAlert } from "lucide-react";
 import { Modal } from "./modal";
 import { Button } from "./button";
@@ -28,10 +28,11 @@ export function ConfirmationModal({
   onClose,
 }: ConfirmationModalProps) {
   const [typed, setTyped] = useState("");
-
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (prevOpen !== open) {
+    setPrevOpen(open);
     if (open) setTyped("");
-  }, [open]);
+  }
 
   const matches = typed.trim() === confirmToken;
 
