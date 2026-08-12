@@ -3,6 +3,7 @@
 import { getSession, signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { sileo } from "sileo";
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import styles from "./officers.module.css";
@@ -28,18 +29,20 @@ export function OfficerLoginForm() {
 
     if (result?.error) {
       setPending(false);
-      setError(
-        "We couldn't find an account with those details. Please check and try again.",
-      );
+      const message =
+        "We couldn't find an account with those details. Please check and try again.";
+      setError(message);
+      sileo.error({ title: "Sign in failed", description: message });
       return;
     }
 
     const session = await getSession();
     if ((session?.access?.permissions?.length ?? 0) === 0) {
       setPending(false);
-      setError(
-        "This portal is for officers only. Use the student sign in instead.",
-      );
+      const message =
+        "This portal is for officers only. Use the student sign in instead.";
+      setError(message);
+      sileo.warning({ title: "Officer access required", description: message });
       return;
     }
 

@@ -1,55 +1,139 @@
 "use client";
 
-import { useEffect, useActionState, useRef } from "react";
-import { CalendarPlus, MapPin } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { sileo } from "sileo";
+import { AlertTriangle, CalendarCheck, CalendarPlus, KeyRound, Loader2, MapPin } from "lucide-react";
 import type { EventItem, EventsAccess } from "./types";
 import { saveEvent } from "@/app/admin/events/actions";
-import { Modal } from "@/app/components/ui/modal";
+import { Drawer } from "@/app/components/ui/drawer";
+import { ModalActions } from "@/app/components/ui/modal-actions";
+import { Button } from "@/app/components/ui/button";
+import { DatePicker } from "@/app/components/ui/date-picker";
+import { TimePicker } from "@/app/components/ui/time-picker";
+import { Select } from "@/app/components/ui/select";
 import styles from "./event-modal.module.css";
 
 export type EventModalProps = {
   mode: "create" | "edit";
   event?: EventItem;
   access: EventsAccess;
+  programs: { id: string; code: string; name: string }[];
   onClose: () => void;
 };
 
-export function EventModal({ mode, event, access, onClose }: EventModalProps) {
-  const [state, formAction, pending] = useActionState(saveEvent, { ok: true });
-  const submittedRef = useRef(false);
+export function EventModal({
+  mode,
+  event,
+  access,
+  programs,
+  onClose,
+}: EventModalProps) {
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const descRef = useRef<HTMLTextAreaElement>(null);
 
   const isEdit = mode === "edit";
+  const [requiresAttendance, setRequiresAttendance] = useState(
+    event?.requiresAttendance ?? false,
+  );
+  const [scanPassword, setScanPassword] = useState(event?.scanPassword ?? "");
 
   useEffect(() => {
-    if (submittedRef.current && state.ok && !pending) {
-      submittedRef.current = false;
-      onClose();
-    }
-    if (state.ok === false) submittedRef.current = false;
-  }, [state, pending, onClose]);
+    const el = descRef.current;
+    if (!el) return;
+    const resize = () => {
+      el.style.height = "auto";
+      el.style.height = `${el.scrollHeight}px`;
+    };
+    el.addEventListener("input", resize);
+    resize();
+    return () => el.removeEventListener("input", resize);
+  }, []);
 
   const action = (formData: FormData) => {
-    submittedRef.current = true;
-    formAction(formData);
+    setPending(true);
+    setError(null);
+    void sileo
+      .promise(
+        async () => {
+          const result = await saveEvent({ ok: true }, formData);
+          if (!result.ok) throw new Error(result.error ?? "Something went wrong.");
+          return result;
+        },
+        {
+          loading: {
+            title: isEdit ? "Saving changes" : "Creating event",
+            description: isEdit
+              ? "Updating your event…"
+              : "Scheduling your event…",
+            icon: <Loader2 />,
+          },
+          success: () => {
+            onClose();
+            return {
+              title: isEdit ? "Event updated" : "Event created",
+              description: event?.title ?? "Your event was saved successfully.",
+              icon: <CalendarCheck />,
+            };
+          },
+          error: (err) => ({
+            title: "Couldn't save event",
+            description:
+              err instanceof Error ? err.message : "Please check and try again.",
+            icon: <AlertTriangle />,
+          }),
+        },
+      )
+      .then((result) => {
+        if (!result.ok) setError(result.error ?? "Something went wrong.");
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : "Something went wrong.");
+      })
+      .finally(() => {
+        setPending(false);
+      });
+  };
+
+  const generatePasscode = () => {
+    setScanPassword(
+      Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join(""),
+    );
   };
 
   return (
-    <Modal open onClose={onClose}>
-      <div className={styles.head}>
-        <div className={styles.headIcon}>
-          <CalendarPlus size={16} />
-        </div>
-        <div>
-          <h3 className={styles.title}>{isEdit ? "Edit Event" : "New Event"}</h3>
-          <p className={styles.subtitle}>
-            {isEdit
-              ? "Update this scheduled activity"
-              : "Schedule a faculty-wide activity"}
-          </p>
-        </div>
-      </div>
-
-      <form action={action} className={styles.form}>
+    <Drawer
+      open
+      onClose={onClose}
+      title={
+        <>
+          <span className={styles.headIcon}>
+            <CalendarPlus size={16} />
+          </span>
+          <span>
+            <span className={styles.titleLine}>
+              {isEdit ? "Edit Event" : "New Event"}
+            </span>
+            <span className={styles.subtitle}>
+              {isEdit
+                ? "Update this scheduled activity"
+                : "Schedule a faculty-wide activity"}
+            </span>
+          </span>
+        </>
+      }
+      footer={
+        <ModalActions
+          onCancel={onClose}
+          cancelLabel="Cancel"
+          confirmType="submit"
+          confirmForm="event-form"
+          confirmLabel={pending ? "Saving..." : "Save Event"}
+          disabled={pending}
+        />
+      }
+    >
+      <form id="event-form" action={action} className={styles.form}>
         <input type="hidden" name="id" value={event?.id ?? ""} />
 
         <div className={styles.field}>
@@ -70,6 +154,7 @@ export function EventModal({ mode, event, access, onClose }: EventModalProps) {
           <label className={styles.label}>Description</label>
           <textarea
             name="description"
+            ref={descRef}
             defaultValue={event?.description ?? ""}
             rows={2}
             placeholder="Optional details for attendees..."
@@ -80,27 +165,24 @@ export function EventModal({ mode, event, access, onClose }: EventModalProps) {
         <div className={styles.fieldGrid}>
           <div className={styles.field}>
             <label className={styles.label}>
-              Starts at <span className={styles.required}>*</span>
+              Event date <span className={styles.required}>*</span>
             </label>
-            <input
-              type="datetime-local"
-              name="startsAt"
-              defaultValue={toInputValue(event?.startsAt)}
-              className={styles.input}
-              required
-            />
+            <DatePicker name="eventDate" value={event?.startsAt} />
+          </div>
+        </div>
+
+        <div className={styles.fieldGrid}>
+          <div className={styles.field}>
+            <label className={styles.label}>
+              Start time <span className={styles.required}>*</span>
+            </label>
+            <TimePicker name="startTime" value={event?.startsAt} />
           </div>
           <div className={styles.field}>
             <label className={styles.label}>
-              Ends at <span className={styles.required}>*</span>
+              End time <span className={styles.required}>*</span>
             </label>
-            <input
-              type="datetime-local"
-              name="endsAt"
-              defaultValue={toInputValue(event?.endsAt)}
-              className={styles.input}
-              required
-            />
+            <TimePicker name="endTime" value={event?.endsAt} />
           </div>
         </div>
 
@@ -118,14 +200,67 @@ export function EventModal({ mode, event, access, onClose }: EventModalProps) {
           </div>
         </div>
 
+        <div className={styles.field}>
+          <label className={styles.label}>Target audience</label>
+          <Select
+            name="programId"
+            value={event?.programId ?? ""}
+            placeholder="All (faculty-wide)"
+            options={[
+              { value: "", label: "All (faculty-wide)" },
+              ...programs.map((p) => ({
+                value: p.id,
+                label: `${p.code} — ${p.name}`,
+              })),
+            ]}
+          />
+          <p className={styles.hint}>
+            Choose a specific program or keep it faculty-wide.
+          </p>
+        </div>
+
         <label className={styles.check}>
           <input
             type="checkbox"
             name="requiresAttendance"
-            defaultChecked={event?.requiresAttendance ?? false}
+            checked={requiresAttendance}
+            onChange={(e) => setRequiresAttendance(e.target.checked)}
           />
           <span>Requires attendance (QR scan enabled)</span>
         </label>
+
+        {requiresAttendance && (
+          <div className={styles.field}>
+            <label className={styles.label}>
+              Event password <span className={styles.required}>*</span>
+            </label>
+            <div className={styles.inputWrap}>
+              <KeyRound size={14} />
+              <input
+                type="text"
+                name="scanPassword"
+                value={scanPassword}
+                onChange={(e) => setScanPassword(e.target.value)}
+                placeholder="e.g. 6-digit code for the scanner"
+                className={styles.inputIcon}
+                required
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className={styles.genBtn}
+                onClick={generatePasscode}
+              >
+                Generate
+              </Button>
+            </div>
+            <p className={styles.hint}>
+              Officers must enter this on the mobile scanner to unlock
+              attendance for this event.
+            </p>
+          </div>
+        )}
 
         {isEdit && access.yearRep && (
           <p className={styles.note}>
@@ -133,29 +268,8 @@ export function EventModal({ mode, event, access, onClose }: EventModalProps) {
           </p>
         )}
 
-        {state.ok === false && state.error && (
-          <p className={styles.error}>{state.error}</p>
-        )}
-
-        <div className={styles.foot}>
-          <button type="button" className={styles.cancel} onClick={onClose}>
-            Cancel
-          </button>
-          <button type="submit" className={styles.save} disabled={pending}>
-            {pending ? "Saving..." : "Save Event"}
-          </button>
-        </div>
+        {error && <p className={styles.error}>{error}</p>}
       </form>
-    </Modal>
+    </Drawer>
   );
-}
-
-function toInputValue(iso?: string): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours(),
-  )}:${pad(d.getMinutes())}`;
 }

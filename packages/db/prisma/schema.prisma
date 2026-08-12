@@ -101,6 +101,7 @@ model Program {
   sections      Section[]
   userRoles     UserRole[]
   sanctionRules SanctionRule[]
+  events        Event[]
 }
 
 model YearLevel {
@@ -243,6 +244,10 @@ model Event {
   endsAt             DateTime
   location           String?
   requiresAttendance Boolean      @default(false)
+  scanPassword       String?
+  programId          String?
+  program            Program?     @relation(fields: [programId], references: [id])
+  createdAt          DateTime     @default(now())
   createdById        String
   createdBy          User         @relation("EventCreatedBy", fields: [createdById], references: [id])
   attendances        Attendance[]
@@ -255,6 +260,8 @@ model Attendance {
   status            AttendanceStatus @default(PRESENT)
   scannedById       String?
   scannedAt         DateTime         @default(now())
+  checkedInAt       DateTime?
+  checkedOutAt      DateTime?
   event             Event            @relation(fields: [eventId], references: [id])
   student           Student          @relation(fields: [studentId], references: [id])
   scannedBy         User?            @relation("AttendanceScannedBy", fields: [scannedById], references: [id])

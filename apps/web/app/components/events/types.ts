@@ -6,6 +6,9 @@ export type EventItem = {
   description: string | null;
   location: string | null;
   requiresAttendance: boolean;
+  scanPassword: string | null;
+  programId: string | null;
+  programName: string | null;
   createdByName: string;
   startsAt: string;
   endsAt: string;

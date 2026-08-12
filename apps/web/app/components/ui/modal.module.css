@@ -12,11 +12,17 @@
 .dialog {
   width: 100%;
   max-width: 38rem;
-  max-height: 85vh;
-  overflow-y: auto;
+  max-height: 88vh;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   background: var(--surface-card);
   border-radius: 12px;
   box-shadow: 0 20px 40px rgba(16, 24, 40, 0.2);
+}
+
+.dialog::-webkit-scrollbar {
+  display: none;
 }
 
 .header {
@@ -36,28 +42,34 @@
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-strong);
-}
-
-.close {
-  flex: none;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border: 1px solid var(--border-default);
-  border-radius: 8px;
-  background: var(--surface-card);
-  color: var(--text-subtle);
-  cursor: pointer;
-  transition: all 0.15s ease;
+  gap: 0.625rem;
 }
 
-.close:hover {
-  border-color: #93c5fd;
-  color: #2563eb;
+.title h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+}
+
+.title p {
+  margin: 0.125rem 0 0;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--text-faint);
 }
 
 .body {
   padding: 1.25rem;
+}
+
+.footer {
+  position: sticky;
+  bottom: 0;
+  padding: 0.875rem 1.25rem;
+  background: var(--surface-card);
+  border-top: 1px solid var(--border-subtle);
 }

@@ -1,4 +1,4 @@
-import { CalendarClock, Download, Gauge, QrCode, Zap } from "lucide-react";
+import { CalendarClock, CalendarX2, Download, Gauge, QrCode, Zap } from "lucide-react";
 import type { EventItem, EventsAccess, EventsStats } from "./types";
 import { Badge } from "@/app/components/ui/badge";
 import styles from "./event-sidebar.module.css";
@@ -11,6 +11,8 @@ export type EventSidebarProps = {
 };
 
 export function EventSidebar({ items, stats, access, onCreate }: EventSidebarProps) {
+  const hasLive = items.some((e) => e.status === "live");
+
   const upcoming = items
     .filter((e) => e.status !== "past")
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
@@ -18,17 +20,23 @@ export function EventSidebar({ items, stats, access, onCreate }: EventSidebarPro
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.card}>
+      <div
+        className={styles.card}
+        data-live={hasLive || undefined}
+      >
         <div className={styles.cardHead}>
           <h3 className={styles.cardTitle}>
-            <CalendarClock size={16} />
-            Upcoming
+            {hasLive ? <Zap size={16} /> : <CalendarClock size={16} />}
+            {hasLive ? "Live Event" : "Upcoming"}
           </h3>
-          <Badge tone="brand">{upcoming.length}</Badge>
+          <Badge tone={hasLive ? "amber" : "brand"}>{upcoming.length}</Badge>
         </div>
         <div className={styles.upcoming}>
           {upcoming.length === 0 && (
-            <p className={styles.empty}>No upcoming events scheduled.</p>
+            <div className={styles.empty}>
+              <CalendarX2 size={20} />
+              <span>No upcoming events scheduled.</span>
+            </div>
           )}
           {upcoming.map((e) => (
             <div
@@ -62,17 +70,45 @@ export function EventSidebar({ items, stats, access, onCreate }: EventSidebarPro
           Attendance Snapshot
         </h3>
         <div className={styles.snapshotHead}>
-          <div>
+          <Badge tone="green">on track</Badge>
+        </div>
+        <div className={styles.gauge}>
+          <svg
+            className={styles.gaugeSvg}
+            viewBox="0 0 200 110"
+            role="img"
+            aria-label={`Overall attendance rate ${stats.avgRate} percent`}
+          >
+            <defs>
+              <linearGradient id="attRateGradient" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#2563eb" />
+                <stop offset="100%" stopColor="#22c55e" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 25 105 A 75 75 0 0 1 175 105"
+              fill="none"
+              stroke="var(--surface-muted)"
+              strokeWidth="14"
+              strokeLinecap="round"
+            />
+            <path
+              d="M 25 105 A 75 75 0 0 1 175 105"
+              fill="none"
+              stroke="url(#attRateGradient)"
+              strokeWidth="14"
+              strokeLinecap="round"
+              strokeDasharray="235.62"
+              strokeDashoffset={235.62 * (1 - stats.avgRate / 100)}
+            />
+          </svg>
+          <div className={styles.gaugeCenter}>
             <span className={styles.snapshotValue}>
               {stats.avgRate}
               <span className={styles.snapshotSuffix}>%</span>
             </span>
             <span className={styles.snapshotLabel}>overall present rate</span>
           </div>
-          <Badge tone="green">on track</Badge>
-        </div>
-        <div className={styles.snapshotBar}>
-          <span style={{ width: `${stats.avgRate}%` }} />
         </div>
         <div className={styles.snapshotMeta}>
           <span>Target 95%</span>
@@ -105,17 +141,33 @@ export function EventSidebar({ items, stats, access, onCreate }: EventSidebarPro
         </h3>
         <div className={styles.actions}>
           {access.create && onCreate && (
-            <button type="button" className={styles.primary} onClick={onCreate}>
-              New Event
+            <button type="button" className={styles.quickTile} onClick={onCreate}>
+              <span className={styles.quickIcon}>
+                <Zap size={14} />
+              </span>
+              <span className={styles.quickMeta}>
+                <span className={styles.quickLabel}>New Event</span>
+                <span className={styles.quickSub}>Create an event</span>
+              </span>
             </button>
           )}
-          <button type="button" className={styles.ghost}>
-            <QrCode size={14} />
-            Scan Attendance
+          <button type="button" className={styles.quickTile}>
+            <span className={styles.quickIcon}>
+              <QrCode size={14} />
+            </span>
+            <span className={styles.quickMeta}>
+              <span className={styles.quickLabel}>Scan Attendance</span>
+              <span className={styles.quickSub}>Log via QR</span>
+            </span>
           </button>
-          <button type="button" className={styles.ghost}>
-            <Download size={14} />
-            Export List
+          <button type="button" className={styles.quickTile}>
+            <span className={styles.quickIcon}>
+              <Download size={14} />
+            </span>
+            <span className={styles.quickMeta}>
+              <span className={styles.quickLabel}>Export List</span>
+              <span className={styles.quickSub}>Download CSV</span>
+            </span>
           </button>
         </div>
       </div>

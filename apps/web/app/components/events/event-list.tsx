@@ -51,11 +51,12 @@ export type EventListProps = {
   onPageChange: (page: number) => void;
   onFilter: (filter: Filter) => void;
   onQuery: (query: string) => void;
+  onView: (event: EventItem) => void;
   onEdit: (event: EventItem) => void;
   onDelete: (event: EventItem) => void;
 };
 
-export function EventList({ items, filter, query, page, onPageChange, onFilter, onQuery, onEdit, onDelete }: EventListProps) {
+export function EventList({ items, filter, query, page, onPageChange, onFilter, onQuery, onView, onEdit, onDelete }: EventListProps) {
   const view = useSyncExternalStore(subscribeView, () =>
     readView(window.localStorage),
     () => "list",
@@ -121,7 +122,7 @@ export function EventList({ items, filter, query, page, onPageChange, onFilter, 
 
       {view === "calendar" ? (
         <div className={styles.calendarBody}>
-          <EventCalendar items={filtered} />
+          <EventCalendar items={filtered} onSelect={onView} />
         </div>
       ) : (
         <>
@@ -149,7 +150,7 @@ export function EventList({ items, filter, query, page, onPageChange, onFilter, 
                     <p className={styles.sectionLabel}>Upcoming &amp; live</p>
                     <div className={styles.tileGrid}>
                       {notPast.map((e) => (
-                        <EventTile key={e.id} event={e} onEdit={() => onEdit(e)} onDelete={() => onDelete(e)} />
+                        <EventTile key={e.id} event={e} onView={() => onView(e)} onEdit={() => onEdit(e)} onDelete={() => onDelete(e)} />
                       ))}
                     </div>
                   </div>
@@ -159,7 +160,7 @@ export function EventList({ items, filter, query, page, onPageChange, onFilter, 
                     <p className={styles.sectionLabel}>Past events</p>
                     <div className={styles.tileGrid}>
                       {past.map((e) => (
-                        <EventTile key={e.id} event={e} onEdit={() => onEdit(e)} onDelete={() => onDelete(e)} />
+                        <EventTile key={e.id} event={e} onView={() => onView(e)} onEdit={() => onEdit(e)} onDelete={() => onDelete(e)} />
                       ))}
                     </div>
                   </div>

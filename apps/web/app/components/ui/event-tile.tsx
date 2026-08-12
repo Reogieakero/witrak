@@ -5,17 +5,30 @@ import styles from "./event-tile.module.css";
 
 export type EventTileProps = {
   event: EventItem;
+  onView?: () => void;
   onEdit: () => void;
   onDelete: () => void;
 };
 
-export function EventTile({ event, onEdit, onDelete }: EventTileProps) {
+export function EventTile({ event, onEdit, onDelete, onView }: EventTileProps) {
   const presentRate = event.attendanceRate ?? 0;
   const dateTone =
     event.status === "past" ? "gray" : event.status === "live" ? "amber" : "brand";
 
   return (
-    <div className={styles.tile} data-status={event.status}>
+    <div
+      className={styles.tile}
+      data-status={event.status}
+      onClick={() => onView?.()}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onView?.();
+        }
+      }}
+    >
       <div className={styles.top}>
         <div className={styles.dateBox} data-tone={dateTone}>
           <span className={styles.dateMonth}>{event.month}</span>
@@ -31,6 +44,11 @@ export function EventTile({ event, onEdit, onDelete }: EventTileProps) {
           {event.status === "past" && <Badge tone="gray">Completed</Badge>}
           {event.requiresAttendance && event.status !== "past" && (
             <Badge tone="green">Attendance</Badge>
+          )}
+          {event.programName ? (
+            <Badge tone="brand">{event.programName}</Badge>
+          ) : (
+            <Badge tone="gray">All</Badge>
           )}
         </div>
       </div>
@@ -90,8 +108,8 @@ export function EventTile({ event, onEdit, onDelete }: EventTileProps) {
         <span className={styles.createdBy} title={event.createdByName}>
           by {event.createdByName}
         </span>
-        <span className={styles.actions}>
-          <button type="button" className={styles.actionBtn} title="View" onClick={onEdit}>
+        <span className={styles.actions} onClick={(e) => e.stopPropagation()}>
+          <button type="button" className={styles.actionBtn} title="View" onClick={onView ?? onEdit}>
             <Eye size={15} />
           </button>
           {event.canEdit && (

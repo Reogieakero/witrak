@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import { ThemeProvider } from "@/app/components/theme-provider";
+import { SileoToaster } from "@/app/components/sileo-toaster";
+import "sileo/styles.css";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -18,6 +20,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={nunito.variable} suppressHydrationWarning>
       <body>
         <ThemeProvider>{children}</ThemeProvider>
+        <SileoToaster />
       </body>
     </html>
   );

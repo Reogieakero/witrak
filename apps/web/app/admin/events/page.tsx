@@ -47,32 +47,37 @@ export default async function AdminEventsPage() {
 
   const now = new Date();
 
-  const [user, events, activeTerm, attendanceRows, studentCount] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        name: true,
-        roles: { include: { role: { select: { name: true } } } },
-      },
-    }),
-    prisma.event.findMany({
-      orderBy: { startsAt: "asc" },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        startsAt: true,
-        endsAt: true,
-        location: true,
-        requiresAttendance: true,
-        createdById: true,
-        createdBy: { select: { name: true } },
-      },
-    }),
-    prisma.academicTerm.findFirst({ where: { isActive: true } }),
-    prisma.attendance.findMany({ select: { eventId: true, status: true } }),
-    prisma.student.count(),
-  ]);
+  const [user, events, programs, activeTerm, attendanceRows, studentCount] =
+    await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          name: true,
+          roles: { include: { role: { select: { name: true } } } },
+        },
+      }),
+      prisma.event.findMany({
+        orderBy: { startsAt: "desc" },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          startsAt: true,
+          endsAt: true,
+          location: true,
+          requiresAttendance: true,
+          scanPassword: true,
+          programId: true,
+          program: { select: { name: true } },
+          createdById: true,
+          createdBy: { select: { name: true } },
+        },
+      }),
+      prisma.program.findMany({ orderBy: { code: "asc" } }),
+      prisma.academicTerm.findFirst({ where: { isActive: true } }),
+      prisma.attendance.findMany({ select: { eventId: true, status: true } }),
+      prisma.student.count(),
+    ]);
 
   const attByEvent = new Map<string, { total: number; present: number }>();
   let attendanceTotal = 0;
@@ -104,6 +109,9 @@ export default async function AdminEventsPage() {
       description: e.description,
       location: e.location,
       requiresAttendance: e.requiresAttendance,
+      scanPassword: e.scanPassword,
+      programId: e.programId,
+      programName: e.program?.name ?? null,
       createdByName: e.createdBy.name,
       startsAt: e.startsAt.toISOString(),
       endsAt: e.endsAt.toISOString(),
@@ -143,6 +151,7 @@ export default async function AdminEventsPage() {
         items={items}
         stats={stats}
         access={{ create: canCreate, edit: canEdit, delete: canDelete, yearRep: isYearRep }}
+        programs={programs}
       />
     </AdminShell>
   );

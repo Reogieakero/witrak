@@ -1,53 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { EventItem } from "./types";
 import styles from "./event-calendar.module.css";
 
 export type EventCalendarProps = {
   items: EventItem[];
+  onSelect: (event: EventItem) => void;
 };
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-type DayEvent = {
-  status: "live" | "upcoming" | "past";
-  title: string;
-  requiresAttendance: boolean;
-};
 
 function dateKey(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function eventStatus(e: EventItem): DayEvent["status"] {
-  return e.status;
-}
-
-export function EventCalendar({ items }: EventCalendarProps) {
-  const now = new Date();
+export function EventCalendar({ items, onSelect }: EventCalendarProps) {
+  const now = useMemo(() => new Date(), []);
   const [cursor, setCursor] = useState({
     year: now.getFullYear(),
     month: now.getMonth(),
   });
 
-  const byDay = new Map<string, DayEvent[]>();
-  for (const e of items) {
-    const key = dateKey(new Date(e.startsAt));
-    const list = byDay.get(key) ?? [];
-    list.push({
-      status: eventStatus(e),
-      title: e.title,
-      requiresAttendance: e.requiresAttendance,
-    });
-    byDay.set(key, list);
-  }
+  const byDay = useMemo(() => {
+    const map = new Map<string, EventItem[]>();
+    for (const e of items) {
+      const key = dateKey(new Date(e.startsAt));
+      const list = map.get(key) ?? [];
+      list.push(e);
+      map.set(key, list);
+    }
+    for (const list of map.values()) {
+      list.sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+    }
+    return map;
+  }, [items]);
 
   const monthLabel = new Date(cursor.year, cursor.month, 1).toLocaleDateString(
     "en-US",
-    { month: "long", year: "numeric" },
+    { month: "long" },
+  );
+  const yearLabel = new Date(cursor.year, cursor.month, 1).toLocaleDateString(
+    "en-US",
+    { year: "numeric" },
   );
 
   const first = new Date(cursor.year, cursor.month, 1);
@@ -67,10 +64,20 @@ export function EventCalendar({ items }: EventCalendarProps) {
     now.getMonth() === d.getMonth() &&
     now.getDate() === d.getDate();
 
+  const atMonthStart = cursor.year === now.getFullYear() && cursor.month === now.getMonth();
+
   return (
     <div className={styles.calendar}>
       <div className={styles.head}>
-        <h3 className={styles.monthLabel}>{monthLabel}</h3>
+        <div className={styles.title}>
+          <h3 className={styles.monthLabel}>
+            {monthLabel}
+            <span className={styles.yearLabel}>{yearLabel}</span>
+          </h3>
+          <span className={styles.monthMeta}>
+            {daysInMonth} days · {byDay.size} with events
+          </span>
+        </div>
         <div className={styles.nav}>
           <button
             type="button"
@@ -78,9 +85,14 @@ export function EventCalendar({ items }: EventCalendarProps) {
             onClick={() => shiftMonth(-1)}
             aria-label="Previous month"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={15} />
           </button>
-          <button type="button" className={styles.todayBtn} onClick={goToday}>
+          <button
+            type="button"
+            className={styles.todayBtn}
+            onClick={goToday}
+            disabled={atMonthStart}
+          >
             Today
           </button>
           <button
@@ -89,14 +101,16 @@ export function EventCalendar({ items }: EventCalendarProps) {
             onClick={() => shiftMonth(1)}
             aria-label="Next month"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={15} />
           </button>
         </div>
       </div>
 
       <div className={styles.weekdays}>
-        {WEEKDAYS.map((w) => (
-          <span key={w}>{w}</span>
+        {WEEKDAYS.map((w, i) => (
+          <span key={w} data-weekend={i === 0 || i === 6 || undefined}>
+            {w}
+          </span>
         ))}
       </div>
 
@@ -111,38 +125,65 @@ export function EventCalendar({ items }: EventCalendarProps) {
           const key = dateKey(date);
           const events = byDay.get(key) ?? [];
           const today = isToday(date);
+          const weekend = date.getDay() === 0 || date.getDay() === 6;
           const tone = dayTone(events);
+          const count = events.length;
 
           return (
-            <div
+            <button
+              type="button"
               key={key}
               className={styles.cell}
               data-tone={tone}
               data-today={today || undefined}
+              data-weekend={weekend || undefined}
+              data-empty={count === 0 || undefined}
+              onClick={() => count > 0 && onSelect(events[0])}
+              disabled={count === 0}
+              aria-label={
+                count > 0
+                  ? `View events on ${date.toDateString()}`
+                  : undefined
+              }
             >
-              <span className={styles.dayNum} data-today={today || undefined}>
-                {day}
-              </span>
+              <div className={styles.cellTop}>
+                <span className={styles.dayNum} data-today={today || undefined}>
+                  {day}
+                </span>
+                {count > 0 && (
+                  <span className={styles.count} data-tone={tone}>
+                    {count}
+                  </span>
+                )}
+              </div>
               <div className={styles.events}>
-                {events.slice(0, 2).map((ev, i) => (
+                {events.slice(0, 2).map((ev) => (
                   <span
-                    key={i}
+                    key={ev.id}
                     className={styles.eventRow}
                     data-status={ev.status}
                     title={ev.title}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelect(ev);
+                    }}
                   >
-                    <span className={styles.eventDot} data-status={ev.status} />
-                    <span className={styles.eventName}>
-                      {ev.title}
-                      {ev.requiresAttendance ? "*" : ""}
-                    </span>
+                    <span className={styles.eventTime}>{ev.scheduleTime}</span>
+                    <span className={styles.eventName}>{ev.title}</span>
+                    {ev.requiresAttendance && (
+                      <span className={styles.eventAtt} title="Requires attendance">
+                        QR
+                      </span>
+                    )}
                   </span>
                 ))}
-                {events.length > 2 && (
-                  <span className={styles.more}>+{events.length - 2} more</span>
+                {count > 2 && (
+                  <span className={styles.more}>
+                    +{count - 2} more
+                  </span>
                 )}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -150,7 +191,7 @@ export function EventCalendar({ items }: EventCalendarProps) {
       <div className={styles.legend}>
         <span className={styles.legendItem}>
           <span className={styles.legendDot} data-tone="upcoming" />
-          Brand event
+          Upcoming
         </span>
         <span className={styles.legendItem}>
           <span className={styles.legendDot} data-tone="live" />
@@ -158,15 +199,15 @@ export function EventCalendar({ items }: EventCalendarProps) {
         </span>
         <span className={styles.legendItem}>
           <span className={styles.legendDot} data-tone="past" />
-          Past event
+          Completed
         </span>
-        <span className={styles.legendNote}>* requires attendance</span>
+        <span className={styles.legendNote}>QR = attendance required</span>
       </div>
     </div>
   );
 }
 
-function dayTone(events: DayEvent[]): "live" | "upcoming" | "past" | "none" {
+function dayTone(events: EventItem[]): "live" | "upcoming" | "past" | "none" {
   if (events.length === 0) return "none";
   if (events.some((e) => e.status === "live")) return "live";
   if (events.some((e) => e.status === "upcoming")) return "upcoming";

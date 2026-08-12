@@ -1,8 +1,8 @@
 import Link from "next/link";
 import styles from "./button.module.css";
 
-type ButtonVariant = "primary" | "secondary" | "white" | "outline";
-type ButtonSize = "sm" | "md";
+type ButtonVariant = "primary" | "secondary" | "white" | "outline" | "danger";
+type ButtonSize = "sm" | "md" | "lg" | "xl";
 
 export type ButtonProps = {
   variant?: ButtonVariant;

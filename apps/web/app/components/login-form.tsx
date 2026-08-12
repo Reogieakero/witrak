@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
 import styles from "./login-form.module.css";
 
@@ -35,6 +36,10 @@ export function LoginForm({
     setPending(false);
     if (result?.error) {
       setError("Invalid email or password.");
+      sileo.error({
+        title: "Sign in failed",
+        description: "Invalid email or password.",
+      });
     } else if (result?.ok) {
       window.location.href = callbackUrl;
     }

@@ -2,17 +2,17 @@
 
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
 import styles from "./modal.module.css";
 
 type ModalProps = {
   open: boolean;
   onClose: () => void;
-  title?: string;
+  title?: React.ReactNode;
+  footer?: React.ReactNode;
   children: React.ReactNode;
 };
 
-export function Modal({ open, onClose, title, children }: ModalProps) {
+export function Modal({ open, onClose, title, footer, children }: ModalProps) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -33,16 +33,9 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
       <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           {title && <h2 className={styles.title}>{title}</h2>}
-          <button
-            type="button"
-            className={styles.close}
-            onClick={onClose}
-            aria-label="Close dialog"
-          >
-            <X size={16} />
-          </button>
         </div>
         <div className={styles.body}>{children}</div>
+        {footer && <div className={styles.footer}>{footer}</div>}
       </div>
     </div>,
     document.body,

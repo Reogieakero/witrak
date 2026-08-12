@@ -98,6 +98,7 @@ export const openApiSpec = {
           endsAt: { type: "string", format: "date-time" },
           location: { type: "string", nullable: true },
           requiresAttendance: { type: "boolean" },
+          programId: { type: "string", nullable: true },
           createdById: { type: "string" },
           _count: {
             type: "object",

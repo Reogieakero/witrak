@@ -8,6 +8,12 @@ import { hasPermission, type UserAccess } from "@/lib/permissions";
 
 export type SaveEventState = { ok: boolean; error?: string };
 
+function combineDateTime(date: string, time: string): Date | null {
+  if (!date || !time) return null;
+  const d = new Date(`${date}T${time}`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 type SessionWithUser = {
   user: { id: string };
   access: UserAccess | null;
@@ -36,18 +42,29 @@ export async function saveEvent(
   const id = ((formData.get("id") as string) ?? "").trim() || null;
   const title = ((formData.get("title") as string) ?? "").trim();
   const description = ((formData.get("description") as string) ?? "").trim() || null;
-  const startsAt = (formData.get("startsAt") as string) || null;
-  const endsAt = (formData.get("endsAt") as string) || null;
+  const startsAt = combineDateTime(
+    (formData.get("eventDate") as string) ?? "",
+    (formData.get("startTime") as string) ?? "",
+  );
+  const endsAt = combineDateTime(
+    (formData.get("eventDate") as string) ?? "",
+    (formData.get("endTime") as string) ?? "",
+  );
   const location = ((formData.get("location") as string) ?? "").trim() || null;
+  const programId = ((formData.get("programId") as string) ?? "").trim() || null;
   const requiresAttendance = formData.get("requiresAttendance") === "on";
+  const scanPassword = ((formData.get("scanPassword") as string) ?? "").trim() || null;
 
   if (!title || !startsAt || !endsAt) {
     return { ok: false, error: "Title, start, and end are required." };
   }
-  const startDate = new Date(startsAt);
-  const endDate = new Date(endsAt);
-  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
-    return { ok: false, error: "Invalid date/time values." };
+  if (requiresAttendance && !scanPassword) {
+    return { ok: false, error: "Event password is required when attendance is enabled." };
+  }
+  const startDate = startsAt;
+  const endDate = endsAt;
+  if (!startDate || !endDate) {
+    return { ok: false, error: "Title, start, and end are required." };
   }
   if (endDate <= startDate) {
     return { ok: false, error: "End must be after start." };
@@ -70,7 +87,9 @@ export async function saveEvent(
         startsAt: startDate,
         endsAt: endDate,
         location,
+        programId,
         requiresAttendance,
+        scanPassword,
       },
     });
   } else {
@@ -84,7 +103,9 @@ export async function saveEvent(
         startsAt: startDate,
         endsAt: endDate,
         location,
+        programId,
         requiresAttendance,
+        scanPassword,
         createdById: session.user.id,
       },
     });
@@ -94,15 +115,31 @@ export async function saveEvent(
   return { ok: true };
 }
 
-export async function deleteEvent(eventId: string): Promise<void> {
+export async function deleteEvent(
+  eventId: string,
+): Promise<{ ok: boolean; error?: string }> {
   const session = await currentSession();
-  if (!hasPermission(session.access, "events_delete")) return;
+  if (!hasPermission(session.access, "events_delete")) {
+    return { ok: false, error: "Missing permission: events.delete." };
+  }
 
   const existing = await prisma.event.findUnique({ where: { id: eventId } });
-  if (!existing) return;
-  if ((await isYearRep(session.user.id)) && existing.createdById !== session.user.id) return;
+  if (!existing) return { ok: false, error: "Event not found." };
+  if ((await isYearRep(session.user.id)) && existing.createdById !== session.user.id) {
+    return { ok: false, error: "Year Reps can only delete events they created." };
+  }
 
+  const attendanceRows = await prisma.attendance.findMany({
+    where: { eventId },
+    select: { id: true },
+  });
+  if (attendanceRows.length > 0) {
+    await prisma.sanctionEvidence.deleteMany({
+      where: { attendanceId: { in: attendanceRows.map((a) => a.id) } },
+    });
+  }
   await prisma.attendance.deleteMany({ where: { eventId } });
   await prisma.event.delete({ where: { id: eventId } });
   revalidatePath("/admin/events");
+  return { ok: true };
 }

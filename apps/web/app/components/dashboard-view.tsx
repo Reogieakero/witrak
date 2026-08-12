@@ -81,6 +81,7 @@ export default async function DashboardView() {
       take: 3,
     }),
     prisma.event.findMany({
+      where: { startsAt: { lte: now } },
       orderBy: { startsAt: "desc" },
       take: 3,
       select: { id: true, title: true },
@@ -169,7 +170,7 @@ export default async function DashboardView() {
     ? Math.round((attended / attendanceRows.length) * 100)
     : 0;
 
-  const eventTrend = latestEvents.map((e) => {
+  const eventTrend = [...latestEvents].reverse().map((e) => {
     const rows = attendanceRows.filter((a) => a.eventId === e.id);
     const eventAttended = rows.filter(
       (a) => a.status === "PRESENT" || a.status === "LATE",

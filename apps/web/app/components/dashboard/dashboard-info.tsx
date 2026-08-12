@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Modal } from "@/app/components/ui/modal";
+import { ModalActions } from "@/app/components/ui/modal-actions";
 import styles from "./dashboard-info.module.css";
 
 type Section = { icon: LucideIcon; title: string; text: string };
@@ -85,6 +86,7 @@ export function DashboardInfo() {
             );
           })}
         </ul>
+        <ModalActions onCancel={() => setOpen(false)} cancelLabel="Close" />
       </Modal>
     </>
   );
