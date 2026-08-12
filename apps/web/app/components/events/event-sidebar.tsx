@@ -1,4 +1,4 @@
-import { CalendarClock, Download, Gauge, Plus, QrCode, Zap } from "lucide-react";
+import { CalendarClock, Download, Gauge, QrCode, Zap } from "lucide-react";
 import type { EventItem, EventsAccess, EventsStats } from "./types";
 import { Badge } from "@/app/components/ui/badge";
 import styles from "./event-sidebar.module.css";
@@ -106,7 +106,6 @@ export function EventSidebar({ items, stats, access, onCreate }: EventSidebarPro
         <div className={styles.actions}>
           {access.create && onCreate && (
             <button type="button" className={styles.primary} onClick={onCreate}>
-              <Plus size={14} />
               New Event
             </button>
           )}

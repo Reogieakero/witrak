@@ -1,5 +1,5 @@
-import { Plus } from "lucide-react";
 import { Badge } from "@/app/components/ui/badge";
+import { Button } from "@/app/components/ui/button";
 import styles from "./event-header.module.css";
 
 export type EventHeaderProps = {
@@ -21,10 +21,9 @@ export function EventHeader({ termName, onCreate }: EventHeaderProps) {
         </p>
       </div>
       {onCreate && (
-        <button type="button" className={styles.primaryBtn} onClick={onCreate}>
-          <Plus size={14} />
+        <Button variant="primary" size="md" onClick={onCreate}>
           New Event
-        </button>
+        </Button>
       )}
     </div>
   );
