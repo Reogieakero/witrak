@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50/50" data-role="super-admin">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHUSOCOM - Transparency</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#2563eb',
+                            secondary: '#3b82f6',
+                            light: '#93c5fd',
+                            subtle: '#eff6ff',
+                        },
+                        ink: {
+                            DEFAULT: '#0f172a',
+                            soft: '#334155',
+                            muted: '#64748b',
+                            faint: '#94a3b8',
+                        },
+                        line: { DEFAULT: '#e2e8f0', soft: '#eef2f7' },
+                    },
+                    boxShadow: {
+                        soft: '0 1px 2px rgba(15,23,42,0.04)',
+                        lift: '0 8px 24px -8px rgba(15,23,42,0.12), 0 2px 6px rgba(15,23,42,0.04)',
+                        ring: '0 0 0 4px rgba(37,99,235,0.12)',
+                    },
+                    backgroundImage: {
+                        'brand-gradient': 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                        'brand-soft': 'linear-gradient(135deg, rgba(37,99,235,0.10), rgba(59,130,246,0.06))',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --brand-primary: #2563eb;
+            --brand-secondary: #3b82f6;
+            --brand-light: #93c5fd;
+            --brand-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up { animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+        .row-hover { transition: background 0.15s ease; }
+        .row-hover:hover { background: #f8fafc; }
+    </style>
+</head>
+<body class="h-full font-sans text-gray-900 bg-gray-50/50 antialiased selection:bg-brand-primary selection:text-white">
+
+    <div class="min-h-screen flex flex-col">
+
+        <div id="sidebarBackdrop" class="fixed inset-0 z-40 bg-gray-900/20 backdrop-blur-xs hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 bottom-0 left-0 z-50 w-[180px] bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ease-in-out -translate-x-full lg:translate-x-0">
+            <div class="h-16 px-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-6 h-6 rounded-lg bg-brand-gradient flex items-center justify-center text-white shadow-xs">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-white"></i>
+                    </div>
+                    <span class="font-extrabold text-sm tracking-tight text-gray-900">FHUSOCOM</span>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden p-1 rounded hover:bg-brand-50 text-brand-primary transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-brand-primary"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-2 space-y-0.5">
+                <div class="px-2 pt-2 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Main</div>
+
+                <a href="index.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="events.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="calendar-check-2" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Events</span>
+                </a>
+
+                <a href="attendance.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="qr-code" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Attendance</span>
+                </a>
+
+                <a href="transparency.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg bg-brand-subtle text-brand-primary font-semibold text-xs transition-colors group">
+                    <i data-lucide="folder-open" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Transparency</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Sanctions</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="hand-coins" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Fees</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="megaphone" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Announcements</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="users" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Members</span>
+                </a>
+
+                <div class="px-2 pt-4 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">System</div>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="user-cog" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Users &amp; Roles</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="scroll-text" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Audit Log</span>
+                </a>
+            </div>
+
+            <div class="p-2 border-t border-gray-100 bg-gray-50/50">
+                <div class="flex items-center gap-2 p-1.5 rounded-lg">
+                    <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                        P
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-gray-900 block truncate">President</span>
+                        <span class="text-[10px] text-gray-500 block truncate" id="roleLabel">Super Admin</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="lg:pl-[180px] flex-1 flex flex-col min-w-0">
+
+            <header class="h-16 bg-white/90 backdrop-blur border-b border-gray-200 px-4 flex items-center justify-between sticky top-0 z-30">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg hover:bg-brand-subtle text-brand-primary transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5 text-brand-primary"></i>
+                    </button>
+                    <span class="text-xs font-medium text-gray-500">FHUSOCOM Admin</span>
+                    <span class="text-gray-300 text-xs">/</span>
+                    <span class="text-xs font-semibold text-gray-900">Transparency</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="relative hidden md:block">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-primary"></i>
+                        <input id="globalSearch" type="text" placeholder="Search files..." class="w-52 lg:w-64 pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                    </div>
+
+                    <div class="relative hidden lg:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-50 border border-gray-200" title="Preview the page as a role (see ROLES-AND-MODULES.md)">
+                        <i data-lucide="eye" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Preview as</span>
+                        <select id="roleSelect" class="text-[11px] font-semibold text-brand-primary bg-transparent focus:outline-none cursor-pointer">
+                            <option value="super-admin">Super Admin</option>
+                            <option value="secretary">Secretary</option>
+                            <option value="treasurer">Treasurer</option>
+                            <option value="discipline">Disc. Officer</option>
+                            <option value="year-rep">Year Rep</option>
+                        </select>
+                    </div>
+
+                    <button class="p-1.5 text-brand-primary hover:bg-brand-subtle rounded-lg transition-colors relative" title="Notifications">
+                        <i data-lucide="bell" class="w-4 h-4 text-brand-primary"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-brand-primary rounded-full"></span>
+                    </button>
+                    <div class="h-4 w-px bg-gray-200"></div>
+                    <div class="flex items-center gap-2 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                            P
+                        </div>
+                        <div class="hidden xl:block leading-tight">
+                            <span class="text-[11px] font-semibold text-gray-900 block">President</span>
+                            <span class="text-[9px] text-gray-400 block" id="headerRoleLabel">Super Admin</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    </div>
+                </div>
+            </header>
+
+            <main class="w-full p-4 lg:p-5 flex flex-col lg:flex-row gap-4 items-start">
+
+                <div class="flex-1 min-w-0 space-y-4">
+
+                    <div class="flex flex-wrap items-end justify-between gap-3 animate-fade-up">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h1 class="text-2xl font-extrabold tracking-tight text-gray-900">Transparency</h1>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-subtle text-brand-primary border border-brand-100">Term 1 · 2025–2026</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Publish budgets, reports, minutes, and org documents for the whole student body.</p>
+                        </div>
+                        <button data-action="upload" onclick="openUploadModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md hover:-translate-y-0.5 transition-all">
+                            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                            Upload File
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2.5 shadow-soft animate-fade-up" style="animation-delay: 40ms">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Manage access</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">View &middot; All officers + students</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-50 text-brand-700 border border-brand-100">Upload / Delete &middot; Super Admin, Secretary</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-100">Financial files only &middot; Treasurer</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-50 text-gray-500 border border-gray-200">View only &middot; Disc. Officer, Year Rep</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 animate-fade-up" style="animation-delay: 80ms">
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-brand-soft text-brand-primary flex items-center justify-center">
+                                    <i data-lucide="folder-open" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">+3 this term</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">12</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Total Files</div>
+                            <div class="mt-1 text-[10px] text-gray-400">across 4 categories</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <i data-lucide="hand-coins" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">42%</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">5</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Financial Docs</div>
+                            <div class="mt-1 text-[10px] text-gray-400">budgets &amp; disbursements</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
+                                    <i data-lucide="calendar-check-2" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-violet-600 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">programs</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">4</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Event Files</div>
+                            <div class="mt-1 text-[10px] text-gray-400">programs &amp; schedules</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                                    <i data-lucide="scroll-text" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">3 recent</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">3</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Minutes &amp; Reports</div>
+                            <div class="mt-1 text-[10px] text-gray-400">meeting minutes, reports</div>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft animate-fade-up" style="animation-delay: 120ms">
+                        <div class="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
+                            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100">
+                                <button data-cat="all" onclick="setCategory('all')" id="catAll" class="filter-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-white text-gray-900 shadow-soft transition-all">All</button>
+                                <button data-cat="financial" onclick="setCategory('financial')" class="filter-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold text-gray-500 hover:bg-white hover:text-gray-900 transition-all">Financial</button>
+                                <button data-cat="events" onclick="setCategory('events')" class="filter-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold text-gray-500 hover:bg-white hover:text-gray-900 transition-all">Events</button>
+                                <button data-cat="minutes" onclick="setCategory('minutes')" class="filter-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold text-gray-500 hover:bg-white hover:text-gray-900 transition-all">Minutes</button>
+                                <button data-cat="reports" onclick="setCategory('reports')" class="filter-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold text-gray-500 hover:bg-white hover:text-gray-900 transition-all">Reports</button>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider" id="visibleCountLabel">12 of 12</span>
+                                <select id="sortSelect" onchange="applyFilters()" class="text-[11px] font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand-primary">
+                                    <option value="newest">Newest first</option>
+                                    <option value="oldest">Oldest first</option>
+                                    <option value="az">Title A–Z</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="p-4 pt-3">
+                            <div class="overflow-x-auto rounded-xl border border-gray-100">
+                                <table class="w-full text-left border-collapse min-w-[680px]">
+                                    <thead>
+                                        <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                            <th class="px-3 py-2.5">File</th>
+                                            <th class="px-3 py-2.5">Category</th>
+                                            <th class="px-3 py-2.5">Uploaded by</th>
+                                            <th class="px-3 py-2.5">Date</th>
+                                            <th class="px-3 py-2.5 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fileTableBody">
+                                        <tr data-file data-category="financial" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Semester 1 Budget Report</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">budget-report-s1.pdf &middot; 1.2 MB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">financial</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Treasurer</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Nov 28, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="financial" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Treasurer&apos;s Report — October</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">treasurers-report-oct.pdf &middot; 860 KB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">financial</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Treasurer</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Nov 10, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="financial" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Fund Allocation FY 2025</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">fund-allocation-2025.pdf &middot; 2.4 MB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">financial</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Treasurer</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Oct 22, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="financial" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Disbursement Summary — Q1</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">disbursement-q1.pdf &middot; 640 KB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">financial</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Treasurer</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Oct 05, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="financial" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Collection Report — Semester Fee</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">collection-semester-fee.pdf &middot; 1.0 MB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">financial</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Treasurer</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Sep 28, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="events" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Foundation Day Program</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">foundation-day-program.pdf &middot; 3.1 MB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">events</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Secretary</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Nov 15, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="events" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Intramurals Official Schedule</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">intramurals-schedule.pdf &middot; 1.8 MB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">events</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Secretary</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Oct 30, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="events" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Oath Taking Ceremony Program</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">oath-taking-program.pdf &middot; 920 KB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">events</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Secretary</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Oct 12, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="events" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">GAD Talk Series Topics</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">gad-talk-topics.pdf &middot; 480 KB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">events</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Secretary</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Sep 19, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="minutes" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">General Assembly Minutes</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">ga-minutes.pdf &middot; 750 KB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">minutes</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Secretary</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Nov 21, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="minutes" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Officers&apos; Meeting Minutes — Nov</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">officers-minutes-nov.pdf &middot; 520 KB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">minutes</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Secretary</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Nov 07, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="reports" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Annual Org Report</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">annual-org-report.pdf &middot; 5.6 MB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-brand-700 bg-brand-50 border border-brand-100 px-1.5 py-0.5 rounded-full">reports</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Secretary</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Nov 18, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr data-file data-category="reports" class="row-hover border-t border-gray-100">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center shrink-0">
+                                                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                                                    </div>
+                                                    <div class="min-w-0">
+                                                        <span class="text-xs font-semibold text-gray-900 block truncate">Recognition Night — Awardees List</span>
+                                                        <span class="text-[10px] text-gray-400 block truncate">recognition-awardees.pdf &middot; 1.4 MB</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-brand-700 bg-brand-50 border border-brand-100 px-1.5 py-0.5 rounded-full">reports</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-600">Secretary</span></td>
+                                            <td class="px-3 py-2.5"><span class="text-xs text-gray-500">Nov 30, 2025</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-brand-primary hover:bg-brand-50 transition-colors" title="View file"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                    <button onclick="openFileView(this)" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors" title="Download"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="delete" onclick="openDeleteModal(this)" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div id="fileEmpty" class="hidden py-16 text-center">
+                                <div class="w-12 h-12 rounded-2xl bg-gray-100 border border-gray-200 flex items-center justify-center mx-auto text-gray-400">
+                                    <i data-lucide="folder-search" class="w-5 h-5"></i>
+                                </div>
+                                <p class="mt-3 text-sm font-semibold text-gray-700">No files found</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Try a different category or search query.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-[290px] shrink-0 space-y-4">
+
+                    <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft animate-fade-up" style="animation-delay: 160ms">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                                <i data-lucide="pie-chart" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                Files by Category
+                            </h3>
+                            <span class="text-[10px] font-semibold text-gray-400">12 total</span>
+                        </div>
+                        <div class="mt-3 space-y-2.5">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="hand-coins" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] font-semibold text-gray-700">Financial</span>
+                                        <span class="text-[11px] font-semibold text-gray-900">5</span>
+                                    </div>
+                                    <div class="mt-1 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                                        <div class="h-full w-[42%] rounded-full bg-emerald-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-violet-50 border border-violet-100 text-violet-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="calendar-check-2" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] font-semibold text-gray-700">Events</span>
+                                        <span class="text-[11px] font-semibold text-gray-900">4</span>
+                                    </div>
+                                    <div class="mt-1 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                                        <div class="h-full w-[33%] rounded-full bg-violet-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="scroll-text" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] font-semibold text-gray-700">Minutes</span>
+                                        <span class="text-[11px] font-semibold text-gray-900">2</span>
+                                    </div>
+                                    <div class="mt-1 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                                        <div class="h-full w-[17%] rounded-full bg-amber-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="file-bar-chart" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] font-semibold text-gray-700">Reports</span>
+                                        <span class="text-[11px] font-semibold text-gray-900">2</span>
+                                    </div>
+                                    <div class="mt-1 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                                        <div class="h-full w-[17%] rounded-full bg-brand-500"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft animate-fade-up" style="animation-delay: 200ms">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                                <i data-lucide="clock-3" class="w-3.5 h-3.5 text-brand-primary"></i>
+                                Recent Uploads
+                            </h3>
+                            <span class="text-[10px] font-semibold text-gray-400">3 this month</span>
+                        </div>
+                        <div class="mt-3 space-y-2">
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80 hover:border-gray-200 transition-colors">
+                                <div class="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-[11px] font-semibold text-gray-900 block truncate">Semester 1 Budget Report</span>
+                                    <span class="text-[9px] text-gray-400 block">Nov 28, 2025 &middot; financial</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80 hover:border-gray-200 transition-colors">
+                                <div class="w-7 h-7 rounded-lg bg-brand-50 border border-brand-100 text-brand-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-[11px] font-semibold text-gray-900 block truncate">Recognition Night — Awardees</span>
+                                    <span class="text-[9px] text-gray-400 block">Nov 30, 2025 &middot; reports</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80 hover:border-gray-200 transition-colors">
+                                <div class="w-7 h-7 rounded-lg bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-[11px] font-semibold text-gray-900 block truncate">General Assembly Minutes</span>
+                                    <span class="text-[9px] text-gray-400 block">Nov 21, 2025 &middot; minutes</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
+                            <span>Public to all members</span>
+                            <span class="font-medium text-brand-primary cursor-pointer hover:underline">View all</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-brand-gradient rounded-2xl p-4 text-white shadow-soft animate-fade-up" style="animation-delay: 240ms">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center">
+                                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                            </div>
+                            <h3 class="text-xs font-bold">Transparency Policy</h3>
+                        </div>
+                        <p class="mt-2 text-[11px] leading-relaxed text-blue-50">
+                            Financial documents are published by the Treasurer; programs and minutes by the Secretary. All files stay visible to every officer and student for the term.
+                        </p>
+                        <div class="mt-3 pt-2 border-t border-white/20 flex items-center justify-between text-[10px] text-blue-100">
+                            <span>Audited · append-only</span>
+                            <i data-lucide="external-link" class="w-3 h-3"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Upload modal -->
+    <div id="uploadModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeUploadModal()"></div>
+        <div class="relative w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-xl p-5">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-brand-soft text-brand-primary flex items-center justify-center">
+                        <i data-lucide="upload" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Upload transparency file</h3>
+                        <p class="text-[10px] text-gray-400">Publish a document for all members to view</p>
+                    </div>
+                </div>
+                <button onclick="closeUploadModal()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="mt-4 space-y-3">
+                <div>
+                    <label class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider" for="uploadTitle">File title</label>
+                    <input id="uploadTitle" type="text" placeholder="e.g. Semester 2 Budget Report" class="mt-1 w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider" for="uploadCategory">Category</label>
+                    <select id="uploadCategory" class="mt-1 w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white cursor-pointer">
+                        <option value="financial">Financial</option>
+                        <option value="events">Events</option>
+                        <option value="minutes">Minutes</option>
+                        <option value="reports">Reports</option>
+                    </select>
+                    <p id="financialOnlyNote" class="hidden mt-1 text-[10px] text-amber-600">Treasurer uploads are restricted to the Financial category.</p>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">File</label>
+                    <label for="fileInput" class="mt-1 flex flex-col items-center justify-center gap-1.5 p-6 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 hover:border-brand-primary hover:bg-brand-subtle/50 transition-colors cursor-pointer">
+                        <div class="w-9 h-9 rounded-xl bg-white border border-gray-200 text-brand-primary flex items-center justify-center shadow-xs">
+                            <i data-lucide="file-up" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-gray-700">Click to choose a PDF or image</span>
+                        <span class="text-[10px] text-gray-400">Max 10 MB</span>
+                        <input id="fileInput" type="file" accept=".pdf,image/*" class="hidden">
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-4 flex items-center justify-end gap-2">
+                <button onclick="closeUploadModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button onclick="closeUploadModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">
+                    <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                    Publish File
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete confirmation modal -->
+    <div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeDeleteModal()"></div>
+        <div class="relative w-full max-w-sm bg-white rounded-2xl border border-gray-200 shadow-xl p-5">
+            <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-100 text-red-500 flex items-center justify-center">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </div>
+            <h3 class="mt-3 text-sm font-bold text-gray-900">Delete this file?</h3>
+            <p class="mt-1 text-xs text-gray-500 leading-relaxed">
+                <span id="deleteFileName" class="font-semibold text-gray-700"></span> will be removed from the public transparency list. This cannot be undone.
+            </p>
+            <div class="mt-4 flex items-center justify-end gap-2">
+                <button onclick="closeDeleteModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button onclick="closeDeleteModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-soft transition-colors">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File preview modal -->
+    <div id="fileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeFileModal()"></div>
+        <div class="relative w-full max-w-2xl bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-brand-soft text-brand-primary flex items-center justify-center shrink-0">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-bold text-gray-900 truncate" id="fileModalTitle">Semester 1 Budget Report</h3>
+                        <p class="text-[10px] text-gray-400" id="fileModalMeta">financial · Nov 28, 2025 · 1.2 MB</p>
+                    </div>
+                </div>
+                <button onclick="closeFileModal()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors shrink-0">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="bg-gray-100 h-[380px] flex flex-col items-center justify-center gap-3 p-8">
+                <div class="w-16 h-16 rounded-2xl bg-white border border-gray-200 text-brand-primary flex items-center justify-center shadow-soft">
+                    <i data-lucide="file-text" class="w-7 h-7"></i>
+                </div>
+                <p class="text-xs text-gray-500 text-center max-w-xs">Preview placeholder — the PDF viewer would render the document inline here.</p>
+                <button class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                    Download
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        const ROLE_PERMS = {
+            'super-admin': { upload: true,  delete: true,  financialOnly: false, label: 'Super Admin' },
+            'secretary':   { upload: true,  delete: true,  financialOnly: false, label: 'Secretary' },
+            'treasurer':   { upload: true,  delete: true,  financialOnly: true,  label: 'Treasurer' },
+            'discipline':  { upload: false, delete: false, financialOnly: false, label: 'Disc. Officer' },
+            'year-rep':    { upload: false, delete: false, financialOnly: false, label: 'Year Rep' },
+        };
+
+        function applyRole(role) {
+            const perms = ROLE_PERMS[role] || ROLE_PERMS['super-admin'];
+            document.documentElement.dataset.role = role;
+            document.getElementById('roleLabel').textContent = perms.label;
+            document.getElementById('headerRoleLabel').textContent = perms.label;
+
+            document.querySelectorAll('[data-action="upload"]').forEach(el => el.classList.toggle('hidden', !perms.upload));
+
+            const categoryEl = document.getElementById('uploadCategory');
+            document.getElementById('financialOnlyNote').classList.toggle('hidden', !perms.financialOnly);
+            Array.from(categoryEl.options).forEach(opt => {
+                opt.disabled = perms.financialOnly && opt.value !== 'financial';
+            });
+            if (perms.financialOnly) categoryEl.value = 'financial';
+
+            document.querySelectorAll('[data-action="delete"]').forEach(el => {
+                const row = el.closest('tr[data-category]');
+                const isFinancial = row && row.dataset.category === 'financial';
+                el.classList.toggle('hidden', !perms.delete || (perms.financialOnly && !isFinancial));
+            });
+        }
+
+        document.getElementById('roleSelect').addEventListener('change', (e) => applyRole(e.target.value));
+        applyRole('super-admin');
+
+        function setCategory(cat) {
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                const on = chip.dataset.cat === cat;
+                chip.className = 'filter-chip px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ' +
+                    (on ? 'bg-white text-gray-900 shadow-soft' : 'text-gray-500 hover:bg-white hover:text-gray-900');
+            });
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const query = (document.getElementById('globalSearch').value || '').trim().toLowerCase();
+            const activeCat = document.querySelector('.filter-chip.bg-white')?.dataset.cat || 'all';
+            const sort = document.getElementById('sortSelect').value;
+            const rows = Array.from(document.querySelectorAll('#fileTableBody tr[data-file]'));
+
+            rows.forEach(row => {
+                const catOk = activeCat === 'all' || row.dataset.category === activeCat;
+                const title = row.querySelector('span.text-xs.font-semibold').textContent.toLowerCase();
+                const queryOk = !query || title.includes(query);
+                row.classList.toggle('hidden', !(catOk && queryOk));
+            });
+
+            const visible = rows.filter(r => !r.classList.contains('hidden'));
+            document.getElementById('visibleCountLabel').textContent = visible.length + ' of ' + rows.length;
+            document.getElementById('fileEmpty').classList.toggle('hidden', visible.length !== 0);
+
+            const tbody = document.getElementById('fileTableBody');
+            visible.sort((a, b) => {
+                const titleA = a.querySelector('span.text-xs.font-semibold').textContent;
+                const titleB = b.querySelector('span.text-xs.font-semibold').textContent;
+                if (sort === 'az') return titleA.localeCompare(titleB);
+                return 0;
+            });
+            visible.forEach(row => tbody.appendChild(row));
+        }
+
+        document.getElementById('globalSearch').addEventListener('input', applyFilters);
+
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openDeleteModal(btn) {
+            const row = btn.closest('tr');
+            const title = row.querySelector('span.text-xs.font-semibold').textContent;
+            document.getElementById('deleteFileName').textContent = title;
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openFileView(btn) {
+            const row = btn.closest('tr');
+            const title = row.querySelector('span.text-xs.font-semibold').textContent;
+            const cat = row.querySelector('span.text-[10px].font-semibold.text-emerald-700, span.text-[10px].font-semibold.text-violet-700, span.text-[10px].font-semibold.text-amber-700, span.text-[10px].font-semibold.text-brand-700').textContent;
+            const date = row.querySelectorAll('span.text-xs.text-gray-500')[0].textContent;
+            const meta = cat + ' · ' + date;
+            document.getElementById('fileModalTitle').textContent = title;
+            document.getElementById('fileModalMeta').textContent = meta;
+            document.getElementById('fileModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFileModal() {
+            document.getElementById('fileModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+    </script>
+</body>
+</html>

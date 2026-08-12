@@ -1,6 +1,6 @@
 import styles from "./badge.module.css";
 
-type BadgeTone = "brand" | "amber" | "red" | "green" | "gray";
+type BadgeTone = "brand" | "amber" | "red" | "green" | "gray" | "violet";
 
 type BadgeProps = {
   tone?: BadgeTone;

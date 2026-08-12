@@ -1,0 +1,393 @@
+.folderCard {
+  width: 170px;
+  height: 130px;
+  perspective: 1200px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 0 auto;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.folderToggle {
+  display: none;
+}
+
+.hintWrapper {
+  position: absolute;
+  top: -40px;
+  right: -50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+  pointer-events: none;
+  z-index: 100;
+  animation: floatHint 2.5s ease-in-out infinite;
+}
+
+.hintText {
+  font-family: "Inter", -apple-system, sans-serif;
+  color: #60a5fa;
+  font-size: 10px;
+  font-weight: 900;
+  text-decoration: underline;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  position: relative;
+  right: -25px;
+  top: 10px;
+  transform: rotate(45deg);
+}
+
+.hintArrow {
+  height: 35px;
+  width: 35px;
+}
+
+@keyframes floatHint {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.folderToggle:checked ~ .hintWrapper {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.folderContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.folderToggle:checked ~ .folderContainer {
+  transform: rotateX(10deg) rotateY(-5deg);
+}
+
+.folderBack {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+}
+
+.folderFrontWrapper {
+  position: absolute;
+  bottom: -7px;
+  width: 100%;
+  z-index: 90;
+  transform-origin: bottom;
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 12px;
+}
+
+.folderLabel {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+}
+
+.counter {
+  position: absolute;
+  top: -95px;
+  right: -75px;
+  background-color: #a18cd1;
+  padding: 4px 8px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transform: scale(0) translateY(20px);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 100;
+  pointer-events: auto;
+}
+
+.folderToggle:checked ~ .folderContainer .counter {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  transition-delay: 0.2s;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  background: #34d399;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 10px #34d399;
+}
+
+.statusDot::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #34d399;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.counterLabel {
+  font-family: "Inter", sans-serif;
+  font-size: 8px;
+  font-weight: 800;
+  color: black;
+  text-transform: capitalize;
+}
+
+.counterNumber {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.counter:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #60a5fa;
+  transform: scale(1.1) translateY(-5px) !important;
+  cursor: help;
+}
+
+.counter:hover .counterNumber {
+  color: #60a5fa;
+  transition: color 0.3s ease;
+}
+
+.file {
+  position: absolute;
+  bottom: 5px;
+  left: 10%;
+  width: 80%;
+  height: 85px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 0;
+}
+
+.file1 {
+  background: #ff5f6d;
+  z-index: 25;
+  transition-delay: 0.15s;
+}
+.file2 {
+  background: #ffc371;
+  z-index: 24;
+  transition-delay: 0.1s;
+}
+.file3 {
+  background: #4facfe;
+  z-index: 23;
+  transition-delay: 0.05s;
+}
+
+.shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: none;
+}
+
+.folderToggle:checked ~ .folderContainer .shine {
+  left: 150%;
+  transition: left 0.8s ease-in-out;
+  transition-delay: 0.3s;
+}
+
+.fileText {
+  font-family: "Inter", sans-serif;
+  font-size: 9px;
+  color: white;
+  padding: 12px;
+  font-weight: 800;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.3s ease 0.4s;
+}
+
+.folderToggle:checked ~ .folderContainer .fileText {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.folderToggle:checked ~ .folderContainer .folderFrontWrapper {
+  transform: rotateX(-50deg);
+}
+
+.folderToggle:checked ~ .folderContainer .file1 {
+  transform: translateY(-70px) rotate(-10deg) translateX(-15px) translateZ(20px);
+}
+.folderToggle:checked ~ .folderContainer .file2 {
+  transform: translateY(-55px) rotate(8deg) translateX(18px) translateZ(10px);
+}
+.folderToggle:checked ~ .folderContainer .file3 {
+  transform: translateY(-40px) rotate(-15deg) translateX(-8px);
+}
+
+.folderToggle:checked ~ .folderContainer .file:hover {
+  cursor: pointer;
+  filter: brightness(1.1);
+}
+
+.folderToggle:checked ~ .folderContainer .file1:hover {
+  transform: translateY(-80px) rotate(-10deg) translateX(-15px) translateZ(20px);
+}
+.folderToggle:checked ~ .folderContainer .file2:hover {
+  transform: translateY(-65px) rotate(8deg) translateX(18px) translateZ(10px);
+}
+.folderToggle:checked ~ .folderContainer .file3:hover {
+  transform: translateY(-50px) rotate(-15deg) translateX(-8px);
+}
+
+.fileIcon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 14px;
+  height: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 0.3s ease;
+}
+
+.fileTag {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: rgba(255, 255, 255, 0.9);
+  font-family: "Inter", -apple-system, sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  padding: 3px 6px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.folderToggle:checked ~ .folderContainer .file:hover .fileIcon {
+  color: rgba(255, 255, 255, 0.9);
+}
+.folderToggle:checked ~ .folderContainer .fileTag {
+  opacity: 1;
+}
+
+.folderSearch {
+  position: absolute;
+  top: -40px;
+  left: 10%;
+  width: 30px;
+  height: 25px;
+  background-color: #60a5fa;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  opacity: 0;
+  z-index: 100;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.searchIcon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: "Inter", sans-serif;
+  font-size: 9px;
+  margin-left: 8px;
+  outline: none;
+  transition: width 0.4s ease;
+}
+
+.searchInput::placeholder {
+  color: #ffffff;
+}
+
+.folderToggle:checked ~ .folderContainer .folderSearch {
+  opacity: 1;
+  top: -80px;
+  width: 80%;
+}
+
+.folderToggle:checked ~ .folderContainer .folderSearch:focus-within {
+  width: 90%;
+  background-color: #ff3b30;
+}
+
+.folderToggle:checked ~ .folderContainer .folderSearch:focus-within .searchInput {
+  width: 100%;
+}
