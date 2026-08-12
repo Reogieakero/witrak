@@ -11,6 +11,9 @@
     width: 20rem;
     position: sticky;
     top: 5rem;
+    align-self: flex-start;
+    max-height: calc(100vh - 5rem - 1rem);
+    overflow-y: auto;
   }
 }
 
