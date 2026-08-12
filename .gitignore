@@ -29,6 +29,9 @@ packages/db/prisma/*.db-journal
 .env.development
 !.env.example
 
+# Local file uploads (use Supabase Storage instead)
+apps/web/public/uploads/
+
 # Logs
 logs/
 *.log

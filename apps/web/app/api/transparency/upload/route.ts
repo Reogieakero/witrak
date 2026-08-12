@@ -2,12 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { requirePermission } from "@/lib/permissions";
-import { handleError } from "@/lib/api";
-import { writeFile, mkdirSync, existsSync } from "fs";
-import { join } from "path";
 import { randomUUID } from "crypto";
-
-const UPLOAD_DIR = join(process.cwd(), "public", "uploads");
+import { uploadTransparencyFile } from "@/lib/supabase-storage";
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -47,28 +43,22 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!existsSync(UPLOAD_DIR)) {
-      mkdirSync(UPLOAD_DIR, { recursive: true });
-    }
-
     const ext = file.name.split(".").pop();
     const storedName = `${randomUUID()}.${ext}`;
-    const filePath = join(UPLOAD_DIR, storedName);
     const buffer = await file.arrayBuffer();
-    await new Promise<void>((resolve, reject) => {
-      writeFile(filePath, Buffer.from(buffer), (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
 
-    const fileUrl = `/uploads/${storedName}`;
+    const { publicUrl } = await uploadTransparencyFile(
+      storedName,
+      buffer,
+      file.type || "application/octet-stream",
+    );
+
     const size = formatFileSize(file.size);
 
     await prisma.transparencyFile.create({
       data: {
         title: title.trim(),
-        fileUrl,
+        fileUrl: publicUrl,
         category,
         uploadedById: userId,
       },
@@ -78,12 +68,14 @@ export async function POST(request: Request) {
       ok: true,
       file: {
         title: title.trim(),
-        fileUrl,
+        fileUrl: publicUrl,
         category,
         size,
       },
     });
   } catch (e) {
-    return handleError(e);
+    const message = e instanceof Error ? e.message : "Upload failed.";
+    console.error("Transparency upload error:", e);
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
 }
