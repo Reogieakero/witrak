@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50/50" data-role="super-admin">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHUSOCOM - Sanctions</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#2563eb',
+                            secondary: '#3b82f6',
+                            light: '#93c5fd',
+                            subtle: '#eff6ff',
+                        },
+                        ink: {
+                            DEFAULT: '#0f172a',
+                            soft: '#334155',
+                            muted: '#64748b',
+                            faint: '#94a3b8',
+                        },
+                        line: { DEFAULT: '#e2e8f0', soft: '#eef2f7' },
+                    },
+                    boxShadow: {
+                        soft: '0 1px 2px rgba(15,23,42,0.04)',
+                        lift: '0 8px 24px -8px rgba(15,23,42,0.12), 0 2px 6px rgba(15,23,42,0.04)',
+                        ring: '0 0 0 4px rgba(37,99,235,0.12)',
+                    },
+                    backgroundImage: {
+                        'brand-gradient': 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                        'brand-soft': 'linear-gradient(135deg, rgba(37,99,235,0.10), rgba(59,130,246,0.06))',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --brand-primary: #2563eb;
+            --brand-secondary: #3b82f6;
+            --brand-light: #93c5fd;
+            --brand-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up { animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+        @keyframes pulseDot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.45); }
+            50%      { box-shadow: 0 0 0 4px rgba(239,68,68,0); }
+        }
+        .pulse-dot { animation: pulseDot 1.8s ease-out infinite; }
+
+        .row-hover { transition: background 0.15s ease; }
+        .row-hover:hover { background: #f8fafc; }
+    </style>
+</head>
+<body class="h-full font-sans text-gray-900 bg-gray-50/50 antialiased selection:bg-brand-primary selection:text-white">
+
+    <div class="min-h-screen flex flex-col">
+
+        <div id="sidebarBackdrop" class="fixed inset-0 z-40 bg-gray-900/20 backdrop-blur-xs hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 bottom-0 left-0 z-50 w-[180px] bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ease-in-out -translate-x-full lg:translate-x-0">
+            <div class="h-16 px-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-6 h-6 rounded-lg bg-brand-gradient flex items-center justify-center text-white shadow-xs">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-white"></i>
+                    </div>
+                    <span class="font-extrabold text-sm tracking-tight text-gray-900">FHUSOCOM</span>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden p-1 rounded hover:bg-brand-50 text-brand-primary transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-brand-primary"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-2 space-y-0.5">
+                <div class="px-2 pt-2 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Main</div>
+
+                <a href="index.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="events.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="calendar-check-2" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Events</span>
+                </a>
+
+                <a href="attendance.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="qr-code" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Attendance</span>
+                </a>
+
+                <a href="transparency.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group"><i data-lucide="folder-open" class="w-4 h-4 text-brand-primary"></i><span>Transparency</span>
+                </a>
+
+                <a href="sanctions.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg bg-brand-subtle text-brand-primary font-semibold text-xs transition-colors group">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Sanctions</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="hand-coins" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Fees</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="megaphone" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Announcements</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="users" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Members</span>
+                </a>
+
+                <div class="px-2 pt-4 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">System</div>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="user-cog" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Users &amp; Roles</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="scroll-text" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Audit Log</span>
+                </a>
+            </div>
+
+            <div class="p-2 border-t border-gray-100 bg-gray-50/50">
+                <div class="flex items-center gap-2 p-1.5 rounded-lg">
+                    <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                        P
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-gray-900 block truncate">President</span>
+                        <span class="text-[10px] text-gray-500 block truncate" id="roleLabel">Super Admin</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="lg:pl-[180px] flex-1 flex flex-col min-w-0">
+
+            <header class="h-16 bg-white/90 backdrop-blur border-b border-gray-200 px-4 flex items-center justify-between sticky top-0 z-30">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg hover:bg-brand-subtle text-brand-primary transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5 text-brand-primary"></i>
+                    </button>
+                    <span class="text-xs font-medium text-gray-500">FHUSOCOM Admin</span>
+                    <span class="text-gray-300 text-xs">/</span>
+                    <span class="text-xs font-semibold text-gray-900">Sanctions</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="relative hidden md:block">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-primary"></i>
+                        <input id="globalSearch" type="text" placeholder="Search students, sections..." class="w-52 lg:w-64 pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                    </div>
+
+                    <div class="relative hidden lg:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-50 border border-gray-200" title="Preview the page as a role (see ROLES-AND-MODULES.md)">
+                        <i data-lucide="eye" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Preview as</span>
+                        <select id="roleSelect" class="text-[11px] font-semibold text-brand-primary bg-transparent focus:outline-none cursor-pointer">
+                            <option value="super-admin">Super Admin</option>
+                            <option value="secretary">Secretary</option>
+                            <option value="treasurer">Treasurer</option>
+                            <option value="discipline">Disc. Officer</option>
+                            <option value="year-rep">Year Rep</option>
+                        </select>
+                    </div>
+
+                    <button class="p-1.5 text-brand-primary hover:bg-brand-subtle rounded-lg transition-colors relative" title="Notifications">
+                        <i data-lucide="bell" class="w-4 h-4 text-brand-primary"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-brand-primary rounded-full"></span>
+                    </button>
+                    <div class="h-4 w-px bg-gray-200"></div>
+                    <div class="flex items-center gap-2 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                            P
+                        </div>
+                        <div class="hidden xl:block leading-tight">
+                            <span class="text-[11px] font-semibold text-gray-900 block">President</span>
+                            <span class="text-[9px] text-gray-400 block" id="headerRoleLabel">Super Admin</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    </div>
+                </div>
+            </header>
+
+            <main class="w-full p-4 lg:p-5 flex flex-col lg:flex-row gap-4 items-start">
+
+                <div class="flex-1 min-w-0 space-y-4" id="sanctionsContent">
+
+                    <div class="flex flex-wrap items-end justify-between gap-3 animate-fade-up">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h1 class="text-2xl font-extrabold tracking-tight text-gray-900">Sanctions</h1>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-600 border border-rose-100">Term 1 · 2025–2026</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Review absence-triggered flags, issue sanctions, and respond to student appeals — private records per <span class="font-semibold text-gray-600">DESIGN.md §7</span>.</p>
+                        </div>
+                        <button data-action="create" onclick="openCreateModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md hover:-translate-y-0.5 transition-all">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            Issue Sanction
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2.5 shadow-soft animate-fade-up" style="animation-delay: 40ms">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Manage access</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">View / Queue / Create / Resolve &middot; Super Admin</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-violet-50 text-violet-700 border border-violet-100">View / Queue / Create / Resolve (scoped) &middot; Disc. Officer</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-50 text-gray-500 border border-gray-200">No access &middot; Secretary, Treasurer, Year Rep</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 animate-fade-up" style="animation-delay: 80ms">
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                                    <i data-lucide="flag" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-rose-600 bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded-full">needs review</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">2</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Pending Flags</div>
+                            <div class="mt-1 text-[10px] text-gray-400">absence threshold met</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                                    <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">active</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">5</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Active Sanctions</div>
+                            <div class="mt-1 text-[10px] text-gray-400">across 4 sections</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
+                                    <i data-lucide="message-square-warning" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-violet-600 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">open</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">3</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Appeals</div>
+                            <div class="mt-1 text-[10px] text-gray-400">awaiting response</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <i data-lucide="check-check" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">resolved</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">14</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Resolved</div>
+                            <div class="mt-1 text-[10px] text-gray-400">this term</div>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft animate-fade-up" style="animation-delay: 120ms">
+                        <div class="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
+                            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100">
+                                <button data-tab="queue" onclick="setTab('queue')" id="tabQueueBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white text-gray-900 shadow-soft transition-all">
+                                    <i data-lucide="inbox" class="w-3.5 h-3.5"></i>
+                                    Pending Queue
+                                </button>
+                                <button data-tab="active" onclick="setTab('active')" id="tabActiveBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all">
+                                    <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                                    Active Sanctions
+                                </button>
+                                <button data-tab="resolved" onclick="setTab('resolved')" id="tabResolvedBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all">
+                                    <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                                    Resolved
+                                </button>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider" id="visibleCountLabel"></span>
+                            </div>
+                        </div>
+
+                        <div id="queueView" class="p-4">
+                            <div class="overflow-x-auto rounded-xl border border-gray-100">
+                                <table class="w-full text-left border-collapse min-w-[720px]">
+                                    <thead>
+                                        <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                            <th class="px-3 py-2.5">Student</th>
+                                            <th class="px-3 py-2.5">Section</th>
+                                            <th class="px-3 py-2.5">Trigger</th>
+                                            <th class="px-3 py-2.5">Rule</th>
+                                            <th class="px-3 py-2.5">Evidence</th>
+                                            <th class="px-3 py-2.5 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100" id="queueBody">
+                                        <tr class="row-hover" data-scope="BSIT-3A">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center text-[10px] font-bold">RS</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">R. Salazar</span>
+                                                        <span class="block text-[10px] text-gray-400">Year 3</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSIT-3A</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="text-[11px] font-bold text-rose-600">3 absences</span>
+                                                <span class="block text-[10px] text-gray-400">General Assembly</span>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">3 = warn</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <button onclick="openEvidenceDrawer('R. Salazar')" class="inline-flex items-center gap-1 text-[10px] font-bold text-brand-primary bg-brand-subtle border border-brand-100 px-1.5 py-0.5 rounded-full hover:bg-brand-100 transition-colors">
+                                                    <i data-lucide="paperclip" class="w-3 h-3"></i>3 rows
+                                                </button>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="create" onclick="openCreateModal('R. Salazar')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="Create sanction"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="view" onclick="openEvidenceDrawer('R. Salazar')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View evidence"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover" data-scope="BSCS-2B">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold">JV</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">J. Villanueva</span>
+                                                        <span class="block text-[10px] text-gray-400">Year 2</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSCS-2B</td>
+                                            <td class="px-3 py-2.5">
+                                                <span class="text-[11px] font-bold text-rose-600">5 absences</span>
+                                                <span class="block text-[10px] text-gray-400">3 events</span>
+                                            </td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded-full">5 = flag</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <button onclick="openEvidenceDrawer('J. Villanueva')" class="inline-flex items-center gap-1 text-[10px] font-bold text-brand-primary bg-brand-subtle border border-brand-100 px-1.5 py-0.5 rounded-full hover:bg-brand-100 transition-colors">
+                                                    <i data-lucide="paperclip" class="w-3 h-3"></i>5 rows
+                                                </button>
+                                            </td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="create" onclick="openCreateModal('J. Villanueva')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="Create sanction"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="view" onclick="openEvidenceDrawer('J. Villanueva')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View evidence"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="queueEmpty" class="hidden flex-col items-center justify-center py-10 text-center">
+                                <div class="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center">
+                                    <i data-lucide="inbox" class="w-5 h-5 text-gray-300"></i>
+                                </div>
+                                <p class="mt-2 text-sm font-semibold text-gray-700">No pending flags</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5">Every triggered flag has been actioned.</p>
+                            </div>
+                        </div>
+
+                        <div id="activeView" class="hidden p-4">
+                            <div class="overflow-x-auto rounded-xl border border-gray-100">
+                                <table class="w-full text-left border-collapse min-w-[760px]">
+                                    <thead>
+                                        <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                            <th class="px-3 py-2.5">Student</th>
+                                            <th class="px-3 py-2.5">Section</th>
+                                            <th class="px-3 py-2.5">Reason</th>
+                                            <th class="px-3 py-2.5">Issued</th>
+                                            <th class="px-3 py-2.5">Appeal</th>
+                                            <th class="px-3 py-2.5 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100" id="activeBody">
+                                        <tr class="row-hover" data-scope="BSIT-3A">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center text-[10px] font-bold">RS</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">R. Salazar</span>
+                                                        <span class="block text-[10px] text-gray-400">2023-11042</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSIT-3A</td>
+                                            <td class="px-3 py-2.5 max-w-[220px]">
+                                                <span class="block text-[11px] font-semibold text-gray-800 truncate">Repeated unexcused absences</span>
+                                                <span class="block text-[10px] text-gray-400">3 absences · General Assembly</span>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Aug 05</td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">Appealed</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="appeal" onclick="openAppealModal('R. Salazar')" class="p-1.5 rounded-lg text-violet-500 hover:bg-violet-50 transition-colors" title="Respond to appeal"><i data-lucide="message-square-warning" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="resolve" onclick="openResolveModal('R. Salazar')" class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors" title="Resolve"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="view" onclick="openSanctionDrawer('R. Salazar')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover" data-scope="BSCS-2B">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold">JV</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">J. Villanueva</span>
+                                                        <span class="block text-[10px] text-gray-400">2024-08721</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSCS-2B</td>
+                                            <td class="px-3 py-2.5 max-w-[220px]">
+                                                <span class="block text-[11px] font-semibold text-gray-800 truncate">Repeated unexcused absences</span>
+                                                <span class="block text-[10px] text-gray-400">5 absences · 3 events</span>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Jul 30</td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-gray-500 bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded-full">None</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="resolve" onclick="openResolveModal('J. Villanueva')" class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors" title="Resolve"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="view" onclick="openSanctionDrawer('J. Villanueva')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover" data-scope="BSBA-4B">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">LT</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">L. Bautista</span>
+                                                        <span class="block text-[10px] text-gray-400">2022-07643</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSBA-4B</td>
+                                            <td class="px-3 py-2.5 max-w-[220px]">
+                                                <span class="block text-[11px] font-semibold text-gray-800 truncate">Repeated unexcused absences</span>
+                                                <span class="block text-[10px] text-gray-400">4 absences · Leadership Summit</span>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Jul 18</td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">Appealed</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="appeal" onclick="openAppealModal('L. Bautista')" class="p-1.5 rounded-lg text-violet-500 hover:bg-violet-50 transition-colors" title="Respond to appeal"><i data-lucide="message-square-warning" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="resolve" onclick="openResolveModal('L. Bautista')" class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors" title="Resolve"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="view" onclick="openSanctionDrawer('L. Bautista')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover" data-scope="BSCE-1A">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-violet-500 text-white flex items-center justify-center text-[10px] font-bold">CP</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">C. Aquino</span>
+                                                        <span class="block text-[10px] text-gray-400">2025-03456</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSCE-1A</td>
+                                            <td class="px-3 py-2.5 max-w-[220px]">
+                                                <span class="block text-[11px] font-semibold text-gray-800 truncate">Repeated unexcused absences</span>
+                                                <span class="block text-[10px] text-gray-400">3 absences · Orientation</span>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Jul 12</td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">Appealed</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="appeal" onclick="openAppealModal('C. Aquino')" class="p-1.5 rounded-lg text-violet-500 hover:bg-violet-50 transition-colors" title="Respond to appeal"><i data-lucide="message-square-warning" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="resolve" onclick="openResolveModal('C. Aquino')" class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors" title="Resolve"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="view" onclick="openSanctionDrawer('C. Aquino')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <tr class="row-hover" data-scope="BSA-2C">
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center gap-2">
+                                                    <div class="w-7 h-7 rounded-full bg-teal-500 text-white flex items-center justify-center text-[10px] font-bold">MR</div>
+                                                    <div class="min-w-0">
+                                                        <span class="block text-[11px] font-bold text-gray-900 truncate">M. Reyes</span>
+                                                        <span class="block text-[10px] text-gray-400">2024-09310</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSA-2C</td>
+                                            <td class="px-3 py-2.5 max-w-[220px]">
+                                                <span class="block text-[11px] font-semibold text-gray-800 truncate">Repeated unexcused absences</span>
+                                                <span class="block text-[10px] text-gray-400">3 absences · Foundation Day</span>
+                                            </td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Jul 04</td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-gray-500 bg-gray-50 border border-gray-200 px-1.5 py-0.5 rounded-full">None</span></td>
+                                            <td class="px-3 py-2.5">
+                                                <div class="flex items-center justify-end gap-1">
+                                                    <button data-action="resolve" onclick="openResolveModal('M. Reyes')" class="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 transition-colors" title="Resolve"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                                                    <button data-action="view" onclick="openSanctionDrawer('M. Reyes')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="resolvedView" class="hidden p-4">
+                            <div class="overflow-x-auto rounded-xl border border-gray-100">
+                                <table class="w-full text-left border-collapse min-w-[680px]">
+                                    <thead>
+                                        <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                            <th class="px-3 py-2.5 text-left">Student</th>
+                                            <th class="px-3 py-2.5 text-left">Section</th>
+                                            <th class="px-3 py-2.5 text-left">Reason</th>
+                                            <th class="px-3 py-2.5 text-left">Resolved by</th>
+                                            <th class="px-3 py-2.5 text-left">Outcome</th>
+                                            <th class="px-3 py-2.5 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        <tr class="row-hover">
+                                            <td class="px-3 py-2.5 text-[11px] font-bold text-gray-900">A. Mendoza</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSIT-2A</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-600">3 absences</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Disc. Officer</td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">Cleared</span></td>
+                                            <td class="px-3 py-2.5"><div class="flex items-center justify-end"><button data-action="view" onclick="openSanctionDrawer('A. Mendoza')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button></div></td>
+                                        </tr>
+                                        <tr class="row-hover">
+                                            <td class="px-3 py-2.5 text-[11px] font-bold text-gray-900">G. Francisco</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSCS-1A</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-600">4 absences</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Super Admin</td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">Cleared</span></td>
+                                            <td class="px-3 py-2.5"><div class="flex items-center justify-end"><button data-action="view" onclick="openSanctionDrawer('G. Francisco')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button></div></td>
+                                        </tr>
+                                        <tr class="row-hover">
+                                            <td class="px-3 py-2.5 text-[11px] font-bold text-gray-900">E. Castillo</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">BSBA-3A</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-600">3 absences</td>
+                                            <td class="px-3 py-2.5 text-[11px] text-gray-500">Disc. Officer</td>
+                                            <td class="px-3 py-2.5"><span class="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">Upheld</span></td>
+                                            <td class="px-3 py-2.5"><div class="flex items-center justify-end"><button data-action="view" onclick="openSanctionDrawer('E. Castillo')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button></div></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between px-4 pb-4 text-xs text-gray-500">
+                            <span>Showing <span id="visibleCount">0</span> records</span>
+                            <div class="flex items-center gap-1">
+                                <button class="p-1 rounded-lg text-gray-300 cursor-not-allowed"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
+                                <span class="px-2 py-0.5 rounded-lg text-[11px] font-bold bg-brand-subtle text-brand-primary">1</span>
+                                <button class="p-1 rounded-lg text-brand-primary hover:bg-brand-subtle transition-colors"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-1 animate-fade-up" style="animation-delay: 160ms">
+                        <p class="text-[11px] text-gray-500 leading-relaxed">
+                            Permission model per <span class="font-semibold text-gray-600">ROLES-AND-MODULES.md §2</span> — Sanctions: view, pending queue, create &amp; resolve = Super Admin (all) and Discipline Officer (within assigned scope);
+                            Secretary, Treasurer, and Year Rep have <span class="font-semibold text-gray-600">no sanctions surface</span>. Records are private (DESIGN.md §7): visible only to the owning student and officers holding <code class="text-[10px] bg-gray-100 px-1 rounded">sanctions.view</code> within scope.
+                            Triggering follows an absence-threshold rule (§8); flags require a manual create — there are no auto-sanctions.
+                        </p>
+                    </div>
+
+                </div>
+
+                <aside class="w-full lg:w-80 shrink-0 space-y-4 lg:sticky lg:top-20">
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft p-4 animate-fade-up" style="animation-delay: 100ms">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                <i data-lucide="flag" class="w-4 h-4 text-rose-500"></i>
+                                Flag Rules
+                            </h3>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-subtle text-brand-primary border border-brand-100">Term 1</span>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between rounded-xl bg-gray-50 border border-gray-100 px-3 py-2">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                                    <span class="text-[11px] font-bold text-gray-800 truncate">3 absences</span>
+                                </div>
+                                <span class="text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">warn</span>
+                            </div>
+                            <div class="flex items-center justify-between rounded-xl bg-gray-50 border border-gray-100 px-3 py-2">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>
+                                    <span class="text-[11px] font-bold text-gray-800 truncate">5 absences</span>
+                                </div>
+                                <span class="text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded-full">flag</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 leading-relaxed pt-1">Most specific scope wins (section &gt; program-year &gt; program &gt; faculty). Edits that drop a count below threshold auto-dismiss the pending flag.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft p-4 animate-fade-up" style="animation-delay: 140ms">
+                        <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
+                            <i data-lucide="scale" class="w-4 h-4 text-brand-primary"></i>
+                            Quick Actions
+                        </h3>
+                        <div class="space-y-2">
+                            <button data-action="create" onclick="openCreateModal()" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                Issue Sanction
+                            </button>
+                            <button data-action="resolve" onclick="openResolveModal()" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-colors">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                                Resolve Sanction
+                            </button>
+                            <button data-action="appeal" onclick="openAppealModal()" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-violet-600 bg-violet-50 border border-violet-100 rounded-lg hover:bg-violet-100 transition-colors">
+                                <i data-lucide="message-square-warning" class="w-3.5 h-3.5"></i>
+                                Respond to Appeal
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft p-4 animate-fade-up" style="animation-delay: 180ms">
+                        <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
+                            <i data-lucide="activity" class="w-4 h-4 text-brand-primary"></i>
+                            Recent Sanction Activity
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <div class="p-1.5 rounded-md bg-rose-50 text-rose-500 shrink-0"><i data-lucide="flag" class="w-3.5 h-3.5"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-[11px] font-semibold text-gray-900 block truncate">Flag created</span>
+                                    <span class="text-[10px] text-gray-400 block truncate">J. Villanueva · 5 absences</span>
+                                </div>
+                                <span class="text-[9px] text-gray-400 shrink-0">14:47</span>
+                            </div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <div class="p-1.5 rounded-md bg-emerald-50 text-emerald-600 shrink-0"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-[11px] font-semibold text-gray-900 block truncate">Sanction resolved</span>
+                                    <span class="text-[10px] text-gray-400 block truncate">A. Mendoza · cleared</span>
+                                </div>
+                                <span class="text-[9px] text-gray-400 shrink-0">13:12</span>
+                            </div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <div class="p-1.5 rounded-md bg-violet-50 text-violet-600 shrink-0"><i data-lucide="message-square-warning" class="w-3.5 h-3.5"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-[11px] font-semibold text-gray-900 block truncate">Appeal received</span>
+                                    <span class="text-[10px] text-gray-400 block truncate">L. Bautista</span>
+                                </div>
+                                <span class="text-[9px] text-gray-400 shrink-0">11:30</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </aside>
+            </main>
+        </div>
+    </div>
+
+    <div id="noAccessPanel" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-gray-50/50 p-4">
+        <div class="max-w-sm w-full bg-white rounded-2xl border border-gray-200 shadow-lift p-8 text-center">
+            <div class="mx-auto w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center">
+                <i data-lucide="lock" class="w-7 h-7 text-gray-300"></i>
+            </div>
+            <h2 class="mt-4 text-lg font-extrabold text-gray-900">No access to Sanctions</h2>
+            <p class="mt-1.5 text-xs text-gray-500 leading-relaxed">Your role does not have the <code class="text-[10px] bg-gray-100 px-1 rounded">sanctions.view</code> permission. Sanction records are private (DESIGN.md §7) and restricted to the Super Admin and Discipline Officer within their assigned scope.</p>
+        </div>
+    </div>
+
+    <div id="createModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeCreateModal()"></div>
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 mx-auto w-[calc(100%-2rem)] max-w-md bg-white rounded-2xl border border-gray-200 shadow-lift animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-brand-soft text-brand-primary flex items-center justify-center">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Issue Sanction</h3>
+                        <p class="text-[10px] text-gray-400">Convert a flag into a formal sanction</p>
+                    </div>
+                </div>
+                <button onclick="closeCreateModal()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Student</label>
+                    <input id="createStudent" type="text" placeholder="Search by name or student no." class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Triggered rule</label>
+                    <select class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                        <option>3 absences → warn</option>
+                        <option>5 absences → flag</option>
+                        <option>4 absences → flag</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Reason</label>
+                    <textarea rows="3" placeholder="Describe the sanction and attached evidence…" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all"></textarea>
+                </div>
+                <p class="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2">
+                    <i data-lucide="info" class="w-3 h-3 inline"></i>
+                    Triggering attendance rows are attached as <code class="text-[9px]">SanctionEvidence</code> (flag → resolved). Every create is audit-logged.
+                </p>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeCreateModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button class="px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">Issue Sanction</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resolveModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeResolveModal()"></div>
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 mx-auto w-[calc(100%-2rem)] max-w-md bg-white rounded-2xl border border-gray-200 shadow-lift animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <i data-lucide="check" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Resolve Sanction</h3>
+                        <p class="text-[10px] text-gray-400" id="resolveName">R. Salazar</p>
+                    </div>
+                </div>
+                <button onclick="closeResolveModal()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Outcome</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="px-2 py-2 text-[11px] font-bold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">Cleared</button>
+                        <button class="px-2 py-2 text-[11px] font-bold rounded-lg bg-gray-50 text-gray-500 border border-gray-200">Upheld</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Resolution note</label>
+                    <textarea rows="3" placeholder="Add context for the audit log…" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all"></textarea>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeResolveModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button class="px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">Resolve</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="appealModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeAppealModal()"></div>
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 mx-auto w-[calc(100%-2rem)] max-w-md bg-white rounded-2xl border border-gray-200 shadow-lift animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
+                        <i data-lucide="message-square-warning" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Respond to Appeal</h3>
+                        <p class="text-[10px] text-gray-400" id="appealName">R. Salazar</p>
+                    </div>
+                </div>
+                <button onclick="closeAppealModal()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <div class="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                    <span class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Student's appeal</span>
+                    <p class="mt-1 text-[11px] text-gray-700 leading-relaxed">"I was hospitalized during the General Assembly and submitted a medical certificate to my program chair. Requesting the sanction be lifted."</p>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Decision</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="px-2 py-2 text-[11px] font-bold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100">Grant</button>
+                        <button class="px-2 py-2 text-[11px] font-bold rounded-lg bg-gray-50 text-gray-500 border border-gray-200">Deny</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Response note</label>
+                    <textarea rows="3" placeholder="Explain the decision for the student and audit log…" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all"></textarea>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeAppealModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button class="px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">Submit Response</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sanctionDrawer" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeDrawer()"></div>
+        <div class="absolute top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-lift flex flex-col animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+                        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Sanction Details</h3>
+                        <p class="text-[10px] text-gray-400" id="sanctionDrawerName">R. Salazar</p>
+                    </div>
+                </div>
+                <button onclick="closeDrawer()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
+                        <div class="text-lg font-extrabold text-rose-600">3</div>
+                        <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Absences</div>
+                    </div>
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
+                        <div class="text-lg font-extrabold text-amber-600">warn</div>
+                        <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Rule</div>
+                    </div>
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
+                        <div class="text-lg font-extrabold text-violet-600">Yes</div>
+                        <div class="text-[9px] font-semibold text-gray-400 uppercase tracking-wide">Appeal</div>
+                    </div>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Reason</span>
+                    <p class="text-[11px] text-gray-700 leading-relaxed">Repeated unexcused absences at the General Assembly. Flag met the 3-absence threshold and was converted to a sanction by the Discipline Officer.</p>
+                </div>
+                <div>
+                    <span class="block text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Attached evidence</span>
+                    <div class="overflow-x-auto rounded-xl border border-gray-100">
+                        <table class="w-full text-left border-collapse min-w-[260px]">
+                            <thead>
+                                <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                    <th class="px-3 py-2">Event</th>
+                                    <th class="px-3 py-2">Date</th>
+                                    <th class="px-3 py-2">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="row-hover">
+                                    <td class="px-3 py-2 text-[11px] font-bold text-gray-900">General Assembly</td>
+                                    <td class="px-3 py-2 text-[10px] text-gray-500">Aug 12</td>
+                                    <td class="px-3 py-2"><span class="text-[10px] font-bold text-red-500 bg-red-50 border border-red-100 rounded-full px-1.5 py-0.5">Absent</span></td>
+                                </tr>
+                                <tr class="row-hover">
+                                    <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Council Orientation</td>
+                                    <td class="px-3 py-2 text-[10px] text-gray-500">Aug 05</td>
+                                    <td class="px-3 py-2"><span class="text-[10px] font-bold text-red-500 bg-red-50 border border-red-100 rounded-full px-1.5 py-0.5">Absent</span></td>
+                                </tr>
+                                <tr class="row-hover">
+                                    <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Foundation Day</td>
+                                    <td class="px-3 py-2 text-[10px] text-gray-500">Jul 27</td>
+                                    <td class="px-3 py-2"><span class="text-[10px] font-bold text-red-500 bg-red-50 border border-red-100 rounded-full px-1.5 py-0.5">Absent</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeDrawer()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Close</button>
+                <button data-action="resolve" onclick="openResolveModal(); closeDrawer();" class="px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">Resolve</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="evidenceDrawer" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeDrawer()"></div>
+        <div class="absolute top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-lift flex flex-col animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-brand-soft text-brand-primary flex items-center justify-center">
+                        <i data-lucide="paperclip" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Flag Evidence</h3>
+                        <p class="text-[10px] text-gray-400" id="evidenceDrawerName">R. Salazar</p>
+                    </div>
+                </div>
+                <button onclick="closeDrawer()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                <p class="text-[11px] text-gray-500 leading-relaxed">Attendance history behind the flag (view-only, via <code class="text-[10px] bg-gray-100 px-1 rounded">attendance.view</code> evidence access). Confirms the threshold was met before issuing a sanction.</p>
+                <div class="overflow-x-auto rounded-xl border border-gray-100">
+                    <table class="w-full text-left border-collapse min-w-[260px]">
+                        <thead>
+                            <tr class="bg-gray-50/80 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                                <th class="px-3 py-2">Event</th>
+                                <th class="px-3 py-2">Date</th>
+                                <th class="px-3 py-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">General Assembly</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">Aug 12</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-red-500 bg-red-50 border border-red-100 rounded-full px-1.5 py-0.5">Absent</span></td>
+                            </tr>
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Council Orientation</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">Aug 05</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-red-500 bg-red-50 border border-red-100 rounded-full px-1.5 py-0.5">Absent</span></td>
+                            </tr>
+                            <tr class="row-hover">
+                                <td class="px-3 py-2 text-[11px] font-bold text-gray-900">Foundation Day</td>
+                                <td class="px-3 py-2 text-[10px] text-gray-500">Jul 27</td>
+                                <td class="px-3 py-2"><span class="text-[10px] font-bold text-red-500 bg-red-50 border border-red-100 rounded-full px-1.5 py-0.5">Absent</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button data-action="create" onclick="openCreateModal(); closeDrawer();" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    Convert Flag to Sanction
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        const ROLE_PERMS = {
+            'super-admin': { access: true,  create: true, resolve: true, appeal: true, view: true, scoped: false, label: 'Super Admin' },
+            'secretary':   { access: false, create: false, resolve: false, appeal: false, view: false, scoped: false, label: 'Secretary' },
+            'treasurer':   { access: false, create: false, resolve: false, appeal: false, view: false, scoped: false, label: 'Treasurer' },
+            'discipline':  { access: true,  create: true, resolve: true, appeal: true, view: true, scoped: true,  label: 'Disc. Officer' },
+            'year-rep':    { access: false, create: false, resolve: false, appeal: false, view: false, scoped: false, label: 'Year Rep' },
+        };
+
+        function applyRole(role) {
+            const perms = ROLE_PERMS[role] || ROLE_PERMS['super-admin'];
+            document.documentElement.dataset.role = role;
+            document.getElementById('roleLabel').textContent = perms.label;
+            document.getElementById('headerRoleLabel').textContent = perms.label;
+
+            const hasAccess = perms.access;
+            document.getElementById('sanctionsContent').classList.toggle('hidden', !hasAccess);
+            document.getElementById('noAccessPanel').classList.toggle('hidden', hasAccess);
+
+            document.querySelectorAll('[data-action="create"]').forEach(el => el.classList.toggle('hidden', !perms.create));
+            document.querySelectorAll('[data-action="resolve"]').forEach(el => el.classList.toggle('hidden', !perms.resolve));
+            document.querySelectorAll('[data-action="appeal"]').forEach(el => el.classList.toggle('hidden', !perms.appeal));
+            document.querySelectorAll('[data-action="view"]').forEach(el => el.classList.toggle('hidden', !perms.view));
+
+            if (hasAccess && perms.scoped) {
+                document.querySelectorAll('tr[data-scope]').forEach(row => {
+                    const inScope = row.dataset.scope && ['BSIT-3A', 'BSIT-2A', 'BSIT-1A', 'BSIT-4A'].includes(row.dataset.scope);
+                    row.classList.toggle('hidden', !inScope);
+                });
+            } else {
+                document.querySelectorAll('tr[data-scope]').forEach(row => row.classList.remove('hidden'));
+            }
+
+            updateVisibleCount();
+        }
+
+        document.getElementById('roleSelect').addEventListener('change', (e) => applyRole(e.target.value));
+        applyRole('super-admin');
+
+        let activeTab = 'queue';
+
+        function setTab(tab) {
+            activeTab = tab;
+            const queueView = document.getElementById('queueView');
+            const activeView = document.getElementById('activeView');
+            const resolvedView = document.getElementById('resolvedView');
+            const qBtn = document.getElementById('tabQueueBtn');
+            const aBtn = document.getElementById('tabActiveBtn');
+            const rBtn = document.getElementById('tabResolvedBtn');
+            const on = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white text-gray-900 shadow-soft transition-all';
+            const off = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all';
+
+            queueView.classList.toggle('hidden', tab !== 'queue');
+            activeView.classList.toggle('hidden', tab !== 'active');
+            resolvedView.classList.toggle('hidden', tab !== 'resolved');
+
+            qBtn.className = tab === 'queue' ? on : off;
+            aBtn.className = tab === 'active' ? on : off;
+            rBtn.className = tab === 'resolved' ? on : off;
+            lucide.createIcons();
+            updateVisibleCount();
+        }
+
+        function updateVisibleCount() {
+            let count = 0;
+            if (activeTab === 'queue') {
+                count = document.querySelectorAll('#queueBody tr:not(.hidden)').length;
+            } else if (activeTab === 'active') {
+                count = document.querySelectorAll('#activeBody tr:not(.hidden)').length;
+            } else {
+                count = document.querySelectorAll('#resolvedView tbody tr:not(.hidden)').length;
+            }
+            document.getElementById('visibleCount').textContent = count;
+            document.getElementById('visibleCountLabel').textContent = count + (count === 1 ? ' record' : ' records');
+
+            const queueEmpty = document.getElementById('queueEmpty');
+            if (activeTab === 'queue') {
+                queueEmpty.classList.toggle('hidden', count !== 0);
+                queueEmpty.classList.toggle('flex', count === 0);
+            } else {
+                queueEmpty.classList.add('hidden');
+                queueEmpty.classList.remove('flex');
+            }
+        }
+
+        function openCreateModal(name) {
+            if (name) document.getElementById('createStudent').value = name;
+            document.getElementById('createModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openResolveModal(name) {
+            if (name) document.getElementById('resolveName').textContent = name;
+            document.getElementById('resolveModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeResolveModal() {
+            document.getElementById('resolveModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openAppealModal(name) {
+            if (name) document.getElementById('appealName').textContent = name;
+            document.getElementById('appealModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeAppealModal() {
+            document.getElementById('appealModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openSanctionDrawer(name) {
+            document.getElementById('sanctionDrawerName').textContent = name;
+            document.getElementById('sanctionDrawer').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openEvidenceDrawer(name) {
+            document.getElementById('evidenceDrawerName').textContent = name;
+            document.getElementById('evidenceDrawer').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDrawer() {
+            document.getElementById('sanctionDrawer').classList.add('hidden');
+            document.getElementById('evidenceDrawer').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('globalSearch').addEventListener('input', (e) => {
+            const q = e.target.value.trim().toLowerCase();
+            const tables = activeTab === 'queue' ? '#queueBody tr' : activeTab === 'active' ? '#activeBody tr' : '#resolvedView tbody tr';
+            document.querySelectorAll(tables).forEach(row => {
+                const hay = (row.textContent || '').toLowerCase();
+                row.classList.toggle('hidden', q && !hay.includes(q));
+            });
+            updateVisibleCount();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDrawer();
+                closeCreateModal();
+                closeResolveModal();
+                closeAppealModal();
+            }
+        });
+    </script>
+</body>
+</html>

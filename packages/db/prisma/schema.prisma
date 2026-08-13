@@ -296,14 +296,14 @@ model Sanction {
   title        String
   reason       String
   status       SanctionStatus   @default(OPEN)
-  issuedById   String
+  issuedById   String?
   issuedAt     DateTime         @default(now())
   resolvedById String?
   resolvedAt   DateTime?
   resolvedNote String?
   student      Student          @relation(fields: [studentId], references: [id])
   rule         SanctionRule?    @relation(fields: [ruleId], references: [id])
-  issuedBy     User             @relation("SanctionIssuedBy", fields: [issuedById], references: [id])
+  issuedBy     User?            @relation("SanctionIssuedBy", fields: [issuedById], references: [id])
   resolvedBy   User?            @relation("SanctionResolvedBy", fields: [resolvedById], references: [id])
   evidences    SanctionEvidence[]
 }
@@ -385,12 +385,12 @@ model Announcement {
 
 model AuditLog {
   id        Int         @id @default(autoincrement())
-  actorId   String
+  actorId   String?
   action    AuditAction
   targetId  String?
   details   Json
   timestamp DateTime    @default(now())
-  actor     User        @relation(fields: [actorId], references: [id])
+  actor     User?       @relation(fields: [actorId], references: [id])
 
   @@index([actorId])
   @@index([action])

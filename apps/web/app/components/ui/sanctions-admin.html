@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sanctions · FHUSOCOM Admin — Design Mockup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: "#eff6ff", 100: "#dbeafe", 200: "#bfdbfe", 300: "#93c5fd",
+              400: "#60a5fa", 500: "#3b82f6", 600: "#2563eb", 700: "#1d4ed8",
+              800: "#1e40af", 900: "#1e3a8a",
+            },
+          },
+          fontFamily: {
+            sans: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"],
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+  </style>
+</head>
+<body class="h-full bg-slate-100 text-slate-900 antialiased">
+  <div class="flex min-h-full">
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="hidden md:flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white">
+      <div class="flex items-center gap-2 px-5 h-16 border-b border-slate-200">
+        <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white">
+          <i data-lucide="graduation-cap" class="h-4 w-4"></i>
+        </span>
+        <span class="font-semibold tracking-tight text-slate-900">FHUSOCOM</span>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+        <div>
+          <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Main</p>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100" href="#"><i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard</a>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100" href="#"><i data-lucide="calendar-check-2" class="h-4 w-4"></i> Events</a>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100" href="#"><i data-lucide="qr-code" class="h-4 w-4"></i> Attendance</a>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100" href="#"><i data-lucide="folder-open" class="h-4 w-4"></i> Transparency</a>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium bg-brand-50 text-brand-700" href="#"><i data-lucide="shield-alert" class="h-4 w-4"></i> Sanctions</a>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100" href="#"><i data-lucide="hand-coins" class="h-4 w-4"></i> Fees</a>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100" href="#"><i data-lucide="megaphone" class="h-4 w-4"></i> Announcements</a>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100" href="#"><i data-lucide="users" class="h-4 w-4"></i> Members</a>
+        </div>
+        <div>
+          <p class="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">System</p>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100" href="#"><i data-lucide="user-cog" class="h-4 w-4"></i> Users &amp; Roles</a>
+          <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100" href="#"><i data-lucide="scroll-text" class="h-4 w-4"></i> Audit Log</a>
+        </div>
+      </nav>
+
+      <div class="border-t border-slate-200 p-3">
+        <div class="flex items-center gap-3 rounded-lg px-2 py-2">
+          <span class="grid h-9 w-9 place-items-center rounded-full bg-brand-600 text-sm font-semibold text-white" id="side-initials">SA</span>
+          <div class="min-w-0">
+            <p class="truncate text-sm font-medium text-slate-900" id="side-name">Super Admin</p>
+            <p class="truncate text-xs text-slate-500" id="side-role">Super Admin</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===================== CONTENT ===================== -->
+    <div class="flex min-w-0 flex-1 flex-col">
+      <!-- Header -->
+      <header class="flex h-16 items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 sm:px-6">
+        <div class="flex items-center gap-2 text-sm">
+          <span class="text-slate-400">FHUSOCOM Admin</span>
+          <span class="text-slate-300">/</span>
+          <span class="font-medium text-slate-900">Sanctions</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Role switcher (mockup control) -->
+          <label class="hidden sm:flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
+            <i data-lucide="user-round" class="h-3.5 w-3.5"></i>
+            <span>View as</span>
+            <select id="role-switch" class="bg-transparent font-semibold text-slate-900 outline-none">
+              <option value="super">Super Admin</option>
+              <option value="discipline">Discipline Officer</option>
+              <option value="student">Student</option>
+            </select>
+          </label>
+
+          <button class="relative grid h-9 w-9 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50">
+            <i data-lucide="bell" class="h-4 w-4"></i>
+            <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500"></span>
+          </button>
+          <span class="grid h-9 w-9 place-items-center rounded-full bg-brand-600 text-sm font-semibold text-white" id="head-initials">SA</span>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <!-- Page title -->
+        <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Sanctions</h1>
+            <p class="mt-1 text-sm text-slate-500" id="subtitle">Review absence-flagged students, issue sanctions, and manage threshold rules.</p>
+          </div>
+          <button id="new-sanction-btn" class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700">
+            <i data-lucide="plus" class="h-4 w-4"></i> New Sanction
+          </button>
+        </div>
+
+        <!-- Privacy banner -->
+        <div class="mb-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <i data-lucide="lock" class="mt-0.5 h-4 w-4 shrink-0"></i>
+          <p>
+            <span class="font-semibold">Private records.</span>
+            Sanctions and flags are never shown in public lists, aggregates, or leaderboards. Visibility is scoped to the officer's section set; students see only their own sanctions.
+          </p>
+        </div>
+
+        <!-- Stats -->
+        <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <div class="flex items-center justify-between">
+              <p class="text-sm text-slate-500">Open Flags</p>
+              <span class="grid h-8 w-8 place-items-center rounded-lg bg-red-50 text-red-600"><i data-lucide="flag" class="h-4 w-4"></i></span>
+            </div>
+            <p class="mt-2 text-2xl font-semibold text-slate-900">7</p>
+            <p class="text-xs text-slate-400">Pending review</p>
+          </div>
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <div class="flex items-center justify-between">
+              <p class="text-sm text-slate-500">Active Sanctions</p>
+              <span class="grid h-8 w-8 place-items-center rounded-lg bg-amber-50 text-amber-600"><i data-lucide="alert-triangle" class="h-4 w-4"></i></span>
+            </div>
+            <p class="mt-2 text-2xl font-semibold text-slate-900">4</p>
+            <p class="text-xs text-slate-400">Open status</p>
+          </div>
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <div class="flex items-center justify-between">
+              <p class="text-sm text-slate-500">Resolved</p>
+              <span class="grid h-8 w-8 place-items-center rounded-lg bg-green-50 text-green-600"><i data-lucide="check-circle-2" class="h-4 w-4"></i></span>
+            </div>
+            <p class="mt-2 text-2xl font-semibold text-slate-900">12</p>
+            <p class="text-xs text-slate-400">This term</p>
+          </div>
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <div class="flex items-center justify-between">
+              <p class="text-sm text-slate-500">Under Sanction</p>
+              <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand-50 text-brand-600"><i data-lucide="users" class="h-4 w-4"></i></span>
+            </div>
+            <p class="mt-2 text-2xl font-semibold text-slate-900">4</p>
+            <p class="text-xs text-slate-400">Distinct students</p>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="mb-5 border-b border-slate-200">
+          <nav class="-mb-px flex gap-6 text-sm font-medium" id="tabs">
+            <button data-tab="pending" class="border-brand-600 border-b-2 px-1 pb-3 text-brand-700">Pending Review</button>
+            <button data-tab="sanctions" class="px-1 pb-3 text-slate-500 hover:text-slate-700">Sanctions</button>
+            <button data-tab="rules" class="px-1 pb-3 text-slate-500 hover:text-slate-700">Rules</button>
+            <button data-tab="own" class="px-1 pb-3 text-slate-500 hover:text-slate-700">My Sanctions</button>
+          </nav>
+        </div>
+
+        <!-- ============ TAB: PENDING REVIEW ============ -->
+        <section data-panel="pending" class="space-y-3">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Flagged by absence threshold — most specific rule wins (§8.4)</p>
+
+          <!-- Flag card -->
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <div class="flex flex-wrap items-center gap-4">
+              <span class="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700">MA</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <p class="font-medium text-slate-900">Maria Alvarez</p>
+                  <span class="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">Critical</span>
+                </div>
+                <p class="text-sm text-slate-500">BSCS-2-A · 9 / 4 absences</p>
+              </div>
+              <div class="w-40">
+                <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div class="h-full rounded-full bg-red-500" style="width:100%"></div>
+                </div>
+                <p class="mt-1 text-xs text-slate-400">Flagged Aug 09</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700">Review</button>
+                <button class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Dismiss</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <div class="flex flex-wrap items-center gap-4">
+              <span class="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700">JC</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <p class="font-medium text-slate-900">Juan Cruz</p>
+                  <span class="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">High</span>
+                </div>
+                <p class="text-sm text-slate-500">BSIT-3-B · 6 / 4 absences</p>
+              </div>
+              <div class="w-40">
+                <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div class="h-full rounded-full bg-amber-500" style="width:80%"></div>
+                </div>
+                <p class="mt-1 text-xs text-slate-400">Flagged Aug 08</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700">Review</button>
+                <button class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Dismiss</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-xl border border-slate-200 bg-white p-4">
+            <div class="flex flex-wrap items-center gap-4">
+              <span class="grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-sm font-semibold text-slate-700">RT</span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <p class="font-medium text-slate-900">Rina Tan</p>
+                  <span class="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">Moderate</span>
+                </div>
+                <p class="text-sm text-slate-500">BSCS-1-C · 5 / 4 absences</p>
+              </div>
+              <div class="w-40">
+                <div class="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div class="h-full rounded-full bg-amber-400" style="width:65%"></div>
+                </div>
+                <p class="mt-1 text-xs text-slate-400">Flagged Aug 07</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white hover:bg-brand-700">Review</button>
+                <button class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Dismiss</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ TAB: SANCTIONS ============ -->
+        <section data-panel="sanctions" class="hidden">
+          <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+              <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th class="px-4 py-3">Student</th>
+                  <th class="px-4 py-3">Rule / Reason</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3">Issued By</th>
+                  <th class="px-4 py-3">Date</th>
+                  <th class="px-4 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="px-4 py-3"><p class="font-medium text-slate-900">Maria Alvarez</p><p class="text-xs text-slate-400">BSCS-2-A</p></td>
+                  <td class="px-4 py-3 text-slate-600">Excessive absences (&gt;4)</td>
+                  <td class="px-4 py-3"><span class="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">Open</span></td>
+                  <td class="px-4 py-3 text-slate-600">Discipline Off.</td>
+                  <td class="px-4 py-3 text-slate-600">Aug 09</td>
+                  <td class="px-4 py-3 text-right"><button class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Resolve</button></td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3"><p class="font-medium text-slate-900">Juan Cruz</p><p class="text-xs text-slate-400">BSIT-3-B</p></td>
+                  <td class="px-4 py-3 text-slate-600">Excessive absences (&gt;4)</td>
+                  <td class="px-4 py-3"><span class="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">Open</span></td>
+                  <td class="px-4 py-3 text-slate-600">Discipline Off.</td>
+                  <td class="px-4 py-3 text-slate-600">Aug 08</td>
+                  <td class="px-4 py-3 text-right"><button class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Resolve</button></td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3"><p class="font-medium text-slate-900">Paolo Reyes</p><p class="text-xs text-slate-400">BSCS-4-A</p></td>
+                  <td class="px-4 py-3 text-slate-600">Repeat unexcused absences</td>
+                  <td class="px-4 py-3"><span class="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">Resolved</span></td>
+                  <td class="px-4 py-3 text-slate-600">Super Admin</td>
+                  <td class="px-4 py-3 text-slate-600">Jul 22</td>
+                  <td class="px-4 py-3 text-right text-xs text-slate-400">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ TAB: RULES ============ -->
+        <section data-panel="rules" class="hidden space-y-3">
+          <div id="rules-scope-note" class="hidden rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800">
+            <i data-lucide="info" class="mr-1 inline h-4 w-4"></i>
+            You are scoped to <span class="font-semibold">BSCS-2 / BSCS-1</span>. Rules outside your scope are read-only.
+          </div>
+          <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+              <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th class="px-4 py-3">Scope</th>
+                  <th class="px-4 py-3">Absence Threshold</th>
+                  <th class="px-4 py-3">Period</th>
+                  <th class="px-4 py-3">Action</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3 text-right">Edit</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="px-4 py-3 text-slate-600">Faculty-wide</td>
+                  <td class="px-4 py-3 font-medium text-slate-900">4</td>
+                  <td class="px-4 py-3 text-slate-600">Current term</td>
+                  <td class="px-4 py-3 text-slate-600">Flag for review</td>
+                  <td class="px-4 py-3"><span class="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">Active</span></td>
+                  <td class="px-4 py-3 text-right"><button class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Edit</button></td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 text-slate-600">BSCS-2-A</td>
+                  <td class="px-4 py-3 font-medium text-slate-900">3</td>
+                  <td class="px-4 py-3 text-slate-600">Current term</td>
+                  <td class="px-4 py-3 text-slate-600">Flag for review</td>
+                  <td class="px-4 py-3"><span class="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">Active</span></td>
+                  <td class="px-4 py-3 text-right"><button class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50">Edit</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ============ TAB: MY SANCTIONS (student) ============ -->
+        <section data-panel="own" class="hidden">
+          <div class="rounded-xl border border-slate-200 bg-white p-6">
+            <div class="flex items-start gap-3">
+              <span class="grid h-10 w-10 place-items-center rounded-full bg-amber-50 text-amber-600"><i data-lucide="alert-triangle" class="h-5 w-5"></i></span>
+              <div>
+                <p class="font-medium text-slate-900">Unexcused Absences</p>
+                <p class="mt-1 text-sm text-slate-500">Status: <span class="font-medium text-amber-700">Open</span> · Issued Aug 09 by Discipline Officer.</p>
+                <p class="mt-2 text-sm text-slate-500">Reason: 5 unexcused absences this term. Attached evidence: 5 attendance records.</p>
+                <button class="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                  <i data-lucide="message-square" class="h-4 w-4"></i> Submit Appeal
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    const tabs = document.querySelectorAll("#tabs button");
+    const panels = document.querySelectorAll("[data-panel]");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => {
+          t.classList.remove("border-brand-600", "border-b-2", "text-brand-700");
+          t.classList.add("text-slate-500");
+        });
+        tab.classList.add("border-brand-600", "border-b-2", "text-brand-700");
+        tab.classList.remove("text-slate-500");
+        const target = tab.dataset.tab;
+        panels.forEach((p) => p.classList.toggle("hidden", p.dataset.panel !== target));
+      });
+    });
+
+    // Role-based visibility (per ROLES-AND-MODULES.md + DESIGN.md §7,§8,§12)
+    const ROLES = {
+      super: {
+        name: "Super Admin", initials: "SA", subtitle: "Review absence-flagged students, issue sanctions, and manage threshold rules (faculty-wide).",
+        canManage: true, canOwn: false, scoped: false,
+      },
+      discipline: {
+        name: "Discipline Officer", initials: "DO", subtitle: "Review flags and issue sanctions for your assigned section scope. Attendance view is for evidence only.",
+        canManage: true, canOwn: false, scoped: true,
+      },
+      student: {
+        name: "Student", initials: "ST", subtitle: "View your own sanctions and submit appeals. No queue or rules are visible to you.",
+        canManage: false, canOwn: true, scoped: false,
+      },
+    };
+
+    function applyRole(key) {
+      const r = ROLES[key];
+      document.getElementById("side-name").textContent = r.name;
+      document.getElementById("side-role").textContent = r.name;
+      document.getElementById("side-initials").textContent = r.initials;
+      document.getElementById("head-initials").textContent = r.initials;
+      document.getElementById("subtitle").textContent = r.subtitle;
+
+      const isStudent = key === "student";
+      const isOfficer = !isStudent;
+
+      // New Sanction button + officer-only controls
+      document.getElementById("new-sanction-btn").style.display = r.canManage ? "" : "none";
+
+      // Tabs visibility
+      const tabMap = {
+        pending: document.querySelector('[data-tab="pending"]'),
+        sanctions: document.querySelector('[data-tab="sanctions"]'),
+        rules: document.querySelector('[data-tab="rules"]'),
+        own: document.querySelector('[data-tab="own"]'),
+      };
+      tabMap.pending.style.display = isOfficer ? "" : "none";
+      tabMap.rules.style.display = isOfficer ? "" : "none";
+      tabMap.own.style.display = isStudent ? "" : "none";
+      tabMap.sanctions.style.display = ""; // both officers (scoped) and student (own) see a list view
+
+      // Default to a sensible tab
+      const defaultTab = isStudent ? "own" : "pending";
+      document.querySelector(`[data-tab="${defaultTab}"]`).click();
+
+      // Scoped note on rules
+      document.getElementById("rules-scope-note").classList.toggle("hidden", !r.scoped);
+
+      // Officer-only action buttons (Review / Dismiss / Resolve / Edit)
+      document.querySelectorAll("[data-officer-only]").forEach((el) => {
+        el.style.display = isOfficer ? "" : "none";
+      });
+    }
+
+    document.getElementById("role-switch").addEventListener("change", (e) => applyRole(e.target.value));
+
+    // mark officer-only buttons
+    document.querySelectorAll("button").forEach((b) => {
+      const t = b.textContent.trim();
+      if (["Review", "Dismiss", "Resolve", "Edit", "Submit Appeal"].includes(t)) b.setAttribute("data-officer-only", "");
+    });
+
+    lucide.createIcons();
+    applyRole("super");
+  </script>
+</body>
+</html>

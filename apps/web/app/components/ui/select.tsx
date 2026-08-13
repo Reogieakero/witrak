@@ -11,10 +11,17 @@ type SelectProps = {
   value?: string;
   placeholder?: string;
   options: SelectOption[];
+  onChange?: (value: string) => void;
 };
 
-export function Select({ name, value, placeholder = "Select…", options }: SelectProps) {
-  const [selected, setSelected] = useState(value ?? "");
+export function Select({
+  name,
+  value,
+  placeholder = "Select…",
+  options,
+  onChange,
+}: SelectProps) {
+  const [internal, setInternal] = useState(value ?? "");
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -28,6 +35,16 @@ export function Select({ name, value, placeholder = "Select…", options }: Sele
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
   }, [open]);
+
+  const selected = onChange ? (value ?? "") : internal;
+  const commit = (v: string) => {
+    if (onChange) {
+      onChange(v);
+    } else {
+      setInternal(v);
+    }
+    setOpen(false);
+  };
 
   const current = options.find((o) => o.value === selected);
 
@@ -61,10 +78,7 @@ export function Select({ name, value, placeholder = "Select…", options }: Sele
               aria-selected={o.value === selected}
               className={styles.menuItem}
               data-selected={o.value === selected || undefined}
-              onClick={() => {
-                setSelected(o.value);
-                setOpen(false);
-              }}
+              onClick={() => commit(o.value)}
             >
               <span>{o.label}</span>
               {o.value === selected && <Check size={13} />}

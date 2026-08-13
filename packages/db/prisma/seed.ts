@@ -59,12 +59,9 @@ const ROLE_SEEDS: RoleSeed[] = [
   },
   {
     name: "Discipline Officer",
-    description: "Sanctions only (private records) + attendance view for evidence.",
+    description: "Sanctions view within scope (decisions rest with the admin/president) + attendance view for evidence.",
     permissions: [
-      PermissionKey.sanctions_create,
       PermissionKey.sanctions_view,
-      PermissionKey.sanctions_resolve,
-      PermissionKey.sanctions_appeal_respond,
       PermissionKey.attendance_view,
     ],
   },
