@@ -301,14 +301,14 @@ model Sanction {
   title        String
   reason       String
   status       SanctionStatus   @default(OPEN)
-  issuedById   String
+  issuedById   String?          // null = auto-issued by threshold trigger (system)
   issuedAt     DateTime         @default(now())
   resolvedById String?
   resolvedAt   DateTime?
   resolvedNote String?
   student      Student          @relation(fields: [studentId], references: [id])
   rule         SanctionRule?    @relation(fields: [ruleId], references: [id])
-  issuedBy     User             @relation("SanctionIssuedBy", fields: [issuedById], references: [id])
+  issuedBy     User?            @relation("SanctionIssuedBy", fields: [issuedById], references: [id])
   resolvedBy   User?            @relation("SanctionResolvedBy", fields: [resolvedById], references: [id])
   evidences    SanctionEvidence[]
 }
@@ -323,7 +323,7 @@ model SanctionEvidence {
   @@unique([sanctionId, attendanceId])
 }
 
-// Pending-review queue (§8). One active pending flag per (student, rule, periodRef).
+// Resolved audit-trail flag for an auto-issued sanction (§8). One flag per (student, rule, periodRef).
 model SanctionFlag {
   id           String     @id @default(cuid())
   studentId    String
@@ -400,12 +400,12 @@ model Announcement {
 // APPEND-ONLY: no update/delete API exists for this model (§11).
 model AuditLog {
   id        Int         @id @default(autoincrement())
-  actorId   String
+  actorId   String?     // null = system action
   action    AuditAction
   targetId  String?     // affected user/record
   details   Json        // JSON snapshot incl. names (survives soft-delete)
   timestamp DateTime    @default(now())
-  actor     User        @relation(fields: [actorId], references: [id])
+  actor     User?       @relation(fields: [actorId], references: [id])
 
   @@index([actorId])
   @@index([action])

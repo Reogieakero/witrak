@@ -47,8 +47,8 @@ export const MAIN_NAV: NavItem[] = [
   { label: "Events", href: "/admin/events", icon: CalendarCheck2 },
   { label: "Attendance", href: "/admin/attendance", icon: QrCode },
   { label: "Transparency", href: "/admin/transparency", icon: FolderOpen },
-  { label: "Sanctions", href: "#", icon: ShieldAlert },
-  { label: "Fees", href: "#", icon: HandCoins },
+  { label: "Sanctions", href: "/admin/sanctions", icon: ShieldAlert },
+  { label: "Fees", href: "/admin/fees", icon: HandCoins },
   { label: "Announcements", href: "#", icon: Megaphone },
   { label: "Members", href: "#", icon: Users },
 ];

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { AttendanceStatus, prisma } from "@fhusocom/db";
+import { AttendanceStatus, prisma, recomputeSanctionTriggers } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, studentInScope, type UserAccess } from "@/lib/permissions";
 
@@ -79,6 +79,8 @@ export async function updateAttendanceStatus(input: {
       },
     });
   }
+
+  await recomputeSanctionTriggers(input.studentId);
 
   revalidatePath("/admin/attendance");
   return { ok: true };

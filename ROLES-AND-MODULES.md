@@ -41,7 +41,7 @@
 | Transparency — view | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Transparency — upload / delete | ✓ | ✓ | ✓ financial only | — | — |
 | Sanctions — view | ✓ | — | — | ✓ scoped | — |
-| Sanctions — pending queue / create / resolve | ✓ | — | — | ✓ scoped | — |
+| Sanctions — view / clear / edit rules | ✓ | — | — | — | — |
 | Fees — view | ✓ | — | ✓ | — | — |
 | Fees — create / verify | ✓ | — | ✓ | — | — |
 | Announcements — view | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -53,6 +53,8 @@
 ### Scope notes
 - **Year Rep** rows marked "scoped" are limited to their resolved section set (`WHERE student.section_id IN (:S)`).
 - **Discipline Officer** holds `attendance.view` (faculty-wide) **only** to inspect the attendance history behind a sanction flag — no other attendance surface.
+- **Discipline Officer** sanctions access is **view-only** within scope; resolution (clearing) decisions rest with the **Super Admin / president**. Threshold-triggered sanctions are auto-issued and appear in the officer's view.
+- **Sanction edits** (title / reason) are also restricted to the **Super Admin / president** — the Discipline Officer cannot modify records.
 - **Treasurer** has no attendance access.
 - **Year Rep events**: can create/edit/delete **own** events; events themselves are faculty-wide records (§3.4).
 
@@ -77,7 +79,7 @@ Students see **no** create/edit/delete/verify controls, no directory of other st
 | Super Admin | all keys |
 | Secretary | `events.*`, `attendance.*`, `transparency.upload`, `transparency.delete`, `transparency.view`, `announcements.create`, `announcements.delete` |
 | Treasurer | `fees.create`, `fees.verify_payment`, `fees.view`, `transparency.upload`, `transparency.delete`, `transparency.view` |
-| Discipline Officer | `sanctions.create`, `sanctions.view`, `sanctions.resolve`, `sanctions.appeal_respond`, `attendance.view` (evidence review) |
+| Discipline Officer | `sanctions.view`, `attendance.view` (evidence review) |
 | Year/Program Rep | `events.create`, `events.edit`, `events.delete`, `events.view`, `attendance.scan`, `attendance.view` |
 | Student | `events.view`, `attendance.view`, `sanctions.view_own`, `fees.view`, `transparency.view`, `announcements.view`, fee proof upload capability |
 

@@ -6,6 +6,7 @@ import { ShieldAlert, Loader2, PencilLine, Trash2 } from "lucide-react";
 import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
 import { LoadingOverlay } from "@/app/components/ui/loading-overlay";
+import { ConfirmationModal } from "@/app/components/ui/confirmation-modal";
 import { SanctionsStatsGrid } from "./sanctions-stats";
 import { SanctionsTables } from "./sanctions-tables";
 import { SanctionsModals } from "./sanctions-modals";
@@ -21,6 +22,7 @@ import type {
   SanctionsViewProps,
   SanctionsListTab,
   SanctionRuleOption,
+  SanctionItem,
   SanctionsModal,
   SanctionsDrawer,
 } from "./types";
@@ -64,6 +66,8 @@ export function SanctionsView({
   const [drawer, setDrawer] = useState<SanctionsDrawer | null>(null);
   const [deletingRule, setDeletingRule] = useState(false);
   const [ruleBusy, setRuleBusy] = useState<null | "adding" | "saving">(null);
+  const [resolvingSanction, setResolvingSanction] = useState(false);
+  const [confirmResolve, setConfirmResolve] = useState<SanctionItem | null>(null);
   const [isMutating, startTransition] = useTransition();
 
   const flagRuleSource = rules.filter((r) => r.active).length ? rules.filter((r) => r.active) : DEFAULT_RULES;
@@ -79,20 +83,31 @@ export function SanctionsView({
     setPage(1);
   };
 
+  const requestResolve = (sanctionId: string) => {
+    const item = sanctions.find((s) => s.id === sanctionId);
+    if (item) setConfirmResolve(item);
+  };
+
   const handleResolve = (sanctionId: string) => {
     if (!sanctionId) return;
+    setResolvingSanction(true);
     startTransition(async () => {
-      const result = await sileo.promise(
-        () => resolveSanction({ sanctionId }),
-        {
-          loading: { title: "Resolving sanction", description: "Marking the sanction cleared...", icon: <Loader2 /> },
-          success: { title: "Sanction cleared", description: "The sanction was marked as Cleared.", icon: <ShieldAlert /> },
-          error: (err) => ({ title: "Could not resolve", description: err instanceof Error ? err.message : "Please try again.", icon: <ShieldAlert /> }),
-        },
-      );
-      if (result.ok) {
-        setDrawer(null);
-        router.refresh();
+      try {
+        const result = await sileo.promise(
+          () => resolveSanction({ sanctionId }),
+          {
+            loading: { title: "Resolving sanction", description: "Marking the sanction cleared...", icon: <Loader2 /> },
+            success: { title: "Sanction cleared", description: "The sanction was marked as Cleared.", icon: <ShieldAlert /> },
+            error: (err) => ({ title: "Could not resolve", description: err instanceof Error ? err.message : "Please try again.", icon: <ShieldAlert /> }),
+          },
+        );
+        if (result.ok) {
+          setConfirmResolve(null);
+          setDrawer(null);
+          router.refresh();
+        }
+      } finally {
+        setResolvingSanction(false);
       }
     });
   };
@@ -278,7 +293,7 @@ export function SanctionsView({
           canResolve={canResolve}
           canEdit={canEdit}
           onView={(sanctionId) => setDrawer({ kind: "sanction", id: sanctionId })}
-          onResolve={handleResolve}
+          onResolve={requestResolve}
           onEdit={(sanctionId) => setModal({ kind: "edit", id: sanctionId })}
           disabled={isMutating}
         />
@@ -305,17 +320,38 @@ export function SanctionsView({
         canCreate={canCreate}
         scopeOptions={scopeOptions}
         onEditFor={(sanctionId) => setModal({ kind: "edit", id: sanctionId })}
-        onResolve={handleResolve}
+        onResolve={requestResolve}
       />
 
+      {confirmResolve && (
+        <ConfirmationModal
+          open
+          title="Clear this sanction?"
+          description={
+            <>
+              You are about to mark the sanction for{" "}
+              <strong>{confirmResolve.studentName}</strong> as Cleared. This records the
+              resolution and cannot be undone. Type the student's name to continue.
+            </>
+          }
+          confirmLabel="Clear Sanction"
+          confirmToken={confirmResolve.studentName}
+          variant="brand"
+          onConfirm={() => handleResolve(confirmResolve.id)}
+          onClose={() => setConfirmResolve(null)}
+        />
+      )}
+
       <LoadingOverlay
-        open={deletingRule || ruleBusy !== null}
+        open={deletingRule || resolvingSanction || ruleBusy !== null}
         label={
           deletingRule
             ? "Deleting sanction rule…"
-            : ruleBusy === "saving"
-              ? "Saving sanction rule…"
-              : "Adding sanction rule…"
+            : resolvingSanction
+              ? "Clearing sanction…"
+              : ruleBusy === "saving"
+                ? "Saving sanction rule…"
+                : "Adding sanction rule…"
         }
       />
     </div>

@@ -148,7 +148,7 @@ See `PRISMA-SCHEMA.md` for the full schema.
 - Visible only to: the owning student (`sanctions.view_own`) and officers holding `sanctions.view` **within scope**.
 - Never in public lists, aggregates, or leaderboards.
 - `sanctions.view` still respects scope — a Year Rep cannot see sanctions for students outside their section set, even though they hold the key.
-- The "Pending Review" flag queue (§8) is equally private — officers only.
+- Sanctions are issued automatically on threshold and cleared by the admin / president; the flag audit trail (§8) is equally private — officers only.
 
 ## 8. Sanctions — Absence Threshold Trigger
 
@@ -158,16 +158,19 @@ Every `Attendance` row has `status ∈ {present, absent, excused, late}`. Only `
 ### 8.2 Dedup
 `UNIQUE (event_id, student_id)` on `Attendance` — duplicate/offline scans cannot double-count.
 
-### 8.3 Flow (flag-only; no auto sanctions or auto notices)
+### 8.3 Flow (auto-issue on threshold, cleared on fulfillment)
 1. On every attendance write (scan, manual, or **offline sync batch**), **recompute** the student's `absent` count for the current `AcademicTerm` (per rule `period`). Never increment — recompute, so corrections self-heal.
-2. Match the most specific applicable active `SanctionRule` (see §8.4). If `count >= threshold` and no pending flag exists for (student, rule, period), create a `SanctionFlag` (status `pending`).
-3. Discipline Officer (within scope) opens the flag, sees the triggering attendance history, then either:
-   - **Creates** a `Sanction` with the triggering attendance rows attached as `SanctionEvidence` (flag → `resolved`), or
-   - **Dismisses** the flag (e.g. absence later excused) — dismissal is logged.
-4. **Edits and excusals re-trigger recompute.** If a count drops below threshold, any `pending` flag for that (student, rule, period) is **auto-dismissed** (logged as `flag.auto_dismissed`). Prevent false sanctions.
+2. Match the most specific applicable active `SanctionRule` (see §8.4). If `count >= threshold` and the student has **no existing sanction or flag** for the term yet, **auto-issue** the sanction:
+   - Create a `Sanction` (status `open`) with the triggering attendance rows attached as `SanctionEvidence`, and
+   - Create a `SanctionFlag` (status `resolved`) as the audit trail. `Sanction.issuedById` and the audit log actor are `null` — system-issued.
+   - **One sanction per student**: the dedup is keyed on the student, not the rule — a student is issued a single sanction under the single best-matching rule. Adding or editing rules never stacks a second sanction on a student who already has one.
+3. When the student fulfills the requirement, the **admin / president clicks "Cleared"** (`sanctions.resolve`): the sanction flips to `resolved` with `resolvedNote = "Cleared"` and a `SANCTION_RESOLVED` audit entry. There is no pending queue and no appeal/upheld workflow — a single transaction clears the record. Officers view records; the discipline officer is view-only.
+4. **Adding or editing an active rule backfills.** After a rule is created or updated active, a recompute pass runs across every student in the rule's scope, so students who already meet the new/relaxed threshold are immediately auto-issued — no attendance write required. Idempotent per student, so repeats never duplicate and students with an existing sanction are never re-issued.
+5. **Admin / president may edit a sanction's title and reason** (gated by `sanctions.create`). The absences, rule, evidence, and outcome are fixed — edits update only the free-text fields. The same gate covers **rule management**: the admin can add, edit (threshold/scope/period/active), toggle, and delete sanction rules from the right-hand sidebar. Deleting a rule **cascades** to its dependent data in a single transaction: the rule's `SanctionEvidence`, `Sanction` records, and `SanctionFlag` records are deleted with it.
+6. **Edits and excusals re-trigger recompute.** Because auto-issue is idempotent per (student, rule, period), a corrected count never creates duplicates or double-issues.
 
 ### 8.4 Rule precedence
-Among matching active rules, the **most specific scope wins** (section > program_year > program > faculty). Ties on scope: the **highest threshold ≤ count** wins; then `period` (current-term match preferred). Graduated responses (3 = warn, 5 = flag) are modeled as multiple rules, but in Rev. 2 every rule's `action` is `flag_for_review` only — warnings/auto-sanctions are not enabled.
+Among matching active rules, the **most specific scope wins** (section > program_year > program > faculty). Ties on scope: the **highest threshold ≤ count** wins; then `period` (current-term match preferred). Graduated responses are modeled as multiple rules; in Rev. 2 every rule's `action` is `flag_for_review`, and the recompute **auto-issues one sanction per student** — the single best-matching rule (`threshold ≤ absences`) — when it is met; clearing it is a single admin action.
 
 ### 8.5 Offline sync (QR)
 When the mobile app syncs a scanned batch, the threshold recompute runs as **one pass after sync completes**, spanning the whole batch plus the server-side dedup — so a duplicate offline scan can't double-flag.
@@ -214,7 +217,7 @@ See `ROLES-AND-MODULES.md` for the full matrix and page-level detail. Summary:
 - **Super Admin** — every page (Dashboard, Events, Attendance, Transparency, Sanctions, Fees, Announcements, Members, Users & Roles, Audit Log).
 - **Secretary** — Events (full), Attendance (scan/view/edit), Transparency (upload/delete), Announcements (create/delete), Members.
 - **Treasurer** — Fees (create/verify), Transparency (financial files only), Members. No attendance.
-- **Discipline Officer** — Sanctions (view/queue/create/resolve, scoped) + `attendance.view` (faculty-wide) solely to inspect sanction evidence. Nothing else.
+- **Discipline Officer** — Sanctions **view only** (scoped; issuance/resolution decisions rest with the Super Admin / president) + `attendance.view` (faculty-wide) solely to inspect sanction evidence. Nothing else.
 - **Year/Program Rep** — Events (create/edit/delete own), Attendance (scan/view, scoped), Members (scoped).
 - **Student** — Events view, Attendance view (own), Transparency view, Sanctions view-own, Fees view + upload proof, Announcements view.
 

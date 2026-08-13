@@ -14,7 +14,7 @@ export type AuditLog = {
   targetId: string | null;
   details: unknown;
   timestamp: Date;
-  actor: { name: string };
+  actor: { name: string } | null;
 };
 
 type AuditActivityProps = {
@@ -122,7 +122,7 @@ export function AuditActivity({ logs, targetById }: AuditActivityProps) {
                     <td className={styles.targetCell}>
                       {log.targetId ? targetById[log.targetId] ?? "—" : "—"}
                     </td>
-                    <td className={styles.actorCell}>{log.actor.name}</td>
+                    <td className={styles.actorCell}>{log.actor?.name ?? "System"}</td>
                     <td className={styles.whenCell}>{formatDateTime(log.timestamp)}</td>
                   </tr>
                 );
