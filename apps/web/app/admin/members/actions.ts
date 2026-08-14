@@ -1,5 +1,6 @@
 "use server";
 
+import bcrypt from "bcryptjs";
 import { ScopeType } from "@fhusocom/db";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@fhusocom/db";
@@ -45,11 +46,37 @@ export async function createStudent(
     return { ok: false, error: "Student number is required." };
   }
 
+  const email = `${studentNo.replace(/[^a-zA-Z0-9.-]/g, "").toLowerCase()}@fhusocom.edu`;
+  const passwordHash = await bcrypt.hash("ChangeMe123!", 10);
+
   try {
-    await prisma.student.create({
-      data: { firstName, lastName, studentNo, sectionId },
+    const role = await prisma.role.findUnique({ where: { name: "Student" } });
+
+    await prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: { email, name: `${firstName} ${lastName}`.trim(), passwordHash },
+      });
+      if (role) {
+        await tx.userRole.create({
+          data: {
+            userId: user.id,
+            roleId: role.id,
+            scopeType: ScopeType.FACULTY,
+            assignedBy: session.user.id,
+          },
+        });
+      }
+      await tx.student.create({
+        data: { firstName, lastName, studentNo, sectionId, userId: user.id },
+      });
     });
-  } catch {
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("studentNo")) {
+      return { ok: false, error: "A student with that student number already exists." };
+    }
+    if (e instanceof Error && e.message.includes("email")) {
+      return { ok: false, error: "An account for that student number already exists." };
+    }
     return { ok: false, error: "A student with that student number already exists." };
   }
 

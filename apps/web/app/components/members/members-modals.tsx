@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { Users, UserPlus, Pencil, Ban, ShieldOff, CheckCircle2, XCircle } from "lucide-react";
 import { Modal } from "@/app/components/ui/modal";
 import { Drawer } from "@/app/components/ui/drawer";
+import { Button } from "@/app/components/ui/button";
 import { ModalActions } from "@/app/components/ui/modal-actions";
 import { Select } from "@/app/components/ui/select";
 import { Badge } from "@/app/components/ui/badge";
@@ -224,31 +225,37 @@ function ViewDrawer({
         canManage ? (
           <div className={styles.drawerFooter}>
             <div className={styles.drawerFooterGroup}>
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                size="md"
                 className={styles.suspendBtn}
                 onClick={() => onSuspend(item.id)}
               >
                 <Ban size={14} />
                 {item.suspended ? "Reinstate" : "Suspend"}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="primary"
+                size="md"
                 className={styles.removeAuthBtn}
                 onClick={() => onRemoveAuth(item.id)}
               >
                 <ShieldOff size={14} />
                 Remove Authorization
-              </button>
+              </Button>
             </div>
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="md"
               className={styles.editBtnWide}
               onClick={() => onEdit(item.id)}
             >
               <Pencil size={14} />
               Edit
-            </button>
+            </Button>
           </div>
         ) : undefined
       }
