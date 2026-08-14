@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 import { AdminShell } from "@/app/components/admin-shell";
 import { AnnouncementsView } from "@/app/components/announcements/announcements-view";
+import { getTermContext, termRange } from "@/lib/terms";
 import type {
   AnnouncementItem,
   AnnouncementStats,
@@ -29,7 +30,10 @@ export default async function AdminAnnouncementsPage() {
   const access = session.access;
   if (!hasPermission(access, "announcements_view")) redirect("/dashboard");
 
-  const [user, announcements, activeTerm, programs] = await Promise.all([
+  const { term } = await getTermContext();
+  const range = termRange(term);
+
+  const [user, announcements, programs] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -38,6 +42,7 @@ export default async function AdminAnnouncementsPage() {
       },
     }),
     prisma.announcement.findMany({
+      where: range ? { createdAt: range } : undefined,
       orderBy: { createdAt: "desc" },
       include: {
         createdBy: {
@@ -49,7 +54,6 @@ export default async function AdminAnnouncementsPage() {
         program: { select: { name: true } },
       },
     }),
-    prisma.academicTerm.findFirst({ where: { isActive: true } }),
     prisma.program.findMany({ orderBy: { name: "asc" } }),
   ]);
 
@@ -79,7 +83,7 @@ export default async function AdminAnnouncementsPage() {
     total: items.length,
     thisWeek: announcements.filter((a) => a.createdAt >= weekAgo).length,
     authors: new Set(items.map((i) => i.authorName)).size,
-    termName: activeTerm?.name ?? "Current Term",
+    termName: term?.name ?? "Current Term",
   };
 
   const userName = user?.name ?? "Officer";

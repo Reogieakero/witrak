@@ -61,11 +61,19 @@ export function AttendanceView({
   const [refreshKey, setRefreshKey] = useState(0);
   const router = useRouter();
 
+  const openStudentId = selectedStudent?.id ?? null;
+  const openEventId = selectedEvent?.id ?? null;
+  const openId = openStudentId ?? openEventId;
+
   useEffect(() => {
+    if (!openId) return;
     let cancelled = false;
     async function loadRecords() {
       try {
-        const res = await fetch("/api/attendance", { cache: "no-store" });
+        const qs = openStudentId
+          ? `studentId=${encodeURIComponent(openId ?? "")}`
+          : `eventId=${encodeURIComponent(openId ?? "")}`;
+        const res = await fetch(`/api/attendance?${qs}`, { cache: "no-store" });
         if (!res.ok) throw new Error("Failed to load attendance records.");
         const data: { records: ApiRecord[] } = await res.json();
         if (cancelled) return;
@@ -92,7 +100,7 @@ export function AttendanceView({
     return () => {
       cancelled = true;
     };
-  }, [refreshKey]);
+  }, [openStudentId, openEventId, openId, refreshKey]);
 
   const handleAttendanceChanged = () => {
     setRefreshKey((k) => k + 1);

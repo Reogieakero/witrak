@@ -21,11 +21,18 @@ export function FeesSidebar({
   onCreateFee,
   onVerifyQuick,
   onPaymentDetails,
+  onRecordPayment,
+  onAddMethod,
+  onEditMethod,
+  onDeleteMethod,
   fees,
+  paymentMethods,
   onEditFee,
   onDeleteFee,
   stats,
 }: FeesSidebarProps) {
+  const methodLabel = (type: string) =>
+    type.charAt(0) + type.slice(1).toLowerCase();
   return (
     <aside className={styles.sidebar}>
       <div className={styles.card}>
@@ -87,6 +94,21 @@ export function FeesSidebar({
               </span>
             </button>
           )}
+          {canVerify && (
+            <button
+              type="button"
+              className={styles.quickTile}
+              onClick={onRecordPayment}
+            >
+              <span className={styles.quickIcon}>
+                <Landmark size={14} />
+              </span>
+              <span className={styles.quickMeta}>
+                <span className={styles.quickLabel}>Record Payment</span>
+                <span className={styles.quickSub}>Add payment details</span>
+              </span>
+            </button>
+          )}
           <button type="button" className={styles.quickTile} onClick={onPaymentDetails}>
             <span className={styles.quickIcon}>
               <FileClock size={14} />
@@ -140,6 +162,69 @@ export function FeesSidebar({
                 <span className={styles.feeAmount}>{f.amount}</span>
                 <span className={styles.feeDue}>Due {f.dueDate}</span>
               </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.card}>
+        <div className={styles.cardHead}>
+          <h3 className={styles.cardTitle}>
+            <Landmark size={16} />
+            Payment Methods
+          </h3>
+          {canCreate && (
+            <button
+              type="button"
+              className={styles.addBtn}
+              title="Add payment method"
+              onClick={onAddMethod}
+            >
+              <Plus size={13} />
+            </button>
+          )}
+        </div>
+        <div className={styles.feeList}>
+          {paymentMethods.length === 0 && (
+            <p className={styles.empty}>No payment methods added yet.</p>
+          )}
+          {paymentMethods.map((m) => (
+            <div key={m.id} className={styles.feeItem}>
+              <div className={styles.feeHead}>
+                <span className={styles.feeTitle}>
+                  {methodLabel(m.type)}
+                  {m.active ? "" : " (hidden)"}
+                </span>
+                {canCreate && (
+                  <div className={styles.feeActions}>
+                    <button
+                      type="button"
+                      className={styles.editBtn}
+                      title="Edit method"
+                      onClick={() => onEditMethod(m.id)}
+                    >
+                      <Pencil size={13} />
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.deleteBtn}
+                      title="Remove method"
+                      onClick={() => onDeleteMethod(m)}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className={styles.feeMeta}>
+                <span className={styles.feeAmount}>{m.accountName}</span>
+                {m.accountNumber && (
+                  <span className={styles.feeDue}>{m.accountNumber}</span>
+                )}
+              </div>
+              {m.instructions && (
+                <p className={styles.methodNote}>{m.instructions}</p>
+              )}
             </div>
           ))}
         </div>

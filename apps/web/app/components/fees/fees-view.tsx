@@ -11,13 +11,14 @@ import { FeesStatsGrid } from "./fees-stats";
 import { FeesTables } from "./fees-tables";
 import { FeesModals } from "./fees-modals";
 import { FeesSidebar } from "./fees-sidebar";
-import { createFee, updateFee, deleteFee, verifyFeeProof } from "@/app/admin/fees/actions";
+import { createFee, updateFee, deleteFee, verifyFeeProof, recordPayment, upsertPaymentMethod, deletePaymentMethod } from "@/app/admin/fees/actions";
 import type {
   FeesViewProps,
   FeesListTab,
   FeesModal,
   FeesDrawer,
   FeeItem,
+  PaymentMethodItem,
 } from "./types";
 import styles from "./fees-view.module.css";
 
@@ -25,6 +26,7 @@ export function FeesView({
   fees,
   proofRows,
   balanceRows,
+  paymentMethods,
   stats,
   canCreate,
   canVerify,
@@ -36,11 +38,17 @@ export function FeesView({
   const [modal, setModal] = useState<FeesModal | null>(null);
   const [drawer, setDrawer] = useState<FeesDrawer | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<FeeItem | null>(null);
+  const [confirmDeleteMethod, setConfirmDeleteMethod] = useState<PaymentMethodItem | null>(null);
   const [busy, setBusy] = useState(false);
   const [busyLabel, setBusyLabel] = useState<string | null>(null);
   const [isMutating, startTransition] = useTransition();
 
   const pendingProofs = proofRows.filter((p) => p.status === "PENDING");
+  const students = balanceRows.map((r) => ({
+    id: r.id,
+    name: r.studentName,
+    studentNo: r.studentNo,
+  }));
 
   const handleTab = (next: FeesListTab) => {
     setTab(next);
@@ -173,6 +181,91 @@ export function FeesView({
     });
   };
 
+  const handleRecordPayment = (input: {
+    studentId: string;
+    feeId: string;
+    method?: string;
+    reference?: string;
+    accountName?: string;
+  }) => {
+    setBusy(true);
+    setBusyLabel("Recording payment…");
+    startTransition(async () => {
+      try {
+        const result = await sileo.promise(
+          () => recordPayment(input),
+          {
+            loading: { title: "Recording payment", description: "Saving the payment details…", icon: <Loader2 /> },
+            success: { title: "Payment recorded", description: "The student balance is marked as paid.", icon: <HandCoins /> },
+            error: (err) => ({ title: "Could not record payment", description: err instanceof Error ? err.message : "Please try again.", icon: <HandCoins /> }),
+          },
+        );
+        if (result.ok) {
+          setModal(null);
+          router.refresh();
+        }
+      } finally {
+        setBusy(false);
+        setBusyLabel(null);
+      }
+    });
+  };
+
+  const handleUpsertMethod = (input: {
+    id?: string;
+    type: string;
+    accountName: string;
+    accountNumber?: string;
+    instructions?: string;
+    active?: boolean;
+  }) => {
+    setBusy(true);
+    setBusyLabel(input.id ? "Updating method…" : "Adding method…");
+    startTransition(async () => {
+      try {
+        const result = await sileo.promise(
+          () => upsertPaymentMethod(input),
+          {
+            loading: { title: input.id ? "Updating method" : "Adding method", description: "Saving payment method…", icon: <Loader2 /> },
+            success: { title: "Payment method saved", description: "Students will see this under where to pay.", icon: <HandCoins /> },
+            error: (err) => ({ title: "Could not save method", description: err instanceof Error ? err.message : "Please try again.", icon: <HandCoins /> }),
+          },
+        );
+        if (result.ok) {
+          setModal(null);
+          router.refresh();
+        }
+      } finally {
+        setBusy(false);
+        setBusyLabel(null);
+      }
+    });
+  };
+
+  const handleDeleteMethod = (id: string) => {
+    setBusy(true);
+    setBusyLabel("Removing method…");
+    startTransition(async () => {
+      try {
+        const result = await sileo.promise(
+          () => deletePaymentMethod(id),
+          {
+            loading: { title: "Removing method", description: "Deleting payment method…", icon: <Loader2 /> },
+            success: { title: "Method removed", description: "It no longer appears to students.", icon: <HandCoins /> },
+            error: (err) => ({ title: "Could not remove method", description: err instanceof Error ? err.message : "Please try again.", icon: <HandCoins /> }),
+          },
+        );
+        if (result.ok) {
+          setConfirmDeleteMethod(null);
+          router.refresh();
+        }
+      } finally {
+        setBusy(false);
+        setBusyLabel(null);
+      }
+    });
+  };
+
   const openProof = (proofId: string) => {
     const exists = proofRows.some((p) => p.id === proofId);
     if (exists) setDrawer({ kind: "proof", proofId });
@@ -239,6 +332,11 @@ export function FeesView({
           const latest = proofRows[0];
           if (latest) setDrawer({ kind: "proof", proofId: latest.id });
         }}
+        onRecordPayment={() => setModal({ kind: "record" })}
+        paymentMethods={paymentMethods}
+        onAddMethod={() => setModal({ kind: "method" })}
+        onEditMethod={(id) => setModal({ kind: "editMethod", id })}
+        onDeleteMethod={(m) => setConfirmDeleteMethod(m)}
         fees={fees}
         onEditFee={(feeId) => setModal({ kind: "edit", feeId })}
         onDeleteFee={(feeId) => {
@@ -251,6 +349,8 @@ export function FeesView({
       <FeesModals
         fees={fees}
         proofs={proofRows}
+        students={students}
+        paymentMethods={paymentMethods}
         modal={modal}
         drawer={drawer}
         busy={busy}
@@ -259,6 +359,8 @@ export function FeesView({
         onCreateFee={handleCreate}
         onEditFee={handleUpdateFee}
         onVerify={handleVerify}
+        onRecordPayment={handleRecordPayment}
+        onUpsertMethod={handleUpsertMethod}
       />
 
       {confirmDelete && (
@@ -277,6 +379,26 @@ export function FeesView({
           confirmToken={confirmDelete.title}
           onConfirm={() => handleDeleteFee(confirmDelete.id)}
           onClose={() => setConfirmDelete(null)}
+        />
+      )}
+
+      {confirmDeleteMethod && (
+        <ConfirmationModal
+          open
+          title="Remove this payment method?"
+          description={
+            <>
+              <strong>{confirmDeleteMethod.accountName}</strong> (
+              {confirmDeleteMethod.type.charAt(0) +
+                confirmDeleteMethod.type.slice(1).toLowerCase()}
+              ) will no longer be shown to students as a place to pay. This cannot be
+              undone.
+            </>
+          }
+          confirmLabel="Remove Method"
+          confirmToken={confirmDeleteMethod.accountName}
+          onConfirm={() => handleDeleteMethod(confirmDeleteMethod.id)}
+          onClose={() => setConfirmDeleteMethod(null)}
         />
       )}
 

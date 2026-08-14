@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 import { AdminShell } from "@/app/components/admin-shell";
 import { EventsView } from "@/app/components/events/events-view";
+import { getTermContext, termRange } from "@/lib/terms";
 import type { EventItem, EventsStats } from "@/app/components/events/types";
 
 const PRESENT_STATUSES = ["PRESENT", "LATE"];
@@ -47,7 +48,10 @@ export default async function AdminEventsPage() {
 
   const now = new Date();
 
-  const [user, events, programs, activeTerm, attendanceRows, studentCount] =
+  const { term } = await getTermContext();
+  const range = termRange(term);
+
+  const [user, events, programs, attendanceRows, studentCount, studentProgramRows] =
     await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -57,6 +61,7 @@ export default async function AdminEventsPage() {
         },
       }),
       prisma.event.findMany({
+        where: range ? { createdAt: range } : undefined,
         orderBy: { startsAt: "desc" },
         select: {
           id: true,
@@ -74,22 +79,48 @@ export default async function AdminEventsPage() {
         },
       }),
       prisma.program.findMany({ orderBy: { code: "asc" } }),
-      prisma.academicTerm.findFirst({ where: { isActive: true } }),
       prisma.attendance.findMany({ select: { eventId: true, status: true } }),
       prisma.student.count(),
+      prisma.student.findMany({
+        select: { section: { select: { programYear: { select: { programId: true } } } } },
+      }),
     ]);
 
-  const attByEvent = new Map<string, { total: number; present: number }>();
-  let attendanceTotal = 0;
+  const termEventIds = new Set(events.map((e) => e.id));
+
+  const programStudentCount = new Map<string, number>();
+  for (const s of studentProgramRows) {
+    const pid = s.section?.programYear.programId;
+    if (pid) programStudentCount.set(pid, (programStudentCount.get(pid) ?? 0) + 1);
+  }
+  const programTargetById = new Map(programs.map((p) => [p.id, p.enrollmentTarget]));
+  const targetTotal = programs.reduce((sum, p) => sum + (p.enrollmentTarget ?? 0), 0);
+  const hasTargets = programs.some((p) => p.enrollmentTarget != null);
+  const displayedTotalStudents = hasTargets ? targetTotal : studentCount;
+
+  const expectedForEvent = (programId: string | null) => {
+    if (programId) {
+      return programTargetById.get(programId) ?? programStudentCount.get(programId) ?? 0;
+    }
+    return displayedTotalStudents;
+  };
+
+  const presentByEvent = new Map<string, number>();
+  const rowCountByEvent = new Map<string, number>();
   let presentTotal = 0;
   for (const row of attendanceRows) {
-    const agg = attByEvent.get(row.eventId) ?? { total: 0, present: 0 };
-    agg.total += 1;
-    if (PRESENT_STATUSES.includes(row.status)) agg.present += 1;
-    attByEvent.set(row.eventId, agg);
-    attendanceTotal += 1;
-    if (PRESENT_STATUSES.includes(row.status)) presentTotal += 1;
+    if (!termEventIds.has(row.eventId)) continue;
+    rowCountByEvent.set(row.eventId, (rowCountByEvent.get(row.eventId) ?? 0) + 1);
+    if (PRESENT_STATUSES.includes(row.status)) {
+      presentByEvent.set(row.eventId, (presentByEvent.get(row.eventId) ?? 0) + 1);
+      presentTotal += 1;
+    }
   }
+
+  const expectedTotal = [...events].reduce(
+    (sum, e) => (rowCountByEvent.get(e.id) ? sum + expectedForEvent(e.programId) : sum),
+    0,
+  );
 
   const canCreate = hasPermission(access, "events_create");
   const canEdit = hasPermission(access, "events_edit");
@@ -98,8 +129,10 @@ export default async function AdminEventsPage() {
     user?.roles.some((r) => r.role.name === "Year/Program Rep") ?? false;
 
   const items: EventItem[] = events.map((e) => {
-    const agg = attByEvent.get(e.id) ?? { total: 0, present: 0 };
-    const rate = agg.total ? Math.round((agg.present / agg.total) * 100) : 0;
+    const expected = expectedForEvent(e.programId);
+    const present = presentByEvent.get(e.id) ?? 0;
+    const hasRows = (rowCountByEvent.get(e.id) ?? 0) > 0;
+    const rate = hasRows && expected ? Math.round((present / expected) * 100) : 0;
     const status = eventStatus(e.startsAt, e.endsAt, now);
     const schedule = formatSchedule(e.startsAt, e.endsAt);
     const dm = formatDayMonth(e.startsAt);
@@ -121,9 +154,9 @@ export default async function AdminEventsPage() {
       scheduleTime: schedule.time,
       status,
       daysUntil: status === "upcoming" ? daysUntil(e.startsAt, now) : null,
-      attendanceTotal: agg.total,
-      attendancePresent: agg.present,
-      attendanceRate: agg.total ? rate : null,
+      attendanceTotal: hasRows ? expected : 0,
+      attendancePresent: present,
+      attendanceRate: hasRows && expected ? rate : null,
       canEdit: canEdit && (!isYearRep || e.createdById === userId),
       canDelete: canDelete && (!isYearRep || e.createdById === userId),
     };
@@ -134,11 +167,11 @@ export default async function AdminEventsPage() {
     upcoming: items.filter((e) => e.status === "upcoming").length,
     live: items.filter((e) => e.status === "live").length,
     past: items.filter((e) => e.status === "past").length,
-    avgRate: attendanceTotal ? Math.round((presentTotal / attendanceTotal) * 100) : 0,
+    avgRate: expectedTotal ? Math.round((presentTotal / expectedTotal) * 100) : 0,
     presentTotal,
-    attendanceTotal,
+    attendanceTotal: expectedTotal,
     studentCount,
-    termName: activeTerm?.name ?? "Current Term",
+    termName: term?.name ?? "Current Term",
   };
 
   const userName = user?.name ?? "Officer";

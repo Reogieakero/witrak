@@ -56,20 +56,21 @@ export const MAIN_NAV: NavItem[] = [
 
 export const SYSTEM_NAV: NavItem[] = [
   { label: "Students", href: "/admin/students", icon: GraduationCap },
-  { label: "Audit Log", href: "#", icon: ScrollText },
+  { label: "Audit Log", href: "/admin/audit-log", icon: ScrollText },
 ];
 
 export type QuickAction = {
   label: string;
   sub: string;
   icon: LucideIcon;
+  href: string;
 };
 
 export const QUICK_ACTIONS: QuickAction[] = [
-  { label: "Assign Role", sub: "Officers", icon: UserCog },
-  { label: "Approve Req.", sub: "Role requests", icon: CheckCheck },
-  { label: "New Event", sub: "Schedule", icon: CalendarPlus },
-  { label: "Scan Attendance", sub: "Log entry", icon: QrCode },
-  { label: "Upload Doc", sub: "Transparency", icon: Upload },
-  { label: "Export Reports", sub: "PDF / CSV", icon: Download },
+  { label: "Assign Role", sub: "Officers", icon: UserCog, href: "/admin/members" },
+  { label: "Approve Req.", sub: "Role requests", icon: CheckCheck, href: "/admin/members" },
+  { label: "New Event", sub: "Schedule", icon: CalendarPlus, href: "/admin/events" },
+  { label: "Scan Attendance", sub: "Log entry", icon: QrCode, href: "/admin/attendance" },
+  { label: "Upload Doc", sub: "Transparency", icon: Upload, href: "/admin/transparency" },
+  { label: "Export Reports", sub: "PDF / CSV", icon: Download, href: "/admin/transparency" },
 ];

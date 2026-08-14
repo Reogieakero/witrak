@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 import { AdminShell } from "@/app/components/admin-shell";
 import { TransparencyView } from "@/app/components/transparency/transparency-view";
+import { getTermContext, termRange } from "@/lib/terms";
 import type { TransparencyFileItem, TransparencyStats } from "@/app/components/transparency/types";
 
 type Category = "financial" | "events" | "minutes" | "reports";
@@ -30,7 +31,10 @@ export default async function AdminTransparencyPage() {
   const access = session.access;
   if (!hasPermission(access, "transparency_view")) redirect("/dashboard");
 
-  const [user, files, activeTerm] = await Promise.all([
+  const { term } = await getTermContext();
+  const range = termRange(term);
+
+  const [user, files] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -39,10 +43,10 @@ export default async function AdminTransparencyPage() {
       },
     }),
     prisma.transparencyFile.findMany({
+      where: range ? { uploadedAt: range } : undefined,
       orderBy: { uploadedAt: "desc" },
       include: { uploadedBy: { select: { name: true } } },
     }),
-    prisma.academicTerm.findFirst({ where: { isActive: true } }),
   ]);
 
   const canUpload = hasPermission(access, "transparency_upload");
@@ -57,7 +61,7 @@ export default async function AdminTransparencyPage() {
 
   const stats: TransparencyStats = {
     totalFiles,
-    termName: activeTerm?.name ?? "Current Term",
+    termName: term?.name ?? "Current Term",
     financialCount: byCategory.financial || 0,
     eventsCount: byCategory.events || 0,
     minutesCount: byCategory.minutes || 0,

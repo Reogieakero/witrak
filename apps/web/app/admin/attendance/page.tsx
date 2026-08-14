@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 import { AdminShell } from "@/app/components/admin-shell";
 import { AttendanceView } from "@/app/components/attendance/attendance-view";
+import { getTermContext, termRange } from "@/lib/terms";
 import type {
   AttendanceEventItem,
   AttendanceStats,
@@ -41,9 +42,12 @@ export default async function AdminAttendancePage() {
 
   const now = new Date();
 
+  const { term } = await getTermContext();
+  const range = termRange(term);
+
   const scope = access?.scopeSectionIds ?? null;
 
-  const [user, events, attendanceRows, studentRows, activeTerm] =
+  const [user, events, attendanceRows, studentRows] =
     await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
@@ -53,6 +57,7 @@ export default async function AdminAttendancePage() {
         },
       }),
       prisma.event.findMany({
+        where: range ? { createdAt: range } : undefined,
         orderBy: { startsAt: "desc" },
         select: {
           id: true,
@@ -64,9 +69,10 @@ export default async function AdminAttendancePage() {
         },
       }),
       prisma.attendance.findMany({
-        where: scope
-          ? { student: { sectionId: { in: scope } } }
-          : undefined,
+        where: {
+          ...(scope ? { student: { sectionId: { in: scope } } } : {}),
+          ...(range ? { scannedAt: range } : {}),
+        },
         orderBy: { scannedAt: "desc" },
         select: {
           id: true,
@@ -116,7 +122,6 @@ export default async function AdminAttendancePage() {
           },
         },
       }),
-      prisma.academicTerm.findFirst({ where: { isActive: true } }),
     ]);
 
   const attByEvent = new Map<
@@ -272,7 +277,7 @@ export default async function AdminAttendancePage() {
     expected,
     attended: attendedTotal,
     absences: Math.max(0, expected - attendedTotal),
-    termName: activeTerm?.name ?? "Current Term",
+    termName: term?.name ?? "Current Term",
     eventCount: eventsWithAttendance.length,
     presentTotal,
   };

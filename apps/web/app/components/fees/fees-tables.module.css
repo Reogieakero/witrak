@@ -236,12 +236,14 @@
   display: block;
   white-space: nowrap;
   max-width: 120px;
+  margin: 0 auto;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .feeColAmount {
   display: block;
+  margin: 0 auto;
   font-weight: 600;
   color: var(--brand-600);
   text-transform: none;
@@ -331,7 +333,7 @@
   display: block;
   font-size: 0.6875rem;
   font-weight: 700;
-  text-align: right;
+  text-align: center;
   white-space: nowrap;
 }
 

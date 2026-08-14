@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { PlusCircle, CheckCheck, FileText, Info, XCircle } from "lucide-react";
+import { PlusCircle, CheckCheck, FileText, Info, XCircle, Landmark } from "lucide-react";
 import { Modal } from "@/app/components/ui/modal";
 import { Drawer } from "@/app/components/ui/drawer";
 import { ModalActions } from "@/app/components/ui/modal-actions";
 import { DatePicker } from "@/app/components/ui/date-picker";
+import { Select } from "@/app/components/ui/select";
+import type { SelectOption } from "@/app/components/ui/select";
 import type { FeesModalsProps, FeeProofRow, FeeItem } from "./types";
 import styles from "./fees-modals.module.css";
 
@@ -26,6 +28,8 @@ function StatusPill({ status }: { status: FeeProofRow["status"] }) {
 export function FeesModals({
   fees,
   proofs,
+  students,
+  paymentMethods,
   modal,
   drawer,
   busy,
@@ -34,10 +38,16 @@ export function FeesModals({
   onCreateFee,
   onEditFee,
   onVerify,
+  onRecordPayment,
+  onUpsertMethod,
 }: FeesModalsProps) {
   const verifyProof = modal?.kind === "verify" ? proofFor(proofs, modal.proofId) : undefined;
   const drawerProof = drawer?.kind === "proof" ? proofFor(proofs, drawer.proofId) : undefined;
   const editFee = modal?.kind === "edit" ? fees.find((f) => f.id === modal.feeId) : undefined;
+  const editingMethod =
+    modal?.kind === "editMethod"
+      ? paymentMethods.find((m) => m.id === modal.id)
+      : undefined;
 
   return (
     <>
@@ -55,6 +65,30 @@ export function FeesModals({
       )}
       {modal?.kind === "verify" && verifyProof && (
         <VerifyModal busy={busy} proof={verifyProof} onVerify={onVerify} onClose={onCloseModal} />
+      )}
+      {modal?.kind === "record" && (
+        <RecordPaymentModal
+          busy={busy}
+          students={students}
+          fees={fees}
+          onRecord={onRecordPayment}
+          onClose={onCloseModal}
+        />
+      )}
+      {modal?.kind === "method" && (
+        <PaymentMethodModal
+          busy={busy}
+          onUpsert={onUpsertMethod}
+          onClose={onCloseModal}
+        />
+      )}
+      {modal?.kind === "editMethod" && editingMethod && (
+        <PaymentMethodModal
+          busy={busy}
+          editing={editingMethod}
+          onUpsert={onUpsertMethod}
+          onClose={onCloseModal}
+        />
       )}
       {drawer?.kind === "proof" && drawerProof && (
         <ProofDrawer proof={drawerProof} onClose={onCloseDrawer} />
@@ -293,6 +327,299 @@ function VerifyModal({
   );
 }
 
+function RecordPaymentModal({
+  busy,
+  students,
+  fees,
+  onRecord,
+  onClose,
+}: {
+  busy: boolean;
+  students: FeesModalsProps["students"];
+  fees: FeeItem[];
+  onRecord: FeesModalsProps["onRecordPayment"];
+  onClose: () => void;
+}) {
+  const [studentId, setStudentId] = useState("");
+  const [feeId, setFeeId] = useState("");
+  const [method, setMethod] = useState("");
+  const [reference, setReference] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const studentOptions: SelectOption[] = students.map((s) => ({
+    value: s.id,
+    label: `${s.name} · ${s.studentNo}`,
+  }));
+  const feeOptions: SelectOption[] = fees.map((f) => ({
+    value: f.id,
+    label: f.title,
+  }));
+  const methodOptions: SelectOption[] = [
+    { value: "GCASH", label: "GCash" },
+    { value: "MAYA", label: "Maya" },
+    { value: "BANK", label: "Bank" },
+    { value: "CASH", label: "Cash" },
+  ];
+
+  const submit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    if (!studentId) return setError("Select a student.");
+    if (!feeId) return setError("Select a fee.");
+    onRecord({ studentId, feeId, method, reference, accountName });
+  };
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title={
+        <span className={styles.modalTitle}>
+          <span className={styles.headIcon}>
+            <Landmark size={16} />
+          </span>
+          <span>
+            <span className={styles.titleLine}>Record Payment</span>
+            <span className={styles.subtitle}>Add payment details on behalf of a student</span>
+          </span>
+        </span>
+      }
+      footer={
+        <ModalActions
+          onCancel={onClose}
+          cancelLabel={busy ? "Working…" : "Cancel"}
+          confirmType="submit"
+          confirmForm="record-form"
+          confirmLabel={busy ? "Recording…" : "Record Payment"}
+          disabled={busy || !studentId || !feeId}
+        />
+      }
+    >
+      <form id="record-form" onSubmit={submit} className={styles.form}>
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Student <span className={styles.required}>*</span>
+          </label>
+          <Select
+            name="studentId"
+            value={studentId}
+            placeholder="Select student"
+            options={studentOptions}
+            onChange={setStudentId}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Fee <span className={styles.required}>*</span>
+          </label>
+          <Select
+            name="feeId"
+            value={feeId}
+            placeholder="Select fee"
+            options={feeOptions}
+            onChange={setFeeId}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Payment method</label>
+          <Select
+            name="method"
+            value={method}
+            placeholder="e.g. GCash, Maya"
+            options={methodOptions}
+            onChange={setMethod}
+          />
+        </div>
+
+        <div className={styles.fieldGrid}>
+          <div className={styles.field}>
+            <label className={styles.label}>Account number / reference</label>
+            <input
+              type="text"
+              name="reference"
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              placeholder="0917xxxxxxx"
+              className={styles.input}
+            />
+          </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Account name</label>
+            <input
+              type="text"
+              name="accountName"
+              value={accountName}
+              onChange={(e) => setAccountName(e.target.value)}
+              placeholder="Juan Dela Cruz"
+              className={styles.input}
+            />
+          </div>
+        </div>
+
+        {error && <p className={styles.errorText}>{error}</p>}
+
+        <p className={styles.note}>
+          <Info size={12} className={styles.flexNone} />
+          <span>
+            This records the payment as paid and verifies it under your account. The
+            student&apos;s balance updates immediately.
+          </span>
+        </p>
+      </form>
+    </Modal>
+  );
+}
+
+function PaymentMethodModal({
+  busy,
+  editing,
+  onUpsert,
+  onClose,
+}: {
+  busy: boolean;
+  editing?: FeesModalsProps["paymentMethods"][number];
+  onUpsert: FeesModalsProps["onUpsertMethod"];
+  onClose: () => void;
+}) {
+  const [type, setType] = useState(editing?.type ?? "GCASH");
+  const [accountName, setAccountName] = useState(editing?.accountName ?? "");
+  const [accountNumber, setAccountNumber] = useState(editing?.accountNumber ?? "");
+  const [instructions, setInstructions] = useState(editing?.instructions ?? "");
+  const [active, setActive] = useState(editing?.active ?? true);
+  const [error, setError] = useState<string | null>(null);
+
+  const typeOptions: SelectOption[] = [
+    { value: "GCASH", label: "GCash" },
+    { value: "MAYA", label: "Maya" },
+    { value: "BANK", label: "Bank" },
+    { value: "CASH", label: "Cash" },
+    { value: "OTHER", label: "Other" },
+  ];
+
+  const submit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+    if (!accountName.trim()) return setError("Account name is required.");
+    onUpsert({
+      id: editing?.id,
+      type,
+      accountName: accountName.trim(),
+      accountNumber: accountNumber.trim(),
+      instructions: instructions.trim(),
+      active,
+    });
+  };
+
+  return (
+    <Modal
+      open
+      onClose={onClose}
+      title={
+        <span className={styles.modalTitle}>
+          <span className={styles.headIcon}>
+            <Landmark size={16} />
+          </span>
+          <span>
+            <span className={styles.titleLine}>
+              {editing ? "Edit Payment Method" : "Add Payment Method"}
+            </span>
+            <span className={styles.subtitle}>
+              Tell students where to send their payment
+            </span>
+          </span>
+        </span>
+      }
+      footer={
+        <ModalActions
+          onCancel={onClose}
+          cancelLabel={busy ? "Working…" : "Cancel"}
+          confirmType="submit"
+          confirmForm="method-form"
+          confirmLabel={
+            busy ? "Saving…" : editing ? "Save Changes" : "Add Method"
+          }
+          disabled={busy || !accountName.trim()}
+        />
+      }
+    >
+      <form id="method-form" onSubmit={submit} className={styles.form}>
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Method <span className={styles.required}>*</span>
+          </label>
+          <Select
+            name="type"
+            value={type}
+            placeholder="Select method"
+            options={typeOptions}
+            onChange={setType}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>
+            Account name <span className={styles.required}>*</span>
+          </label>
+          <input
+            type="text"
+            name="accountName"
+            value={accountName}
+            onChange={(e) => setAccountName(e.target.value)}
+            placeholder="e.g. Fhusocom Org / Juan Dela Cruz"
+            className={styles.input}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Account number / reference</label>
+          <input
+            type="text"
+            name="accountNumber"
+            value={accountNumber}
+            onChange={(e) => setAccountNumber(e.target.value)}
+            placeholder="0917xxxxxxx / bank account"
+            className={styles.input}
+          />
+        </div>
+
+        <div className={styles.field}>
+          <label className={styles.label}>Instructions (optional)</label>
+          <textarea
+            name="instructions"
+            rows={2}
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            placeholder="e.g. Send with your student number as reference."
+            className={styles.area}
+          />
+        </div>
+
+        <label className={styles.checkRow}>
+          <input
+            type="checkbox"
+            checked={active}
+            onChange={(e) => setActive(e.target.checked)}
+          />
+          <span>Visible to students</span>
+        </label>
+
+        {error && <p className={styles.errorText}>{error}</p>}
+
+        <p className={styles.note}>
+          <Info size={12} className={styles.flexNone} />
+          <span>
+            Active methods are shown to students as where to pay. Inactive ones are
+            hidden until you turn them back on.
+          </span>
+        </p>
+      </form>
+    </Modal>
+  );
+}
+
 function ProofDrawer({
   proof,
   onClose,
@@ -345,13 +672,33 @@ function ProofDrawer({
           <p className={styles.par}>{proof.feeTitle}</p>
         </div>
 
-        <div>
-          <span className={styles.sectionLabel}>Proof file</span>
-          <a href={proof.fileUrl} target="_blank" rel="noreferrer" className={styles.fileLink}>
-            <FileText size={14} />
-            {proof.fileUrl}
-          </a>
-        </div>
+        {proof.method || proof.reference || proof.accountName ? (
+          <div>
+            <span className={styles.sectionLabel}>Payment details</span>
+            <p className={styles.par}>
+              {proof.method
+                ? proof.method.charAt(0) + proof.method.slice(1).toLowerCase()
+                : "Payment"}
+              {proof.accountName ? ` · ${proof.accountName}` : ""}
+              {proof.reference ? ` · ${proof.reference}` : ""}
+            </p>
+          </div>
+        ) : null}
+
+        {proof.fileUrl ? (
+          <div>
+            <span className={styles.sectionLabel}>Proof file</span>
+            <a href={proof.fileUrl} target="_blank" rel="noreferrer" className={styles.fileLink}>
+              <FileText size={14} />
+              {proof.fileUrl}
+            </a>
+          </div>
+        ) : (
+          <div>
+            <span className={styles.sectionLabel}>Proof file</span>
+            <p className={styles.parLight}>No file uploaded (recorded by admin).</p>
+          </div>
+        )}
 
         <div>
           <span className={styles.sectionLabel}>Submitted</span>

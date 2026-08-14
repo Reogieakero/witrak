@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 import { AdminShell } from "@/app/components/admin-shell";
 import { SanctionsView } from "@/app/components/sanctions/sanctions-view";
+import { getTermContext, termRange } from "@/lib/terms";
 import type {
   SanctionItem,
   SanctionStats,
@@ -54,7 +55,10 @@ export default async function AdminSanctionsPage() {
   const scope = access?.scopeSectionIds ?? null;
   const studentWhere = scope ? { sectionId: { in: scope } } : undefined;
 
-  const [user, sanctions, rules, activeTerm, auditLogs] = await Promise.all([
+  const { term } = await getTermContext();
+  const range = termRange(term);
+
+  const [user, sanctions, rules, auditLogs] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -63,7 +67,7 @@ export default async function AdminSanctionsPage() {
       },
     }),
     prisma.sanction.findMany({
-      where: { student: studentWhere },
+      where: { ...studentWhere, ...(range ? { issuedAt: range } : {}) },
       orderBy: { issuedAt: "desc" },
       include: {
         student: {
@@ -103,9 +107,11 @@ export default async function AdminSanctionsPage() {
         section: { select: { name: true, programYear: { select: { level: true } } } },
       },
     }),
-    prisma.academicTerm.findFirst({ where: { isActive: true } }),
     prisma.auditLog.findMany({
-      where: { action: { in: SANCTION_AUDIT_ACTIONS } },
+      where: {
+        action: { in: SANCTION_AUDIT_ACTIONS },
+        ...(range ? { timestamp: range } : {}),
+      },
       orderBy: { timestamp: "desc" },
       take: 50,
       include: { actor: { select: { name: true } } },
@@ -167,7 +173,7 @@ export default async function AdminSanctionsPage() {
     activeSanctions: sanctionItems.filter((s) => s.outcome === "Open").length,
     resolved: sanctionItems.filter((s) => s.outcome !== "Open").length,
     total: sanctionItems.length,
-    termName: activeTerm?.name ?? "Current Term",
+    termName: term?.name ?? "Current Term",
   };
 
   const ruleOptions: SanctionRuleOption[] = rules.map((r) => {

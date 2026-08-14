@@ -129,7 +129,7 @@ export function EventSidebar({ items, stats, access, onCreate }: EventSidebarPro
           </div>
           <div>
             <div className={styles.snapshotStatValue}>{stats.attendanceTotal}</div>
-            <div className={styles.snapshotStatLabel}>Records</div>
+            <div className={styles.snapshotStatLabel}>Expected</div>
           </div>
         </div>
       </div>

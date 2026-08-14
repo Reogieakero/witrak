@@ -110,8 +110,8 @@ function BalancesTable({
                 <span className={styles.feeColAmount}>{f.amount}</span>
               </th>
             ))}
-            <th className={styles.alignRight}>Balance</th>
-            <th>Status</th>
+            <th className={styles.center}>Balance</th>
+            <th className={styles.center}>Status</th>
             <th className={styles.alignRight}>Proof</th>
           </tr>
         </thead>
@@ -149,7 +149,7 @@ function BalancesTable({
                     {r.balance}
                   </span>
                 </td>
-                <td>
+                <td className={styles.center}>
                   <span className={`${styles.statusBadge} ${isFull ? styles.statusFull : styles.statusBalance}`}>
                     {isFull ? "Paid in full" : "Has balance"}
                   </span>
@@ -212,8 +212,8 @@ function ProofList({
         <thead>
           <tr>
             <th>Student</th>
-            <th>Fee</th>
-            <th className={styles.alignRight}>Amount</th>
+            <th className={styles.center}>Fee</th>
+            <th className={styles.center}>Amount</th>
             <th>Submitted</th>
             <th className={styles.alignRight}>Actions</th>
           </tr>
@@ -234,7 +234,7 @@ function ProofList({
                 <span className={styles.feeTitle}>{p.feeTitle}</span>
                 <span className={styles.feeSub}>Year {p.yearLevel} · {p.programCode}</span>
               </td>
-              <td className={styles.alignRight}>
+              <td className={styles.center}>
                 <span className={styles.feeAmount}>{p.feeAmount}</span>
               </td>
               <td className={styles.muted}>{p.submittedAt}</td>
@@ -296,8 +296,8 @@ function VerifiedTable({
         <thead>
           <tr>
             <th>Student</th>
-            <th>Fee</th>
-            <th className={styles.alignRight}>Amount</th>
+            <th className={styles.center}>Fee</th>
+            <th className={styles.center}>Amount</th>
             <th>Status</th>
             <th>Reviewed by</th>
             <th className={styles.alignRight}>Actions</th>
@@ -308,7 +308,7 @@ function VerifiedTable({
             <tr key={p.id}>
               <td className={styles.studentName}>{p.studentName}</td>
               <td className={styles.muted}>{p.feeTitle}</td>
-              <td className={styles.alignRight}>
+              <td className={styles.center}>
                 <span className={styles.feeAmount}>{p.feeAmount}</span>
               </td>
               <td>

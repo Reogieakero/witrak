@@ -78,13 +78,6 @@ export function OfficerLoginForm() {
           <label htmlFor="officerPassword" className={styles.label}>
             Password
           </label>
-          <a
-            href="#"
-            onClick={(e) => e.preventDefault()}
-            className={styles.forgot}
-          >
-            Forgot password?
-          </a>
         </div>
         <div className={styles.inputWrap}>
           <Lock size={16} className={styles.inputIcon} />

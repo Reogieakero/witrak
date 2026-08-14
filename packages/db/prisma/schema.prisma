@@ -99,15 +99,16 @@ enum PermissionKey {
 }
 
 model Program {
-  id            String          @id @default(cuid())
-  code          String          @unique
-  name          String
-  yearLevels    YearLevel[]
-  sections      Section[]
-  userRoles     UserRole[]
-  sanctionRules SanctionRule[]
-  events        Event[]
-  announcements Announcement[]
+  id              String          @id @default(cuid())
+  code            String          @unique
+  name            String
+  enrollmentTarget Int?
+  yearLevels      YearLevel[]
+  sections        Section[]
+  userRoles       UserRole[]
+  sanctionRules   SanctionRule[]
+  events          Event[]
+  announcements   Announcement[]
 }
 
 model YearLevel {
@@ -348,6 +349,7 @@ model Fee {
   title       String
   amount      Decimal    @db.Decimal(10, 2)
   dueDate     DateTime
+  createdAt   DateTime   @default(now())
   createdById String
   createdBy   User       @relation("FeeCreatedBy", fields: [createdById], references: [id])
   proofs      FeeProof[]
@@ -360,6 +362,9 @@ model FeeProof {
   fileUrl         String
   status          PaymentStatus @default(PENDING)
   rejectionReason String?
+  method          String?
+  reference       String?
+  accountName     String?
   verifiedById    String?
   verifiedAt      DateTime?
   fee             Fee           @relation(fields: [feeId], references: [id])
@@ -369,6 +374,17 @@ model FeeProof {
 
   @@index([studentId])
   @@index([status])
+}
+
+model PaymentMethod {
+  id            String   @id @default(cuid())
+  type          String
+  accountName   String
+  accountNumber String?
+  instructions  String?
+  active        Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
 }
 
 model TransparencyFile {

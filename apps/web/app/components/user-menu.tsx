@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, LogOut, Monitor, Moon, Sun, User } from "lucide-react";
+import { CalendarRange, Check, GraduationCap, LogOut, Monitor, Moon, Sun, User } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useTheme } from "./theme-provider";
 import type { Theme } from "./theme-provider";
+import { ProgramManager } from "./program-manager";
+import { TermManager } from "./term-manager";
 import styles from "./user-menu.module.css";
 
 type ThemeOption = { value: Theme; label: string; icon: LucideIcon };
@@ -19,10 +21,13 @@ const THEME_OPTIONS: ThemeOption[] = [
 type UserMenuProps = {
   userName: string;
   roleLabel: string;
+  isSuperAdmin?: boolean;
 };
 
-export function UserMenu({ userName, roleLabel }: UserMenuProps) {
+export function UserMenu({ userName, roleLabel, isSuperAdmin = false }: UserMenuProps) {
   const [open, setOpen] = useState(false);
+  const [programsOpen, setProgramsOpen] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -86,6 +91,37 @@ export function UserMenu({ userName, roleLabel }: UserMenuProps) {
             })}
           </div>
 
+          {isSuperAdmin && (
+            <>
+              <div className={styles.divider} />
+              <div className={styles.sectionLabel}>System</div>
+              <button
+                type="button"
+                className={styles.themeItem}
+                onClick={() => {
+                  setOpen(false);
+                  setProgramsOpen(true);
+                }}
+                role="menuitem"
+              >
+                <GraduationCap size={15} className={styles.themeIcon} />
+                <span className={styles.themeLabel}>Programs &amp; Sections</span>
+              </button>
+              <button
+                type="button"
+                className={styles.themeItem}
+                onClick={() => {
+                  setOpen(false);
+                  setTermsOpen(true);
+                }}
+                role="menuitem"
+              >
+                <CalendarRange size={15} className={styles.themeIcon} />
+                <span className={styles.themeLabel}>Academic Terms</span>
+              </button>
+            </>
+          )}
+
           <div className={styles.divider} />
 
           <button
@@ -98,6 +134,9 @@ export function UserMenu({ userName, roleLabel }: UserMenuProps) {
           </button>
         </div>
       )}
+
+      <ProgramManager open={programsOpen} onClose={() => setProgramsOpen(false)} />
+      <TermManager open={termsOpen} onClose={() => setTermsOpen(false)} />
     </div>
   );
 }

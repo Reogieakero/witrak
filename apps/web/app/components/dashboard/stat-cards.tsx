@@ -13,14 +13,17 @@ import {
 } from "lucide-react";
 import { money } from "@/lib/constants/dashboard";
 import { Tooltip } from "@/app/components/ui/tooltip";
+import {
+  StudentTotalCard,
+  type EnrollmentTarget,
+} from "@/app/components/dashboard/student-total-card";
 import styles from "./stat-cards.module.css";
 
 export type StatCardsData = {
   totalStudents: number;
-  totalUsers: number;
+  accountCount: number;
+  accountRate: number;
   programCount: number;
-  completedProfileCount: number;
-  profileRate: number;
   eventCount: number;
   upcomingCount: number;
   presentRate: number;
@@ -28,7 +31,7 @@ export type StatCardsData = {
   collectedRate: number;
   pendingFeeProofCount: number;
   pendingRoleRequestCount: number;
-  pendingFlagCount: number;
+  activeSanctionCount: number;
 };
 
 type MiniStatProps = {
@@ -85,38 +88,34 @@ function Hint({ title, body, source }: { title: string; body: string; source: st
   );
 }
 
-export function StatCards({ data }: { data: StatCardsData }) {
+export function StatCards({
+  data,
+  enrollmentTargets,
+  canEditEnrollment,
+}: {
+  data: StatCardsData;
+  enrollmentTargets?: EnrollmentTarget[];
+  canEditEnrollment?: boolean;
+}) {
   return (
     <>
       <StatCard title="Student Body" icon={<Users size={14} />}>
-        <MiniStat
-          label="Total"
-          icon={<Users size={14} />}
-          value={data.totalStudents.toLocaleString()}
-          sub={
-            <span className={styles.trendText}>
-              <TrendingUp size={11} />
-              {data.programCount} programs
-            </span>
-          }
-          hint={
-            <Hint
-              title="Total Students"
-              body="All registered students across every program."
-              source="Source: Student table"
-            />
-          }
+        <StudentTotalCard
+          total={data.totalStudents}
+          programCount={data.programCount}
+          programs={enrollmentTargets ?? []}
+          canEdit={canEditEnrollment ?? false}
         />
         <MiniStat
-          label="Profiled"
+          label="With Accounts"
           icon={<UserCheck size={14} />}
-          value={data.completedProfileCount.toLocaleString()}
-          sub={`${data.profileRate}% complete`}
+          value={data.accountCount.toLocaleString()}
+          sub={`${data.accountRate}% registered`}
           hint={
             <Hint
-              title="Completed Profiles"
-              body={`User accounts that finished profiling (linked student with a section assigned), out of ${data.totalUsers} total accounts.`}
-              source="Source: User · Student · Section tables"
+              title="Students With Accounts"
+              body={`${data.accountCount.toLocaleString()} students have registered an account in the system, out of ${data.totalStudents.toLocaleString()} total students from official records.`}
+              source="Accounts / official total"
             />
           }
         />
@@ -149,8 +148,8 @@ export function StatCards({ data }: { data: StatCardsData }) {
           hint={
             <Hint
               title="Average Attendance Rate"
-              body="Share of QR-scanned logs marked present or late across all events."
-              source="Source: Attendance table"
+              body="Share of students present or late versus the expected roster for each event — the faculty-wide total, or the targeted program when the event is program-specific."
+              source="Source: Attendance table vs. event targets"
             />
           }
         />
@@ -206,16 +205,16 @@ export function StatCards({ data }: { data: StatCardsData }) {
           }
         />
         <MiniStat
-          label="Flags"
+          label="Sanctions"
           icon={<AlertTriangle size={14} />}
-          value={data.pendingFlagCount.toLocaleString()}
-          sub="follow-up"
+          value={data.activeSanctionCount.toLocaleString()}
+          sub="open"
           tone="red"
           hint={
             <Hint
-              title="Open Sanction Flags"
-              body="Sanction flags triggered by absence rules that still need follow-up."
-              source="Source: SanctionFlag table (status = PENDING)"
+              title="Open Sanctions"
+              body="Sanctions that are still active and awaiting resolution."
+              source="Source: Sanction table (status = OPEN)"
             />
           }
         />

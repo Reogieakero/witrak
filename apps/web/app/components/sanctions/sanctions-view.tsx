@@ -255,8 +255,7 @@ export function SanctionsView({
             </div>
             <p className={styles.pageSubtitle}>
               Sanctions are issued automatically when a student&apos;s absences reach
-              the set limit. Mark a sanction as cleared once the student has met the
-              requirement. Sanction records stay private.
+              the set limit.
             </p>
           </div>
           {canCreate && (

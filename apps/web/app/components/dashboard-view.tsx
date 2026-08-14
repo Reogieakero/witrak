@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { AdminShell } from "@/app/components/admin-shell";
+import { getTermContext, termRange } from "@/lib/terms";
 import { StatCards } from "@/app/components/dashboard/stat-cards";
 import { SanctionFlags } from "@/app/components/dashboard/sanction-flags";
 import { RoleRequests } from "@/app/components/dashboard/role-requests";
@@ -30,33 +31,34 @@ export default async function DashboardView() {
 
   const now = new Date();
 
+  const { term } = await getTermContext();
+  const range = termRange(term);
+
   const [
     totalStudents,
-    totalUsers,
-    completedProfileCount,
     attendanceRows,
+    studentProgramRows,
+    eventsTargets,
     eventCount,
     upcomingEvents,
     latestEvents,
+    allEvents,
     fees,
-    paidProofs,
-    pendingFlags,
+    feeProofs,
+    activeSanctions,
     pendingRoleRequestCount,
     pendingFeeProofCount,
-    pendingFlagCount,
+    activeSanctionCount,
     programCount,
-    activeTerm,
     pendingRoleRequests,
     recentAuditLogs,
     sections,
     yearLevels,
+    programs,
   ] = await Promise.all([
     prisma.student.count(),
-    prisma.user.count(),
-    prisma.user.count({
-      where: { student: { is: { sectionId: { not: null } } } },
-    }),
     prisma.attendance.findMany({
+      where: range ? { scannedAt: range } : undefined,
       select: {
         eventId: true,
         status: true,
@@ -74,26 +76,46 @@ export default async function DashboardView() {
         },
       },
     }),
-    prisma.event.count(),
+    prisma.student.findMany({
+      select: { section: { select: { programYear: { select: { programId: true } } } } },
+    }),
     prisma.event.findMany({
-      where: { startsAt: { gte: now } },
+      select: { id: true, programId: true },
+    }),
+    prisma.event.count({ where: range ? { createdAt: range } : undefined }),
+    prisma.event.findMany({
+      where: { startsAt: { gte: now }, ...(range ? { createdAt: range } : {}) },
       orderBy: { startsAt: "asc" },
       take: 3,
     }),
     prisma.event.findMany({
-      where: { startsAt: { lte: now } },
+      where: { startsAt: { lte: now }, ...(range ? { createdAt: range } : {}) },
       orderBy: { startsAt: "desc" },
       take: 3,
       select: { id: true, title: true },
     }),
-    prisma.fee.findMany({ select: { amount: true } }),
-    prisma.feeProof.findMany({
-      where: { status: "PAID" },
-      select: { fee: { select: { amount: true } } },
+    prisma.event.findMany({
+      where: range ? { createdAt: range } : undefined,
+      orderBy: { startsAt: "desc" },
+      select: { id: true, title: true },
     }),
-    prisma.sanctionFlag.findMany({
-      where: { status: "PENDING" },
+    prisma.fee.findMany({
+      where: range ? { createdAt: range } : undefined,
+      select: { amount: true },
+    }),
+    prisma.feeProof.findMany({
+      where: range ? { createdAt: range } : undefined,
       orderBy: { createdAt: "desc" },
+      select: {
+        studentId: true,
+        feeId: true,
+        status: true,
+        fee: { select: { amount: true } },
+      },
+    }),
+    prisma.sanction.findMany({
+      where: { status: "OPEN", ...(range ? { issuedAt: range } : {}) },
+      orderBy: { issuedAt: "desc" },
       take: 3,
       include: {
         student: {
@@ -106,9 +128,8 @@ export default async function DashboardView() {
     }),
     prisma.roleRequest.count({ where: { status: "PENDING" } }),
     prisma.feeProof.count({ where: { status: "PENDING" } }),
-    prisma.sanctionFlag.count({ where: { status: "PENDING" } }),
+    prisma.sanction.count({ where: { status: "OPEN" } }),
     prisma.program.count(),
-    prisma.academicTerm.findFirst({ where: { isActive: true } }),
     isSuperAdmin
       ? prisma.roleRequest.findMany({
           where: { status: "PENDING" },
@@ -119,6 +140,7 @@ export default async function DashboardView() {
       : [],
     isSuperAdmin
       ? prisma.auditLog.findMany({
+          where: range ? { timestamp: range } : undefined,
           orderBy: { timestamp: "desc" },
           include: { actor: true },
         })
@@ -128,56 +150,81 @@ export default async function DashboardView() {
           include: { programYear: { include: { program: true } } },
         })
       : [],
-    isSuperAdmin
-      ? prisma.yearLevel.findMany({ include: { program: true } })
-      : [],
+    prisma.yearLevel.findMany({ include: { program: true } }),
+    prisma.program.findMany({
+      orderBy: { code: "asc" },
+      select: { id: true, code: true, name: true, enrollmentTarget: true },
+    }),
   ]);
 
   const totalFee = fees.reduce((sum, f) => sum + Number(f.amount), 0);
-  const collected = paidProofs.reduce((sum, p) => sum + Number(p.fee.amount), 0);
-  const collectedRate = totalFee ? Math.round((collected / totalFee) * 100) : 0;
-  const profileRate = totalUsers
-    ? Math.round((completedProfileCount / totalUsers) * 100)
+  const enrollmentTargets = programs.map((p) => ({
+    id: p.id,
+    code: p.code,
+    name: p.name,
+    count: p.enrollmentTarget,
+  }));
+  const targetTotal = enrollmentTargets.reduce(
+    (sum, p) => sum + (p.count ?? 0),
+    0,
+  );
+  const hasTargets = enrollmentTargets.some((p) => p.count != null);
+  const displayedTotalStudents = hasTargets ? targetTotal : totalStudents;
+  const accountRate = displayedTotalStudents
+    ? Math.round((totalStudents / displayedTotalStudents) * 100)
     : 0;
 
-  let attended = 0;
-  const yearAgg = new Map<
-    string,
-    { code: string; level: number; present: number; total: number }
-  >();
+  const feeTarget = totalFee * displayedTotalStudents;
+  const latestByStudentFee = new Map<string, (typeof feeProofs)[number]>();
+  for (const p of feeProofs) {
+    const key = `${p.studentId}:${p.feeId}`;
+    if (!latestByStudentFee.has(key)) latestByStudentFee.set(key, p);
+  }
+  let collected = 0;
+  for (const p of latestByStudentFee.values()) {
+    if (p.status === "PAID") collected += Number(p.fee.amount);
+  }
+  const collectedRate = feeTarget ? Math.round((collected / feeTarget) * 100) : 0;
 
+  const programStudentCount = new Map<string, number>();
+  for (const s of studentProgramRows) {
+    const pid = s.section?.programYear.programId;
+    if (pid) programStudentCount.set(pid, (programStudentCount.get(pid) ?? 0) + 1);
+  }
+  const programTargetById = new Map(programs.map((p) => [p.id, p.enrollmentTarget]));
+  const eventTargetById = new Map(eventsTargets.map((e) => [e.id, e.programId]));
+
+  const expectedForEvent = (eventId: string) => {
+    const programId = eventTargetById.get(eventId);
+    if (programId) {
+      return programTargetById.get(programId) ?? programStudentCount.get(programId) ?? 0;
+    }
+    return displayedTotalStudents;
+  };
+
+  const expectedByEvent = new Map<string, number>();
+  const presentByEvent = new Map<string, number>();
   for (const a of attendanceRows) {
     const isAttended = a.status === "PRESENT" || a.status === "LATE";
-    if (isAttended) attended += 1;
 
-    const sec = a.student.section;
-    if (sec) {
-      const py = sec.programYear;
-      const key = `${py.program.code}-${py.level}`;
-      const agg = yearAgg.get(key) ?? {
-        code: py.program.code,
-        level: py.level,
-        present: 0,
-        total: 0,
-      };
-      agg.total += 1;
-      if (isAttended) agg.present += 1;
-      yearAgg.set(key, agg);
-    }
+    const expected = expectedForEvent(a.eventId);
+    expectedByEvent.set(a.eventId, Math.max(expectedByEvent.get(a.eventId) ?? 0, expected));
+    presentByEvent.set(a.eventId, (presentByEvent.get(a.eventId) ?? 0) + (isAttended ? 1 : 0));
   }
 
-  const presentRate = attendanceRows.length
-    ? Math.round((attended / attendanceRows.length) * 100)
+  const expectedTotal = [...expectedByEvent.values()].reduce((sum, n) => sum + n, 0);
+  const presentTotal = [...presentByEvent.values()].reduce((sum, n) => sum + n, 0);
+  const presentRate = expectedTotal
+    ? Math.round((presentTotal / expectedTotal) * 100)
     : 0;
 
   const eventTrend = [...latestEvents].reverse().map((e) => {
     const rows = attendanceRows.filter((a) => a.eventId === e.id);
-    const eventAttended = rows.filter(
-      (a) => a.status === "PRESENT" || a.status === "LATE",
-    ).length;
     return {
       name: e.title,
-      rate: rows.length ? Math.round((eventAttended / rows.length) * 100) : 0,
+      present: rows.filter((a) => a.status === "PRESENT").length,
+      absent: rows.filter((a) => a.status === "ABSENT").length,
+      late: rows.filter((a) => a.status === "LATE").length,
     };
   });
 
@@ -192,39 +239,43 @@ export default async function DashboardView() {
     "BS-DEVCOM": "DevCom",
   };
 
-  const coursesByCode = new Map<
-    string,
-    { code: string; bars: { level: number; rate: number }[] }
-  >();
-  for (const agg of yearAgg.values()) {
-    const course = coursesByCode.get(agg.code) ?? { code: agg.code, bars: [] };
-    course.bars.push({
-      level: agg.level,
-      rate: agg.total ? Math.round((agg.present / agg.total) * 100) : 0,
-    });
-    coursesByCode.set(agg.code, course);
-  }
-  for (const course of coursesByCode.values()) {
-    for (let level = 1; level <= 4; level++) {
-      if (!course.bars.some((b) => b.level === level)) {
-        course.bars.push({ level, rate: 0 });
-      }
-    }
-    course.bars.sort((a, b) => a.level - b.level);
-  }
-
-  const yearBars = [...coursesByCode.values()]
-    .filter((c) => c.code in PROGRAM_ORDER)
+  const allProgramYearCombos = yearLevels
+    .filter((y) => y.program.code in PROGRAM_ORDER)
+    .map((y) => ({
+      code: y.program.code,
+      level: y.level,
+      key: `${y.program.code}-${y.level}`,
+      label: `${PROGRAM_SHORT[y.program.code] ?? y.program.code} Y${y.level}`,
+    }))
     .sort(
       (a, b) =>
-        (PROGRAM_ORDER[a.code] ?? 99) - (PROGRAM_ORDER[b.code] ?? 99),
-    )
-    .flatMap((c) =>
-      c.bars.map((b) => ({
-        label: `${PROGRAM_SHORT[c.code] ?? c.code} Y${b.level}`,
-        rate: b.rate,
-      })),
+        (PROGRAM_ORDER[a.code] ?? 99) - (PROGRAM_ORDER[b.code] ?? 99) ||
+        a.level - b.level,
     );
+
+  const presentCountByEvent = new Map<string, Map<string, number>>();
+  for (const a of attendanceRows) {
+    const sec = a.student.section;
+    if (!sec) continue;
+    const py = sec.programYear;
+    const isAttended = a.status === "PRESENT" || a.status === "LATE";
+    if (!isAttended) continue;
+    const byKey = presentCountByEvent.get(a.eventId) ?? new Map();
+    const key = `${py.program.code}-${py.level}`;
+    byKey.set(key, (byKey.get(key) ?? 0) + 1);
+    presentCountByEvent.set(a.eventId, byKey);
+  }
+
+  const eventPerformance = allEvents
+    .map((e) => {
+      const byKey = presentCountByEvent.get(e.id) ?? new Map();
+      const bars = allProgramYearCombos.map((c) => ({
+        label: c.label,
+        present: byKey.get(c.key) ?? 0,
+      }));
+      return { id: e.id, title: e.title, bars };
+    })
+    .filter((e) => e.bars.some((b) => b.present > 0));
 
   const sectionById = new Map<string, ScopedSection>(sections.map((s) => [s.id, s]));
   const yearById = new Map<string, ScopedYearLevel>(yearLevels.map((y) => [y.id, y]));
@@ -238,8 +289,8 @@ export default async function DashboardView() {
     : [];
   const targetById = Object.fromEntries(targetUsers.map((u) => [u.id, u.name]));
 
-  const termName = activeTerm?.name ?? "Current Term";
-  const threshold = pendingFlags[0]?.rule.absenceThreshold ?? 3;
+  const termName = term?.name ?? "Current Term";
+  const threshold = activeSanctions[0]?.rule?.absenceThreshold ?? 3;
   const roleLabel = isSuperAdmin
     ? "Super Admin"
     : (userWithRoles?.roles[0]?.role.name ?? "Officer");
@@ -260,11 +311,10 @@ export default async function DashboardView() {
       <div className={styles.statGrid}>
         <StatCards
           data={{
-            totalStudents,
-            totalUsers,
+            totalStudents: displayedTotalStudents,
+            accountCount: totalStudents,
+            accountRate,
             programCount,
-            completedProfileCount,
-            profileRate,
             eventCount,
             upcomingCount: upcomingEvents.length,
             presentRate,
@@ -272,14 +322,16 @@ export default async function DashboardView() {
             collectedRate,
             pendingFeeProofCount,
             pendingRoleRequestCount,
-            pendingFlagCount,
+            activeSanctionCount,
           }}
+          enrollmentTargets={enrollmentTargets}
+          canEditEnrollment={isSuperAdmin}
         />
       </div>
 
       <div className={styles.dashGrid}>
         <div className={styles.leftCol}>
-          <SanctionFlags count={pendingFlagCount} threshold={threshold} flags={pendingFlags} />
+          <SanctionFlags count={activeSanctionCount} threshold={threshold} flags={activeSanctions} />
           <RoleRequests
             count={pendingRoleRequestCount}
             requests={pendingRoleRequests}
@@ -292,12 +344,11 @@ export default async function DashboardView() {
         <div className={styles.rightCol}>
           <Analytics
             termName={termName}
-            presentRate={presentRate}
             eventTrend={eventTrend}
             collected={collected}
-            totalFee={totalFee}
+            totalFee={feeTarget}
             collectedRate={collectedRate}
-            yearBars={yearBars}
+            eventPerformance={eventPerformance}
           />
         </div>
       </div>
@@ -306,3 +357,4 @@ export default async function DashboardView() {
     </AdminShell>
   );
 }
+

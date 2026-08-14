@@ -2,6 +2,7 @@
 
 import {
   CartesianGrid,
+  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -11,7 +12,12 @@ import {
 } from "recharts";
 import styles from "./event-trend-chart.module.css";
 
-export type EventTrendPoint = { name: string; rate: number };
+export type EventTrendPoint = {
+  name: string;
+  present: number;
+  absent: number;
+  late: number;
+};
 
 export function EventTrendChart({ data }: { data: EventTrendPoint[] }) {
   return (
@@ -26,7 +32,7 @@ export function EventTrendChart({ data }: { data: EventTrendPoint[] }) {
             tickLine={false}
           />
           <YAxis
-            domain={[0, 100]}
+            allowDecimals={false}
             tick={{ fontSize: 10, fill: "var(--text-faint)" }}
             axisLine={false}
             tickLine={false}
@@ -42,17 +48,34 @@ export function EventTrendChart({ data }: { data: EventTrendPoint[] }) {
               boxShadow: "0 4px 12px rgba(16, 24, 40, 0.1)",
               zIndex: 9999,
             }}
-            itemStyle={{ color: "#2563eb", fontWeight: 600 }}
             labelStyle={{ color: "var(--text-muted)", fontWeight: 600 }}
-            formatter={(value) => `${value}%`}
+          />
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+          <Line
+            type="natural"
+            dataKey="present"
+            name="Present"
+            stroke="#16a34a"
+            strokeWidth={2.5}
+            dot={{ r: 4, fill: "#fff", stroke: "#16a34a", strokeWidth: 2 }}
+            activeDot={{ r: 5 }}
           />
           <Line
             type="natural"
-            dataKey="rate"
-            name="Attendance Rate"
-            stroke="#2563eb"
+            dataKey="absent"
+            name="Absent"
+            stroke="#ef4444"
             strokeWidth={2.5}
-            dot={{ r: 4, fill: "#fff", stroke: "#2563eb", strokeWidth: 2 }}
+            dot={{ r: 4, fill: "#fff", stroke: "#ef4444", strokeWidth: 2 }}
+            activeDot={{ r: 5 }}
+          />
+          <Line
+            type="natural"
+            dataKey="late"
+            name="Late"
+            stroke="#f59e0b"
+            strokeWidth={2.5}
+            dot={{ r: 4, fill: "#fff", stroke: "#f59e0b", strokeWidth: 2 }}
             activeDot={{ r: 5 }}
           />
         </LineChart>

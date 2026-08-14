@@ -5,6 +5,7 @@ import { hasPermission } from "@/lib/permissions";
 import { money } from "@/lib/constants/dashboard";
 import { AdminShell } from "@/app/components/admin-shell";
 import { FeesView } from "@/app/components/fees/fees-view";
+import { getTermContext, termRange } from "@/lib/terms";
 import type {
   FeeItem,
   FeeProofRow,
@@ -38,56 +39,62 @@ export default async function AdminFeesPage() {
 
   const access = session.access;
   if (!hasPermission(access, "fees_view")) redirect("/dashboard");
-
-  const [user, fees, proofs, students, activeTerm] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        name: true,
-        roles: { include: { role: { select: { name: true } } } },
-      },
-    }),
-    prisma.fee.findMany({
-      orderBy: { dueDate: "desc" },
-    }),
-    prisma.feeProof.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        fee: true,
-        student: {
-          select: {
-            id: true,
-            studentNo: true,
-            firstName: true,
-            lastName: true,
-            section: {
-              select: {
-                name: true,
-                programYear: {
-                  select: { level: true, program: { select: { code: true } } },
+  const { term } = await getTermContext();
+  const range = termRange(term);
+  const [user, fees, proofs, students, studentTotal, programs, paymentMethods] =
+    await Promise.all([
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          name: true,
+          roles: { include: { role: { select: { name: true } } } },
+        },
+      }),
+      prisma.fee.findMany({
+        where: range ? { createdAt: range } : undefined,
+        orderBy: { dueDate: "desc" },
+      }),
+      prisma.feeProof.findMany({
+        where: range ? { createdAt: range } : undefined,
+        orderBy: { createdAt: "desc" },
+        include: {
+          fee: true,
+          student: {
+            select: {
+              id: true,
+              studentNo: true,
+              firstName: true,
+              lastName: true,
+              section: {
+                select: {
+                  name: true,
+                  programYear: {
+                    select: { level: true, program: { select: { code: true } } },
+                  },
                 },
               },
             },
           },
+          verifiedBy: { select: { name: true } },
         },
-        verifiedBy: { select: { name: true } },
-      },
-    }),
-    prisma.student.findMany({
-      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-      include: {
-        section: {
-          select: {
-            name: true,
-            programYear: {
-              select: { level: true, program: { select: { code: true } } },
+      }),
+      prisma.student.findMany({
+        orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+        include: {
+          section: {
+            select: {
+              name: true,
+              programYear: {
+                select: { level: true, program: { select: { code: true } } },
+              },
             },
           },
         },
-      },
-    }),
-    prisma.academicTerm.findFirst({ where: { isActive: true } }),
-  ]);
+      }),
+      prisma.student.count(),
+      prisma.program.findMany({ select: { enrollmentTarget: true } }),
+      prisma.paymentMethod.findMany({ orderBy: { sortOrder: "asc" } }),
+    ]);
 
   const canCreate = hasPermission(access, "fees_create");
   const canVerify = hasPermission(access, "fees_verify_payment");
@@ -116,6 +123,9 @@ export default async function AdminFeesPage() {
       feeTitle: p.fee.title,
       feeAmount: money.format(Number(p.fee.amount)),
       fileUrl: p.fileUrl,
+      method: p.method ?? undefined,
+      reference: p.reference ?? undefined,
+      accountName: p.accountName ?? undefined,
       submittedAt: formatDateTime(p.createdAt),
       verifiedByName: p.verifiedBy?.name,
       verifiedAt: p.verifiedAt ? formatDateTime(p.verifiedAt) : undefined,
@@ -158,8 +168,13 @@ export default async function AdminFeesPage() {
     };
   });
 
-  const studentCount = students.length;
-  const feeTarget = fees.reduce((sum, f) => sum + Number(f.amount) * studentCount, 0);
+  const targetTotal = programs.reduce(
+    (sum, p) => sum + (p.enrollmentTarget ?? 0),
+    0,
+  );
+  const hasTargets = programs.some((p) => p.enrollmentTarget != null);
+  const headcount = hasTargets ? targetTotal : studentTotal;
+  const feeTarget = fees.reduce((sum, f) => sum + Number(f.amount) * headcount, 0);
   let collectedRaw = 0;
   let paidCount = 0;
   for (const key of latestByStudentFee.keys()) {
@@ -180,7 +195,7 @@ export default async function AdminFeesPage() {
     collectedPct: feeTarget > 0 ? Math.round((collectedRaw / feeTarget) * 100) : 0,
     pending: pendingProofRows.length,
     rejected: proofRows.filter((p) => p.status === "REJECTED").length,
-    termName: activeTerm?.name ?? "Current Term",
+    termName: term?.name ?? "Current Term",
     feeCount: feeItems.length,
     paidCount,
   };
@@ -194,14 +209,22 @@ export default async function AdminFeesPage() {
 
   return (
     <AdminShell userName={userName} roleLabel={roleLabel}>
-      <FeesView
-        fees={feeItems}
-        proofRows={proofRows}
-        balanceRows={balanceRows}
-        stats={stats}
-        canCreate={canCreate}
-        canVerify={canVerify}
-      />
+        <FeesView
+          fees={feeItems}
+          proofRows={proofRows}
+          balanceRows={balanceRows}
+          paymentMethods={paymentMethods.map((m) => ({
+            id: m.id,
+            type: m.type,
+            accountName: m.accountName,
+            accountNumber: m.accountNumber,
+            instructions: m.instructions,
+            active: m.active,
+          }))}
+          stats={stats}
+          canCreate={canCreate}
+          canVerify={canVerify}
+        />
     </AdminShell>
   );
 }

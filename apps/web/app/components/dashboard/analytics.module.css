@@ -106,6 +106,12 @@
   text-decoration: underline;
 }
 
+.chartSelectWrap {
+  flex: none;
+  width: 11rem;
+  max-width: 50%;
+}
+
 .chartPeak {
   flex: none;
   font-size: 0.625rem;

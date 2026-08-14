@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 import { AdminShell } from "@/app/components/admin-shell";
 import { AuditLogView } from "@/app/components/audit-log/audit-log-view";
+import { getTermContext, termRange } from "@/lib/terms";
 import type {
   AuditEntry,
   AuditModuleKey,
@@ -143,7 +144,10 @@ export default async function AdminAuditLogPage() {
   const access = session.access;
   if (!hasPermission(access, "audit_view")) redirect("/dashboard");
 
-  const [user, auditLogs, activeTerm] = await Promise.all([
+  const { term } = await getTermContext();
+  const range = termRange(term);
+
+  const [user, auditLogs] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -152,11 +156,11 @@ export default async function AdminAuditLogPage() {
       },
     }),
     prisma.auditLog.findMany({
+      where: range ? { timestamp: range } : undefined,
       orderBy: { timestamp: "desc" },
       take: 200,
       include: { actor: { select: { name: true } } },
     }),
-    prisma.academicTerm.findFirst({ where: { isActive: true } }),
   ]);
 
   const entries: AuditEntry[] = auditLogs.map((l) => {
@@ -195,7 +199,7 @@ export default async function AdminAuditLogPage() {
         count: entries.filter((e) => e.module === m).length,
       }),
     ),
-    termName: activeTerm?.name ?? "Current Term",
+    termName: term?.name ?? "Current Term",
   };
 
   const userName = user?.name ?? "Officer";

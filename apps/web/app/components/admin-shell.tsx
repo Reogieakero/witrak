@@ -21,12 +21,20 @@ function initials(name: string): string {
 type AdminShellProps = {
   userName: string;
   roleLabel: string;
+  isSuperAdmin?: boolean;
   children: React.ReactNode;
 };
 
-export function AdminShell({ userName, roleLabel, children }: AdminShellProps) {
+export function AdminShell({
+  userName,
+  roleLabel,
+  isSuperAdmin = false,
+  children,
+}: AdminShellProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  const canManagePrograms = isSuperAdmin || roleLabel === "Super Admin";
 
   const isActive = (href: string) =>
     href !== "#" && (pathname === href || pathname.startsWith(`${href}/`));
@@ -117,7 +125,7 @@ export function AdminShell({ userName, roleLabel, children }: AdminShellProps) {
               <span className={styles.bellDot} />
             </button>
             <span className={styles.divider} />
-            <UserMenu userName={userName} roleLabel={roleLabel} />
+            <UserMenu userName={userName} roleLabel={roleLabel} isSuperAdmin={canManagePrograms} />
           </div>
         </header>
 

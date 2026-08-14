@@ -157,7 +157,7 @@ export function EventView({
               </div>
               <div className={styles.attStat}>
                 <span className={styles.attStatValue}>{event.attendanceTotal}</span>
-                <span className={styles.attStatLabel}>Records</span>
+                <span className={styles.attStatLabel}>Expected</span>
               </div>
               {past && (
                 <div className={styles.attStat}>

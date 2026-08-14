@@ -21,12 +21,12 @@ const SECTIONS: Section[] = [
   {
     icon: Users,
     title: "Stat Cards",
-    text: "At-a-glance totals for students, officers, programs, and events, plus the current attendance rate, fee collection progress, and pending flags, role requests, and fee proofs.",
+    text: "At-a-glance totals for students, officers, programs, and events, plus the current attendance rate, fee collection progress, and open sanctions, role requests, and fee proofs.",
   },
   {
     icon: ShieldAlert,
-    title: "Sanction Flags",
-    text: "Students whose absence count crossed a configured threshold, shown here while they await review by the Discipline Officer.",
+    title: "Active Sanctions",
+    text: "Formal sanctions that are still open and awaiting resolution by the Discipline Officer.",
   },
   {
     icon: UserPlus,

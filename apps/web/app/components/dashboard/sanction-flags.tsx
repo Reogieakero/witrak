@@ -1,17 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { initials, shortName, studentSectionLabel } from "@/lib/dashboard-utils";
 import type { ScopedSection } from "@/lib/dashboard-utils";
 import { Badge } from "@/app/components/ui/badge";
 import styles from "./sanction-flags.module.css";
 
-export type SanctionFlag = {
+export type ActiveSanction = {
   id: string;
-  triggerCount: number;
-  createdAt: Date;
-  rule: { absenceThreshold: number };
+  title: string;
+  issuedAt: Date;
+  rule: { absenceThreshold: number } | null;
   student: {
     firstName: string;
     lastName: string;
@@ -22,15 +23,15 @@ export type SanctionFlag = {
 type SanctionFlagsProps = {
   count: number;
   threshold: number;
-  flags: SanctionFlag[];
+  flags: ActiveSanction[];
 };
 
 const INTERVAL_MS = 4000;
 
-function riskOf(flag: SanctionFlag): { label: string; cls: string } {
-  const t = flag.rule.absenceThreshold || 1;
-  if (flag.triggerCount >= t * 2) return { label: "Critical", cls: styles.riskCritical };
-  if (flag.triggerCount >= t + 1) return { label: "High", cls: styles.riskHigh };
+function riskOf(flag: ActiveSanction): { label: string; cls: string } {
+  const t = flag.rule?.absenceThreshold || 1;
+  if (t >= 10) return { label: "Critical", cls: styles.riskCritical };
+  if (t >= 5) return { label: "High", cls: styles.riskHigh };
   return { label: "Moderate", cls: styles.riskModerate };
 }
 
@@ -53,9 +54,9 @@ export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
   return (
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
-        <h3 className={styles.panelTitle}>Sanction Flags</h3>
+        <h3 className={styles.panelTitle}>Active Sanctions</h3>
         <Badge tone="red">
-          {count} Flag{count === 1 ? "" : "s"}
+          {count} Open Sanction{count === 1 ? "" : "s"}
         </Badge>
       </div>
 
@@ -65,7 +66,7 @@ export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
         onMouseLeave={() => setPaused(false)}
       >
         {!flag ? (
-          <p className={styles.emptyText}>No open flags.</p>
+          <p className={styles.emptyText}>No open sanctions.</p>
         ) : (
           <div key={flag.id} className={styles.slide}>
             <div className={styles.flagRow}>
@@ -82,17 +83,10 @@ export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
                   </span>
                 </span>
                 <span className={styles.rowSub}>{studentSectionLabel(flag.student)}</span>
-                <span className={styles.flagTrack}>
-                  <span
-                    className={styles.flagBar}
-                    style={{ width: `${Math.min((flag.triggerCount / (flag.rule.absenceThreshold || 1)) * 100, 100)}%` }}
-                  />
-                </span>
+                <span className={styles.rowTitle}>{flag.title}</span>
                 <span className={styles.flagMeta}>
-                  <span>
-                    {flag.triggerCount} / {flag.rule.absenceThreshold} absences
-                  </span>
-                  <span>Flagged {flaggedDate(flag.createdAt)}</span>
+                  <span>{flag.rule?.absenceThreshold ?? threshold} absences</span>
+                  <span>Issued {flaggedDate(flag.issuedAt)}</span>
                 </span>
               </span>
               <AlertTriangle size={15} className={styles.flagIcon} />
@@ -107,7 +101,7 @@ export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
             <button
               key={f.id}
               type="button"
-              aria-label={`Show flag ${i + 1}`}
+              aria-label={`Show sanction ${i + 1}`}
               className={`${styles.dot} ${i === index ? styles.dotActive : ""}`}
               onClick={() => setIndex(i)}
             />
@@ -117,7 +111,9 @@ export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
 
       <div className={styles.panelFooter}>
         <span>Threshold: &gt;{threshold} absences</span>
-        <span className={styles.panelLink}>View all</span>
+        <Link href="/admin/sanctions" className={styles.panelLink}>
+          View all
+        </Link>
       </div>
     </div>
   );
