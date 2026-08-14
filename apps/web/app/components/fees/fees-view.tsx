@@ -189,9 +189,8 @@ export function FeesView({
             </div>
             <p className={styles.pageSubtitle}>
               Post student fees (e.g. membership fee, org shirt) and track every
-              student&apos;s payment status. Students upload receipts, which you{" "}
-              approve or reject per{" "}
-              <span className={styles.sectionNote}>DESIGN.md §9</span>.
+              student&apos;s payment status. Students upload receipts, which you
+              approve or reject.
             </p>
           </div>
           {canCreate && (

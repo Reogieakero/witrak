@@ -99,7 +99,7 @@ function FeeFormModal({
             <span className={styles.subtitle}>
               {editing
                 ? "Update the fee details for this term"
-                : "Post a faculty-wide fee for this term"}
+                : "Post a fee for all students this term"}
             </span>
           </span>
         </span>
@@ -166,9 +166,8 @@ function FeeFormModal({
         <p className={styles.note}>
           <Info size={12} className={styles.flexNone} />
           <span>
-            Fees are <code>faculty-wide</code> — there is no scope on fees in Rev. 2
-            (DESIGN.md §9). Students see the fee on their surface and upload a proof of
-            payment.
+            Fees apply to all students. Once posted, students can see the fee and
+            upload their proof of payment.
           </span>
         </p>
       </form>
@@ -285,8 +284,8 @@ function VerifyModal({
         <p className={styles.note}>
           <Info size={12} className={styles.flexNone} />
           <span>
-            Rejections require a <code>rejection_reason</code>; status becomes{" "}
-            <code>paid</code> or <code>rejected</code>. Every verification is audit-logged.
+            Rejections need a reason so the student knows what to fix. Every approval
+            or rejection is recorded.
           </span>
         </p>
       </form>
@@ -377,8 +376,8 @@ function ProofDrawer({
         )}
 
                 <p className={styles.parLight}>
-          Verify the file matches the student&apos;s name and the fee amount before approving.
-          Rejection requires a reason (DESIGN.md §9.3).
+          Check that the file matches the student&apos;s name and the fee amount before
+          approving. Rejections need a reason.
         </p>
       </div>
     </Drawer>

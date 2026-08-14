@@ -110,7 +110,7 @@ export function AnnouncementsFeed({
           <Empty
             icon={q ? <Search size={20} /> : <Megaphone size={20} />}
             title={q ? "No matching announcements" : "No announcements yet"}
-            sub={q ? "Try a different search." : "Publish the first faculty-wide update."}
+            sub={q ? "Try a different search." : "Publish the first update for everyone."}
           />
         ) : (
           <div className={styles.list}>

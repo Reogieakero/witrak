@@ -81,7 +81,7 @@ export function AuditActivity({ logs, targetById }: AuditActivityProps) {
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
         <h3 className={styles.panelTitle}>Recent Audit Activity</h3>
-        <Badge tone="brand">Append-only</Badge>
+        <Badge tone="brand">Permanent record</Badge>
       </div>
 
       <div className={styles.tableWrap}>

@@ -325,7 +325,7 @@ function RequestModal({
             <span className={styles.titleLine}>
               {approve ? "Approve role request?" : "Reject role request?"}
             </span>
-            <span className={styles.subtitle}>Assign scope in the same action</span>
+            <span className={styles.subtitle}>Assign their area in the same step</span>
           </span>
         </span>
       }
@@ -348,7 +348,8 @@ function RequestModal({
           {approve && (
             <>
               {" "}
-              with scope <strong>{request.scopeLabel}</strong>. A scope is required at approval time.
+              as <strong>{request.scopeLabel}</strong>. An area must be chosen when
+              approving.
             </>
           )}
           .
@@ -374,8 +375,7 @@ function RequestModal({
           </div>
         </div>
         <span className={styles.hint}>
-          Every {approve ? "approval" : "rejection"} is audit-logged (
-          {approve ? "role.assigned" : "role.request_rejected"}).
+          Every {approve ? "approval" : "rejection"} is recorded.
         </span>
       </div>
     </Modal>

@@ -254,9 +254,9 @@ export function SanctionsView({
               <span className={styles.termBadge}>{stats.termName}</span>
             </div>
             <p className={styles.pageSubtitle}>
-              Sanctions are issued automatically when a student's absences meet an active rule.
-              Clear a sanction once the student fulfills the requirement — private records per{" "}
-              <span className={styles.sectionNote}>DESIGN.md §7</span>.
+              Sanctions are issued automatically when a student&apos;s absences reach
+              the set limit. Mark a sanction as cleared once the student has met the
+              requirement. Sanction records stay private.
             </p>
           </div>
           {canCreate && (

@@ -81,7 +81,7 @@ export function TransparencySidebar({ stats, items, onView }: TransparencySideba
           Financial documents are published by the Treasurer; programs and minutes by the Secretary. All files stay visible to every officer and student for the term.
         </p>
         <div className={styles.policyFooter}>
-          <span>Audited · append-only</span>
+          <span>Checked · kept on record</span>
           <ExternalLink size={12} />
         </div>
       </div>

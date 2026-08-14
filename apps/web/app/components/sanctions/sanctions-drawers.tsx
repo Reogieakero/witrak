@@ -142,13 +142,13 @@ export function ActivityDrawer({ logs, onClose }: { logs: SanctionsActivityItem[
         tone="soft"
         icon={<Activity size={16} />}
         title="Activity Logs"
-        subtitle="Sanctions & flags audit trail"
+        subtitle="History of sanction and flag updates"
         onClose={onClose}
       />
       <div className={styles.drawerBody}>
         <p className={styles.parLight}>
-          Append-only audit trail (<code>sanction.auditLog</code>) for sanction creation, resolution,
-          and flag handling.
+          A history of sanction creation, resolution, and flag updates. Entries are
+          permanent and can&apos;t be changed or removed.
         </p>
         {logs.length === 0 ? (
           <p className={styles.parLight}>No sanction activity yet.</p>

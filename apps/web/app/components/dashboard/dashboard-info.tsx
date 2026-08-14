@@ -31,7 +31,7 @@ const SECTIONS: Section[] = [
   {
     icon: UserPlus,
     title: "Role Requests",
-    text: "Pending Year/Program Rep applications that are waiting for scope assignment by a Super Admin.",
+    text: "Students applying to be Year/Program Reps that are waiting for the Super Admin to approve and assign their area.",
   },
   {
     icon: Zap,
@@ -46,7 +46,7 @@ const SECTIONS: Section[] = [
   {
     icon: Activity,
     title: "Recent Audit Activity",
-    text: "An append-only log of officer actions, ordered newest first and paginated 10 entries per page.",
+    text: "A running list of officer actions, newest first, 10 entries per page.",
   },
 ];
 

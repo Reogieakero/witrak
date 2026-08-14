@@ -176,8 +176,8 @@ export function FeesSidebar({
             </div>
           </div>
           <p className={styles.snapNote}>
-            Fees are faculty-wide records (no scope in Rev. 2, DESIGN.md §9). Collection
-            rates recompute from verified <code>FeeProof</code> rows only.
+            These totals count only payments that have been verified, across all
+            students in the faculty.
           </p>
         </div>
       </div>

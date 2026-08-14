@@ -170,8 +170,8 @@ export function StatCards({ data }: { data: StatCardsData }) {
           hint={
             <Hint
               title="Fees Collected"
-              body="Total amount from verified fee payments, compared against the overall fee target."
-              source="Source: Fee · FeeProof tables"
+              body="Total amount from approved fee payments, compared against the overall fee target."
+              source="Verified payments only"
             />
           }
         />
@@ -183,8 +183,8 @@ export function StatCards({ data }: { data: StatCardsData }) {
           hint={
             <Hint
               title="Proofs Pending Review"
-              body="Fee proof submissions that still need to be verified by the treasurer."
-              source="Source: FeeProof table (status = PENDING)"
+              body="Fee payment proofs that still need to be approved by the treasurer."
+              source="Waiting on you"
             />
           }
         />

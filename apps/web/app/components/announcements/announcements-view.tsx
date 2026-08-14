@@ -210,9 +210,8 @@ export function AnnouncementsView({
               <span className={styles.termBadge}>{stats.termName}</span>
             </div>
             <p className={styles.pageSubtitle}>
-              Publish faculty-wide updates that every member sees on their surface.
-              Announcements are <span className={styles.sectionNote}>faculty-wide by default</span>{" "}
-              (no scope in Rev. 2, DESIGN.md §9).
+              Publish updates that every member will see. Announcements are shared
+              with everyone by default, or with a specific program when you choose one.
             </p>
           </div>
           {canCreate && (

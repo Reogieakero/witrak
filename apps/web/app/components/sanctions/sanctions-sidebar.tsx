@@ -115,10 +115,10 @@ export function SanctionsSidebar({
           </h3>
         </div>
         <p className={styles.policyText}>
-          When a student's absences meet an active rule's threshold, a sanction is auto-issued and
-          audit-logged; the admin / president clears it once the student fulfills the requirement.
-          Records are private (DESIGN.md §7) — visible only to the admin / president and the
-          Discipline Officer within their assigned scope.
+          When a student&apos;s absences reach the set limit, a sanction is issued
+          automatically. The admin or president clears it once the student meets the
+          requirement. Only the admin, the Discipline Officer, and the student involved
+          can see these records.
         </p>
         <div className={styles.policyFooter}>
           <span>Admin edits rules</span>
