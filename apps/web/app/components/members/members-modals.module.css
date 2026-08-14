@@ -1,0 +1,252 @@
+.modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.headIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.625rem;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-600);
+  background: var(--brand-50);
+}
+
+.headIcon[data-variant="red"] {
+  color: var(--red-600);
+  background: var(--red-50);
+}
+
+.headIcon[data-variant="brand"] {
+  color: var(--brand-600);
+  background: var(--brand-50);
+}
+
+.titleLine {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.subtitle {
+  display: block;
+  font-size: 0.6875rem;
+  color: var(--text-faint);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 0.25rem 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-subtle);
+}
+
+.required {
+  color: var(--red-600);
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.75rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+  border-radius: 0.5rem;
+  color: var(--text-strong);
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--brand-600);
+  background: var(--surface-card);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.hint {
+  font-size: 0.625rem;
+  color: var(--text-faint);
+}
+
+.drawerBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fieldGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.drawerLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.detailCell {
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  background: var(--surface-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detailLabel {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
+.detailValue {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.note {
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+}
+
+.drawerFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.drawerFooterGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.suspendBtn,
+.removeAuthBtn,
+.editBtnWide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.suspendBtn {
+  color: var(--amber-700);
+  border-color: var(--amber-100);
+}
+
+.suspendBtn:hover {
+  background: var(--amber-50);
+}
+
+.removeAuthBtn {
+  color: var(--red-700);
+  border-color: var(--red-100);
+}
+
+.removeAuthBtn:hover {
+  background: var(--red-50);
+}
+
+.editBtnWide {
+  color: var(--brand-600);
+  border-color: var(--brand-100);
+}
+
+.editBtnWide:hover {
+  background: var(--brand-50);
+}
+
+.requestText {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.requestGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.requestCell {
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.625rem;
+  background: var(--surface-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.requestCellLabel {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
+.requestCellValue {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-strong);
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 480px) {
+  .requestGrid {
+    grid-template-columns: 1fr;
+  }
+}

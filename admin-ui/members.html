@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50/50" data-role="super-admin">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHUSOCOM - Members</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#2563eb',
+                            secondary: '#3b82f6',
+                            light: '#93c5fd',
+                            subtle: '#eff6ff',
+                        },
+                        ink: {
+                            DEFAULT: '#0f172a',
+                            soft: '#334155',
+                            muted: '#64748b',
+                            faint: '#94a3b8',
+                        },
+                        line: { DEFAULT: '#e2e8f0', soft: '#eef2f7' },
+                    },
+                    boxShadow: {
+                        soft: '0 1px 2px rgba(15,23,42,0.04)',
+                        lift: '0 8px 24px -8px rgba(15,23,42,0.12), 0 2px 6px rgba(15,23,42,0.04)',
+                        ring: '0 0 0 4px rgba(37,99,235,0.12)',
+                    },
+                    backgroundImage: {
+                        'brand-gradient': 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                        'brand-soft': 'linear-gradient(135deg, rgba(37,99,235,0.10), rgba(59,130,246,0.06))',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --brand-primary: #2563eb;
+            --brand-secondary: #3b82f6;
+            --brand-light: #93c5fd;
+            --brand-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up { animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+        .row-hover { transition: background 0.15s ease; }
+        .row-hover:hover { background: #f8fafc; }
+    </style>
+</head>
+<body class="h-full font-sans text-gray-900 bg-gray-50/50 antialiased selection:bg-brand-primary selection:text-white">
+
+    <div class="min-h-screen flex flex-col">
+
+        <div id="sidebarBackdrop" class="fixed inset-0 z-40 bg-gray-900/20 backdrop-blur-xs hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 bottom-0 left-0 z-50 w-[180px] bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ease-in-out -translate-x-full lg:translate-x-0">
+            <div class="h-16 px-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-6 h-6 rounded-lg bg-brand-gradient flex items-center justify-center text-white shadow-xs">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-white"></i>
+                    </div>
+                    <span class="font-extrabold text-sm tracking-tight text-gray-900">FHUSOCOM</span>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden p-1 rounded hover:bg-brand-50 text-brand-primary transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-brand-primary"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-2 space-y-0.5">
+                <div class="px-2 pt-2 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Main</div>
+
+                <a href="index.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="events.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="calendar-check-2" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Events</span>
+                </a>
+
+                <a href="attendance.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="qr-code" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Attendance</span>
+                </a>
+
+                <a href="transparency.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group"><i data-lucide="folder-open" class="w-4 h-4 text-brand-primary"></i><span>Transparency</span>
+                </a>
+
+                <a href="sanctions.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Sanctions</span>
+                </a>
+
+                <a href="fees.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="hand-coins" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Fees</span>
+                </a>
+
+                <a href="announcements.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="megaphone" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Announcements</span>
+                </a>
+
+                <a href="members.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg bg-brand-subtle text-brand-primary font-semibold text-xs transition-colors group">
+                    <i data-lucide="users" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Members</span>
+                </a>
+
+                <div class="px-2 pt-4 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">System</div>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="user-cog" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Users &amp; Roles</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="scroll-text" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Audit Log</span>
+                </a>
+            </div>
+
+            <div class="p-2 border-t border-gray-100 bg-gray-50/50">
+                <div class="flex items-center gap-2 p-1.5 rounded-lg">
+                    <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                        P
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-gray-900 block truncate">President</span>
+                        <span class="text-[10px] text-gray-500 block truncate" id="roleLabel">Super Admin</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="lg:pl-[180px] flex-1 flex flex-col min-w-0">
+
+            <header class="h-16 bg-white/90 backdrop-blur border-b border-gray-200 px-4 flex items-center justify-between sticky top-0 z-30">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg hover:bg-brand-subtle text-brand-primary transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5 text-brand-primary"></i>
+                    </button>
+                    <span class="text-xs font-medium text-gray-500">FHUSOCOM Admin</span>
+                    <span class="text-gray-300 text-xs">/</span>
+                    <span class="text-xs font-semibold text-gray-900">Members</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="relative hidden md:block">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-primary"></i>
+                        <input id="globalSearch" type="text" placeholder="Search members, programs…" class="w-52 lg:w-64 pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                    </div>
+
+                    <div class="relative hidden lg:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-50 border border-gray-200" title="Preview the page as a role (see ROLES-AND-MODULES.md)">
+                        <i data-lucide="eye" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Preview as</span>
+                        <select id="roleSelect" class="text-[11px] font-semibold text-brand-primary bg-transparent focus:outline-none cursor-pointer">
+                            <option value="super-admin">Super Admin</option>
+                            <option value="secretary">Secretary</option>
+                            <option value="treasurer">Treasurer</option>
+                            <option value="discipline">Disc. Officer</option>
+                            <option value="year-rep">Year Rep</option>
+                        </select>
+                    </div>
+
+                    <button class="p-1.5 text-brand-primary hover:bg-brand-subtle rounded-lg transition-colors relative" title="Notifications">
+                        <i data-lucide="bell" class="w-4 h-4 text-brand-primary"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-brand-primary rounded-full"></span>
+                    </button>
+                    <div class="h-4 w-px bg-gray-200"></div>
+                    <div class="flex items-center gap-2 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                            P
+                        </div>
+                        <div class="hidden xl:block leading-tight">
+                            <span class="text-[11px] font-semibold text-gray-900 block">President</span>
+                            <span class="text-[9px] text-gray-400 block" id="headerRoleLabel">Super Admin</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    </div>
+                </div>
+            </header>
+
+            <main class="w-full p-4 lg:p-5 flex flex-col lg:flex-row gap-4 items-start">
+
+                <div class="flex-1 min-w-0 space-y-4" id="membersContent">
+
+                    <div class="flex flex-wrap items-end justify-between gap-3 animate-fade-up">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h1 class="text-2xl font-extrabold tracking-tight text-gray-900">Members</h1>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-subtle text-brand-primary border border-brand-100">Term 1 · 2025–2026</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">The student directory is <span class="font-semibold text-gray-600">view-only</span> for most officer roles (ROLES-AND-MODULES.md §2). Only <span class="font-semibold text-gray-600">Super Admin</span> can approve pending role requests. Year Reps see a <span class="font-semibold text-gray-600">scoped</span> set of their own section.</p>
+                        </div>
+                        <button data-action="create" onclick="openInviteModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md hover:-translate-y-0.5 transition-all">
+                            <i data-lucide="user-plus" class="w-3.5 h-3.5"></i>
+                            Add Member
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2.5 shadow-soft animate-fade-up" style="animation-delay: 40ms">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Directory access</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">View · all officer roles</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-50 text-brand-700 border border-brand-100">Year Rep · scoped</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-50 text-teal-700 border border-teal-100">Approve requests · Super Admin</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 animate-fade-up" style="animation-delay: 80ms">
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-brand-soft text-brand-primary flex items-center justify-center">
+                                    <i data-lucide="users" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-brand-primary bg-brand-subtle border border-brand-100 px-1.5 py-0.5 rounded-full">total</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">248</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Members</div>
+                            <div class="mt-1 text-[10px] text-gray-400">enrolled this term</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">active</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">231</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Active</div>
+                            <div class="mt-1 text-[10px] text-emerald-600 font-semibold">verified students</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                                    <i data-lucide="clock-3" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">pending</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">17</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Pending Approval</div>
+                            <div class="mt-1 text-[10px] text-gray-400">role requests awaiting</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
+                                    <i data-lucide="layers" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-violet-600 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">programs</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">6</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Programs</div>
+                            <div class="mt-1 text-[10px] text-gray-400">across the faculty</div>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft animate-fade-up" style="animation-delay: 120ms">
+                        <div class="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
+                            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100">
+                                <button data-filter="all" onclick="setFilter('all')" id="filterAllBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white text-gray-900 shadow-soft transition-all">
+                                    <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                                    All
+                                </button>
+                                <button data-filter="active" onclick="setFilter('active')" id="filterActiveBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all">
+                                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                                    Active
+                                </button>
+                                <button data-filter="pending" onclick="setFilter('pending')" id="filterPendingBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all">
+                                    <i data-lucide="clock-3" class="w-3.5 h-3.5"></i>
+                                    Pending
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <select id="programSelect" class="text-[11px] font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-brand-primary focus:bg-white transition-all cursor-pointer">
+                                    <option value="all">All Programs</option>
+                                    <option value="BSIT">BSIT</option>
+                                    <option value="BSCS">BSCS</option>
+                                    <option value="BSBA">BSBA</option>
+                                    <option value="BSEd">BSEd</option>
+                                    <option value="BSHM">BSHM</option>
+                                    <option value="BEED">BEED</option>
+                                </select>
+                                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider" id="visibleCountLabel"></span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="memberList">
+
+                            <div data-status="active" data-program="BSIT" class="member-item row-hover rounded-2xl border border-gray-100 bg-gradient-to-br from-brand-subtle/40 to-transparent p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Maria L. Santos</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSIT</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>3rd Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section A</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">m.santos@school.edu · Joined Jul 14, 2026</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openMember('Maria L. Santos')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View member"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="edit" onclick="openMemberEdit('Maria L. Santos')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="Edit member"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="pending" data-program="BSCS" class="member-item row-hover rounded-2xl border border-gray-100 bg-gradient-to-br from-amber-50/40 to-transparent p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">John P. Cruz</h3>
+                                            <span class="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Pending</span>
+                                            <span class="text-[10px] font-semibold text-violet-600 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">Year Rep request</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSCS</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>2nd Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section B</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">j.cruz@school.edu · Requested Aug 11, 2026</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openMember('John P. Cruz')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View member"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="approve" onclick="openApproveModal('John P. Cruz')" class="p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-50 transition-colors" title="Approve request"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="reject" onclick="openRejectModal('John P. Cruz')" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Reject request"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="active" data-program="BSBA" class="member-item row-hover rounded-2xl border border-gray-100 bg-gradient-to-br from-brand-subtle/40 to-transparent p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Angela M. Reyes</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSBA</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>4th Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section A</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">a.reyes@school.edu · Joined Jul 09, 2026</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openMember('Angela M. Reyes')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View member"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="edit" onclick="openMemberEdit('Angela M. Reyes')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="Edit member"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="pending" data-program="BSHM" class="member-item row-hover rounded-2xl border border-gray-100 bg-gradient-to-br from-amber-50/40 to-transparent p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Karlo D. Mendoza</h3>
+                                            <span class="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Pending</span>
+                                            <span class="text-[10px] font-semibold text-violet-600 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">Year Rep request</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSHM</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>1st Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section C</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">k.mendoza@school.edu · Requested Aug 10, 2026</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openMember('Karlo D. Mendoza')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View member"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="approve" onclick="openApproveModal('Karlo D. Mendoza')" class="p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-50 transition-colors" title="Approve request"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="reject" onclick="openRejectModal('Karlo D. Mendoza')" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Reject request"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="active" data-program="BSEd" class="member-item row-hover rounded-2xl border border-gray-100 bg-gradient-to-br from-brand-subtle/40 to-transparent p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Sophia A. Ligaya</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSEd</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>3rd Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section A</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">s.ligaya@school.edu · Joined Jul 16, 2026</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openMember('Sophia A. Ligaya')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View member"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="edit" onclick="openMemberEdit('Sophia A. Ligaya')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="Edit member"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="active" data-program="BEED" class="member-item row-hover rounded-2xl border border-gray-100 bg-gradient-to-br from-brand-subtle/40 to-transparent p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Gabriel T. Bautista</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BEED</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>2nd Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section B</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">g.bautista@school.edu · Joined Jul 12, 2026</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openMember('Gabriel T. Bautista')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View member"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="edit" onclick="openMemberEdit('Gabriel T. Bautista')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="Edit member"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="pending" data-program="BSIT" class="member-item row-hover rounded-2xl border border-gray-100 bg-gradient-to-br from-amber-50/40 to-transparent p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Rica N. Fontanilla</h3>
+                                            <span class="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Pending</span>
+                                            <span class="text-[10px] font-semibold text-violet-600 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded-full">Year Rep request</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSIT</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>1st Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section A</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">r.fontanilla@school.edu · Requested Aug 09, 2026</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openMember('Rica N. Fontanilla')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View member"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="approve" onclick="openApproveModal('Rica N. Fontanilla')" class="p-1.5 rounded-lg text-emerald-500 hover:bg-emerald-50 transition-colors" title="Approve request"><i data-lucide="check" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="reject" onclick="openRejectModal('Rica N. Fontanilla')" class="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors" title="Reject request"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="active" data-program="BSCS" class="member-item row-hover rounded-2xl border border-gray-100 bg-gradient-to-br from-brand-subtle/40 to-transparent p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Paulo C. Villanueva</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSCS</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>4th Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section B</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">p.villanueva@school.edu · Joined Jul 11, 2026</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openMember('Paulo C. Villanueva')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View member"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="edit" onclick="openMemberEdit('Paulo C. Villanueva')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="Edit member"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <aside class="w-full lg:w-[300px] shrink-0 space-y-4">
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft p-4 animate-fade-up">
+                        <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
+                            <i data-lucide="zap" class="w-4 h-4 text-brand-primary"></i>
+                            Quick Actions
+                        </h3>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button data-action="create" onclick="openInviteModal()" class="flex items-center gap-2 p-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:bg-brand-subtle hover:border-brand-100 transition-colors text-left">
+                                <span class="p-1.5 rounded-lg bg-brand-soft text-brand-primary"><i data-lucide="user-plus" class="w-3.5 h-3.5"></i></span>
+                                <span class="flex-1 min-w-0">
+                                    <span class="block text-[11px] font-bold text-gray-900">Add Member</span>
+                                    <span class="block text-[10px] text-gray-400">Invite a new student</span>
+                                </span>
+                            </button>
+                            <button onclick="exportDirectory()" class="flex items-center gap-2 p-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:bg-brand-subtle hover:border-brand-100 transition-colors text-left">
+                                <span class="p-1.5 rounded-lg bg-violet-50 text-violet-600"><i data-lucide="download" class="w-3.5 h-3.5"></i></span>
+                                <span class="flex-1 min-w-0">
+                                    <span class="block text-[11px] font-bold text-gray-900">Export Directory</span>
+                                    <span class="block text-[10px] text-gray-400">Download as CSV</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft p-4 animate-fade-up" style="animation-delay: 60ms">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-brand-primary"></i>
+                                Directory Rights
+                            </h3>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">Super Admin</span>
+                                <span class="flex items-center gap-1 text-[10px] font-semibold text-emerald-600"><i data-lucide="eye" class="w-3 h-3"></i>View</span>
+                                <span class="flex items-center gap-1 text-[10px] font-semibold text-brand-600"><i data-lucide="user-cog" class="w-3 h-3"></i>Manage</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">Secretary</span>
+                                <span class="flex items-center gap-1 text-[10px] font-semibold text-emerald-600"><i data-lucide="eye" class="w-3 h-3"></i>View</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">Treasurer</span>
+                                <span class="flex items-center gap-1 text-[10px] font-semibold text-emerald-600"><i data-lucide="eye" class="w-3 h-3"></i>View</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">Disc. Officer</span>
+                                <span class="flex items-center gap-1 text-[10px] font-semibold text-emerald-600"><i data-lucide="eye" class="w-3 h-3"></i>View</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">Year Rep</span>
+                                <span class="text-[10px] text-brand-600 font-semibold">Scoped</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 leading-relaxed pt-1">Permission model per <span class="font-semibold text-gray-600">ROLES-AND-MODULES.md §2</span> — Members: view = all officer roles; approve requests = Super Admin only (§1 approval flow).</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft p-4 animate-fade-up" style="animation-delay: 120ms">
+                        <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
+                            <i data-lucide="activity" class="w-4 h-4 text-brand-primary"></i>
+                            By Program
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">BSIT</span>
+                                <span class="text-[9px] font-bold text-brand-primary bg-brand-subtle border border-brand-100 px-1.5 py-0.5 rounded-full shrink-0">52</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">BSCS</span>
+                                <span class="text-[9px] font-bold text-brand-primary bg-brand-subtle border border-brand-100 px-1.5 py-0.5 rounded-full shrink-0">48</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">BSBA</span>
+                                <span class="text-[9px] font-bold text-brand-primary bg-brand-subtle border border-brand-100 px-1.5 py-0.5 rounded-full shrink-0">41</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">BSHM</span>
+                                <span class="text-[9px] font-bold text-brand-primary bg-brand-subtle border border-brand-100 px-1.5 py-0.5 rounded-full shrink-0">37</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 border border-gray-100/80">
+                                <span class="text-[11px] font-semibold text-gray-700">BSEd / BEED</span>
+                                <span class="text-[9px] font-bold text-brand-primary bg-brand-subtle border border-brand-100 px-1.5 py-0.5 rounded-full shrink-0">70</span>
+                            </div>
+                            <p class="text-[10px] text-gray-400 leading-relaxed pt-1">Year Reps only see members in their resolved section set (ROLES-AND-MODULES.md §2 scope notes).</p>
+                        </div>
+                    </div>
+
+                </aside>
+            </main>
+        </div>
+    </div>
+
+    <div id="noAccessPanel" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-gray-50/50 p-4">
+        <div class="max-w-sm w-full bg-white rounded-2xl border border-gray-200 shadow-lift p-8 text-center">
+            <div class="mx-auto w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center">
+                <i data-lucide="lock" class="w-7 h-7 text-gray-300"></i>
+            </div>
+            <h2 class="mt-4 text-lg font-extrabold text-gray-900">No access to Members</h2>
+            <p class="mt-1.5 text-xs text-gray-500 leading-relaxed">Your role does not have the directory <code class="text-[10px] bg-gray-100 px-1 rounded">members.view</code> permission. The student directory is visible to all officer roles in Rev. 2 (ROLES-AND-MODULES.md §2).</p>
+        </div>
+    </div>
+
+    <div id="memberDrawer" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeMemberDrawer()"></div>
+        <div class="absolute top-0 right-0 bottom-0 w-full max-w-md bg-white shadow-lift flex flex-col animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-brand-soft text-brand-primary flex items-center justify-center">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-bold text-gray-900 truncate" id="memberDrawerName">Member</h3>
+                        <p class="text-[10px] text-gray-400" id="memberDrawerMeta">BSIT · 3rd Year · Section A</p>
+                    </div>
+                </div>
+                <button onclick="closeMemberDrawer()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-5 space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-2xl bg-brand-gradient text-white flex items-center justify-center text-lg font-bold shadow-xs">MS</div>
+                    <div>
+                        <div class="text-sm font-extrabold text-gray-900" id="memberDrawerName2">Maria L. Santos</div>
+                        <div class="text-[11px] text-gray-500" id="memberDrawerEmail">m.santos@school.edu</div>
+                        <span class="mt-1 inline-flex text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                        <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Program</div>
+                        <div class="text-xs font-bold text-gray-900 mt-0.5">BSIT</div>
+                    </div>
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                        <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Year Level</div>
+                        <div class="text-xs font-bold text-gray-900 mt-0.5">3rd Year</div>
+                    </div>
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                        <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Section</div>
+                        <div class="text-xs font-bold text-gray-900 mt-0.5">Section A</div>
+                    </div>
+                    <div class="rounded-xl bg-gray-50 border border-gray-100 p-3">
+                        <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Joined</div>
+                        <div class="text-xs font-bold text-gray-900 mt-0.5">Jul 14, 2026</div>
+                    </div>
+                </div>
+                <div class="rounded-xl bg-brand-subtle border border-brand-100 p-3 flex items-start gap-2">
+                    <i data-lucide="eye" class="w-3.5 h-3.5 text-brand-primary mt-0.5 shrink-0"></i>
+                    <p class="text-[10px] text-gray-600 leading-relaxed">This directory entry is read-only on the student surface (ROLES-AND-MODULES.md §3). Students never see other students' records.</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeMemberDrawer()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="inviteModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeInviteModal()"></div>
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 mx-auto w-[calc(100%-2rem)] max-w-lg bg-white rounded-2xl border border-gray-200 shadow-lift animate-fade-up">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-brand-soft text-brand-primary flex items-center justify-center">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900">Add Member</h3>
+                        <p class="text-[10px] text-gray-400">Invite a new student to the directory</p>
+                    </div>
+                </div>
+                <button onclick="closeInviteModal()" class="p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">First Name</label>
+                        <input type="text" placeholder="e.g. Maria" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Last Name</label>
+                        <input type="text" placeholder="e.g. Santos" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">School Email</label>
+                    <input type="email" placeholder="name@school.edu" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Program</label>
+                        <select class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                            <option>BSIT</option>
+                            <option>BSCS</option>
+                            <option>BSBA</option>
+                            <option>BSHM</option>
+                            <option>BSEd</option>
+                            <option>BEED</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Year</label>
+                        <select class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                            <option>1st Year</option>
+                            <option>2nd Year</option>
+                            <option>3rd Year</option>
+                            <option>4th Year</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Section</label>
+                        <select class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                            <option>A</option>
+                            <option>B</option>
+                            <option>C</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2">
+                    <i data-lucide="info" class="w-3 h-3 inline"></i>
+                    New members self-register with a school email and become active immediately (ROLES-AND-MODULES.md §1). Officer accounts are seeded by Super Admin.
+                </p>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeInviteModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button onclick="closeInviteModal()" class="px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">Send Invite</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="approveModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeApproveModal()"></div>
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 mx-auto w-[calc(100%-2rem)] max-w-sm bg-white rounded-2xl border border-gray-200 shadow-lift animate-fade-up">
+            <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center">
+                    <i data-lucide="check" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900">Approve role request?</h3>
+                    <p class="text-[10px] text-gray-400">Assign scope in the same action</p>
+                </div>
+            </div>
+            <div class="p-5 space-y-3">
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    You are about to approve <span id="approveName" class="font-semibold text-gray-700">John P. Cruz</span> as <span class="font-semibold text-violet-600">Year/Program Rep</span>. A scope (program + year or section) is <span class="font-semibold text-gray-600">required</span> at approval time (ROLES-AND-MODULES.md §1).
+                </p>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Scope Program</label>
+                        <select class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                            <option>BSCS</option>
+                            <option>BSIT</option>
+                            <option>BSBA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">Scope Section</label>
+                        <select class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                            <option>Section B</option>
+                            <option>Section A</option>
+                            <option>Section C</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeApproveModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button onclick="closeApproveModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-soft transition-colors">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    Approve &amp; Assign
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="rejectModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-xs" onclick="closeRejectModal()"></div>
+        <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 mx-auto w-[calc(100%-2rem)] max-w-sm bg-white rounded-2xl border border-gray-200 shadow-lift animate-fade-up">
+            <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
+                <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-100 text-red-500 flex items-center justify-center">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900">Reject role request?</h3>
+                    <p class="text-[10px] text-gray-400">This is audit-logged</p>
+                </div>
+            </div>
+            <div class="p-5 space-y-3">
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    You are about to reject <span id="rejectName" class="font-semibold text-gray-700">John P. Cruz</span>'s request. The user remains a Student and can re-request later. Every reject is logged as <code class="text-[9px] bg-gray-100 px-1 rounded">role.request_rejected</code>.
+                </p>
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-600 mb-1">Reason (optional)</label>
+                    <textarea rows="2" placeholder="e.g. Scope already covered by another rep…" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all"></textarea>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
+                <button onclick="closeRejectModal()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                <button onclick="closeRejectModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-soft transition-colors">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    Reject Request
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        const ROLE_PERMS = {
+            'super-admin': { access: true,  create: true,  manage: true,  label: 'Super Admin' },
+            'secretary':   { access: true,  create: false, manage: false, label: 'Secretary' },
+            'treasurer':   { access: true,  create: false, manage: false, label: 'Treasurer' },
+            'discipline':  { access: true,  create: false, manage: false, label: 'Disc. Officer' },
+            'year-rep':    { access: true,  create: false, manage: false, label: 'Year Rep' },
+        };
+
+        function applyRole(role) {
+            const perms = ROLE_PERMS[role] || ROLE_PERMS['super-admin'];
+            document.documentElement.dataset.role = role;
+            document.getElementById('roleLabel').textContent = perms.label;
+            document.getElementById('headerRoleLabel').textContent = perms.label;
+
+            const hasAccess = perms.access;
+            document.getElementById('membersContent').classList.toggle('hidden', !hasAccess);
+            document.getElementById('noAccessPanel').classList.toggle('hidden', hasAccess);
+
+            document.querySelectorAll('[data-action="create"]').forEach(el => el.classList.toggle('hidden', !perms.create));
+            document.querySelectorAll('[data-action="edit"]').forEach(el => el.classList.toggle('hidden', !perms.manage));
+            document.querySelectorAll('[data-action="approve"]').forEach(el => el.classList.toggle('hidden', !perms.manage));
+            document.querySelectorAll('[data-action="reject"]').forEach(el => el.classList.toggle('hidden', !perms.manage));
+
+            updateVisibleCount();
+        }
+
+        document.getElementById('roleSelect').addEventListener('change', (e) => applyRole(e.target.value));
+        applyRole('super-admin');
+
+        let activeFilter = 'all';
+        let activeProgram = 'all';
+
+        function setFilter(f) {
+            activeFilter = f;
+            const buttons = ['filterAllBtn', 'filterActiveBtn', 'filterPendingBtn'];
+            const on = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white text-gray-900 shadow-soft transition-all';
+            const off = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all';
+
+            buttons.forEach(id => document.getElementById(id).className = off);
+            document.getElementById({
+                all: 'filterAllBtn',
+                active: 'filterActiveBtn',
+                pending: 'filterPendingBtn',
+            }[f]).className = on;
+
+            lucide.createIcons();
+            updateVisibleCount();
+        }
+
+        document.getElementById('programSelect').addEventListener('change', (e) => {
+            activeProgram = e.target.value;
+            updateVisibleCount();
+        });
+
+        function updateVisibleCount() {
+            let count = 0;
+            const q = (document.getElementById('globalSearch').value || '').trim().toLowerCase();
+            document.querySelectorAll('#memberList .member-item').forEach(item => {
+                const matchesFilter = activeFilter === 'all' || item.dataset.status === activeFilter;
+                const matchesProgram = activeProgram === 'all' || item.dataset.program === activeProgram;
+                const matchesQuery = !q || (item.textContent || '').toLowerCase().includes(q);
+                const visible = matchesFilter && matchesProgram && matchesQuery;
+                item.classList.toggle('hidden', !visible);
+                if (visible) count += 1;
+            });
+            document.getElementById('visibleCountLabel').textContent = count + (count === 1 ? ' member' : ' members');
+        }
+
+        document.getElementById('globalSearch').addEventListener('input', updateVisibleCount);
+
+        function openInviteModal() {
+            document.getElementById('inviteModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeInviteModal() {
+            document.getElementById('inviteModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openMember(name) {
+            document.getElementById('memberDrawerName').textContent = name;
+            document.getElementById('memberDrawerName2').textContent = name;
+            document.getElementById('memberDrawer').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMemberDrawer() {
+            document.getElementById('memberDrawer').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openMemberEdit(name) {
+            openMember(name);
+        }
+
+        function openApproveModal(name) {
+            document.getElementById('approveName').textContent = name;
+            document.getElementById('approveModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeApproveModal() {
+            document.getElementById('approveModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function openRejectModal(name) {
+            document.getElementById('rejectName').textContent = name;
+            document.getElementById('rejectModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function exportDirectory() {
+            // placeholder for CSV export
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeInviteModal();
+                closeMemberDrawer();
+                closeApproveModal();
+                closeRejectModal();
+            }
+        });
+    </script>
+</body>
+</html>
