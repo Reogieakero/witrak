@@ -42,7 +42,10 @@ const ROLE_SEEDS: RoleSeed[] = [
       PermissionKey.transparency_delete,
       PermissionKey.transparency_view,
       PermissionKey.announcements_create,
+      PermissionKey.announcements_edit,
       PermissionKey.announcements_delete,
+      PermissionKey.announcements_view,
+      PermissionKey.members_view,
     ],
   },
   {
@@ -55,6 +58,7 @@ const ROLE_SEEDS: RoleSeed[] = [
       PermissionKey.transparency_upload,
       PermissionKey.transparency_delete,
       PermissionKey.transparency_view,
+      PermissionKey.members_view,
     ],
   },
   {
@@ -63,6 +67,7 @@ const ROLE_SEEDS: RoleSeed[] = [
     permissions: [
       PermissionKey.sanctions_view,
       PermissionKey.attendance_view,
+      PermissionKey.members_view,
     ],
   },
   {
@@ -75,6 +80,7 @@ const ROLE_SEEDS: RoleSeed[] = [
       PermissionKey.events_view,
       PermissionKey.attendance_scan,
       PermissionKey.attendance_view,
+      PermissionKey.members_view,
     ],
   },
   {
@@ -102,6 +108,7 @@ const ROLE_SEEDS: RoleSeed[] = [
       PermissionKey.announcements_create,
       PermissionKey.announcements_delete,
       PermissionKey.announcements_view,
+      PermissionKey.members_view,
     ],
   },
   {
@@ -112,9 +119,11 @@ const ROLE_SEEDS: RoleSeed[] = [
       PermissionKey.transparency_delete,
       PermissionKey.transparency_view,
       PermissionKey.announcements_create,
+      PermissionKey.announcements_edit,
       PermissionKey.announcements_delete,
       PermissionKey.announcements_view,
       PermissionKey.events_view,
+      PermissionKey.members_view,
     ],
   },
   {
@@ -126,6 +135,7 @@ const ROLE_SEEDS: RoleSeed[] = [
       PermissionKey.audit_view,
       PermissionKey.announcements_view,
       PermissionKey.events_view,
+      PermissionKey.members_view,
     ],
   },
   {
@@ -137,6 +147,7 @@ const ROLE_SEEDS: RoleSeed[] = [
       PermissionKey.announcements_view,
       PermissionKey.events_view,
       PermissionKey.attendance_view,
+      PermissionKey.members_view,
     ],
   },
 ];

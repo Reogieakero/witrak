@@ -18,8 +18,10 @@ export const PERMISSION_KEYS = [
   "fees_verify_payment",
   "fees_view",
   "announcements_create",
+  "announcements_edit",
   "announcements_delete",
   "announcements_view",
+  "members_view",
   "users_manage_roles",
   "audit_view",
 ] as const;

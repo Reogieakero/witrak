@@ -49,8 +49,8 @@ export const MAIN_NAV: NavItem[] = [
   { label: "Transparency", href: "/admin/transparency", icon: FolderOpen },
   { label: "Sanctions", href: "/admin/sanctions", icon: ShieldAlert },
   { label: "Fees", href: "/admin/fees", icon: HandCoins },
-  { label: "Announcements", href: "#", icon: Megaphone },
-  { label: "Members", href: "#", icon: Users },
+  { label: "Announcements", href: "/admin/announcements", icon: Megaphone },
+  { label: "Members", href: "/admin/members", icon: Users },
 ];
 
 export const SYSTEM_NAV: NavItem[] = [

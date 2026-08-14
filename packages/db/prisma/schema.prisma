@@ -65,6 +65,9 @@ enum AuditAction {
   FLAG_AUTO_DISMISSED
   PAYMENT_VERIFIED
   PAYMENT_REJECTED
+  MEMBER_SUSPENDED
+  MEMBER_REINSTATED
+  MEMBER_AUTHORIZATION_REMOVED
 }
 
 enum PermissionKey {
@@ -87,8 +90,10 @@ enum PermissionKey {
   fees_verify_payment
   fees_view
   announcements_create
+  announcements_edit
   announcements_delete
   announcements_view
+  members_view
   users_manage_roles
   audit_view
 }
@@ -102,6 +107,7 @@ model Program {
   userRoles     UserRole[]
   sanctionRules SanctionRule[]
   events        Event[]
+  announcements Announcement[]
 }
 
 model YearLevel {
@@ -136,6 +142,7 @@ model Student {
   firstName   String
   lastName    String
   sectionId   String?
+  suspended   Boolean    @default(false)
   section     Section?   @relation(fields: [sectionId], references: [id])
   user        User?
   attendances Attendance[]
@@ -375,12 +382,17 @@ model TransparencyFile {
 }
 
 model Announcement {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   body        String
+  imageUrl    String?
+  imagePath   String?
+  scopeType   ScopeType @default(FACULTY)
+  programId   String?
+  program     Program?   @relation(fields: [programId], references: [id])
   createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id])
-  createdAt   DateTime @default(now())
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
 }
 
 model AuditLog {

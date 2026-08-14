@@ -47,10 +47,35 @@ export async function updateAttendanceStatus(input: {
       id: input.studentId,
       ...(access ? studentInScope(access) : {}),
     },
-    select: { id: true },
+    select: {
+      id: true,
+      suspended: true,
+      sectionId: true,
+      user: { select: { roles: { select: { id: true } } } },
+    },
   });
   if (!student) {
     return { ok: false, error: "Student not found or outside your scope." };
+  }
+
+  if (student.suspended) {
+    return { ok: false, error: "Member is suspended and cannot check in." };
+  }
+
+  if (student.sectionId === null && (student.user?.roles.length ?? 0) === 0) {
+    const removed = await prisma.auditLog.findFirst({
+      where: {
+        action: "MEMBER_AUTHORIZATION_REMOVED",
+        targetId: input.studentId,
+      },
+      select: { id: true },
+    });
+    if (removed) {
+      return {
+        ok: false,
+        error: "Member authorization has been removed and cannot check in.",
+      };
+    }
   }
 
   const existing = await prisma.attendance.findUnique({

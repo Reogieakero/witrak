@@ -10,6 +10,6 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-export { AuditAction, AttendanceStatus, FlagStatus } from "@prisma/client";
+export { AuditAction, AttendanceStatus, FlagStatus, ScopeType } from "@prisma/client";
 export type { PermissionKey } from "@prisma/client";
 export { recomputeSanctionTriggers, backfillSanctionRule } from "./flags";
