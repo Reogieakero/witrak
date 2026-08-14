@@ -39,8 +39,8 @@
 }
 
 .button:hover:not(:disabled) {
-  border-color: #93c5fd;
-  color: #2563eb;
+  border-color: var(--brand-300);
+  color: var(--brand-600);
 }
 
 .button:disabled {

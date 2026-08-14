@@ -96,3 +96,65 @@
   padding: 0 2rem;
   font-size: 1rem;
 }
+
+/* Dark mode: render all variants as plain buttons (surface card + tinted
+   border/text) instead of the filled UI look. Light mode keeps the UI styles. */
+:global([data-theme="dark"]) .primary {
+  background: var(--surface-card);
+  border-color: var(--brand-100);
+  color: var(--brand-600);
+  box-shadow: none;
+}
+
+:global([data-theme="dark"]) .primary:hover {
+  background: var(--brand-50);
+  color: var(--brand-700);
+  opacity: 1;
+}
+
+:global([data-theme="dark"]) .secondary {
+  background: var(--surface-card);
+  border-color: var(--line);
+  color: var(--ink-700);
+}
+
+:global([data-theme="dark"]) .secondary:hover {
+  background: var(--brand-50);
+  border-color: var(--brand-300);
+  color: var(--brand-600);
+}
+
+:global([data-theme="dark"]) .white {
+  background: var(--surface-card);
+  border-color: var(--line);
+  color: var(--brand-700);
+}
+
+:global([data-theme="dark"]) .white:hover {
+  background: var(--brand-50);
+  opacity: 1;
+}
+
+:global([data-theme="dark"]) .danger {
+  background: var(--surface-card);
+  border-color: var(--red-100);
+  color: var(--red-600);
+  box-shadow: none;
+}
+
+:global([data-theme="dark"]) .danger:hover {
+  background: var(--red-50);
+  color: var(--red-700);
+}
+
+:global([data-theme="dark"]) .outline {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--ink-700);
+}
+
+:global([data-theme="dark"]) .outline:hover {
+  background: var(--surface-muted);
+  border-color: var(--border-strong);
+  color: var(--text-strong);
+}

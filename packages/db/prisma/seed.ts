@@ -343,7 +343,9 @@ function studentNameFor(i: number): { firstName: string; lastName: string } {
   return { firstName: first, lastName: last };
 }
 
-async function seedScopeStructure(): Promise<{
+async function seedScopeStructure(
+  superAdmin: { id: string },
+): Promise<{
   sections: Awaited<ReturnType<typeof prisma.section.findMany>>;
   yearLevels: Awaited<ReturnType<typeof prisma.yearLevel.findMany>>;
   programs: Awaited<ReturnType<typeof prisma.program.findMany>>;
@@ -371,43 +373,64 @@ async function seedScopeStructure(): Promise<{
   await prisma.section.createMany({ data: sections });
   const sectionRows = await prisma.section.findMany();
 
-  // Students: 3 per section + a handful unassigned
+  // Every student must have an account: provision a User first, then create
+  // the Student profile linked to it.
+  const studentRole = await prisma.role.findUniqueOrThrow({ where: { name: "Student" } });
+  const passwordHash = await bcrypt.hash("password123", 10);
+
   const students: {
+    id: string;
+    userId: string;
     studentNo: string;
     firstName: string;
     lastName: string;
-    sectionId?: string | null;
+    sectionId: string | null;
   }[] = [];
   let idx = 0;
-  for (const section of sectionRows) {
-    for (let n = 0; n < 3; n++) {
-      const name = studentNameFor(idx);
-      students.push({
+
+  async function addStudent(sectionId: string | null) {
+    const name = studentNameFor(idx);
+    const user = await prisma.user.create({
+      data: {
+        email: `student${idx + 1}@fhusocom.edu`,
+        name: `${name.firstName} ${name.lastName}`,
+        passwordHash,
+      },
+    });
+    await prisma.userRole.create({
+      data: {
+        userId: user.id,
+        roleId: studentRole.id,
+        scopeType: ScopeType.FACULTY,
+        assignedBy: superAdmin.id,
+      },
+    });
+    const student = await prisma.student.create({
+      data: {
         studentNo: `2025-${String(idx + 1).padStart(4, "0")}`,
         firstName: name.firstName,
         lastName: name.lastName,
-        sectionId: section.id,
-      });
-      idx++;
+        sectionId,
+        userId: user.id,
+      },
+    });
+    students.push(student);
+    idx++;
+  }
+
+  for (const section of sectionRows) {
+    for (let n = 0; n < 3; n++) {
+      await addStudent(section.id);
     }
   }
   for (let n = 0; n < 6; n++) {
-    const name = studentNameFor(idx);
-    students.push({
-      studentNo: `2025-${String(idx + 1).padStart(4, "0")}`,
-      firstName: name.firstName,
-      lastName: name.lastName,
-      sectionId: null,
-    });
-    idx++;
+    await addStudent(null);
   }
-  await prisma.student.createMany({ data: students });
-  const studentRows = await prisma.student.findMany();
 
   console.log(
-    `Scope structure: ${programs.length} programs, ${yearLevelRows.length} year levels, ${sectionRows.length} sections, ${studentRows.length} students`,
+    `Scope structure: ${programs.length} programs, ${yearLevelRows.length} year levels, ${sectionRows.length} sections, ${students.length} students (all with accounts)`,
   );
-  return { sections: sectionRows, yearLevels: yearLevelRows, programs, students: studentRows };
+  return { sections: sectionRows, yearLevels: yearLevelRows, programs, students };
 }
 
 async function seedUsers(
@@ -465,25 +488,23 @@ async function seedUsers(
   const treasurer = created[1];
   const disciplineOfficer = created[2];
 
-  // Year/Program reps (student-linked, scoped)
+  // Year/Program reps: every student already has an account (provisioned in
+  // seedScopeStructure), so reps are the students' own accounts granted the
+  // "Year/Program Rep" role with a scoped target.
   const repSpecs = [
-    { email: "yearep1@fhusocom.edu", name: "Aila Reyes", studentIdx: 0, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[1] },
-    { email: "yearep2@fhusocom.edu", name: "Bryan Cruz", studentIdx: 1, scope: ScopeType.SECTION, target: sections[2] },
-    { email: "yearep3@fhusocom.edu", name: "Celine Aquino", studentIdx: 2, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[7] },
-    { email: "yearep4@fhusocom.edu", name: "Dino Salazar", studentIdx: 3, scope: ScopeType.SECTION, target: sections[5] },
+    { studentIdx: 0, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[1] },
+    { studentIdx: 1, scope: ScopeType.SECTION, target: sections[2] },
+    { studentIdx: 2, scope: ScopeType.PROGRAM_YEAR, target: yearLevels[7] },
+    { studentIdx: 3, scope: ScopeType.SECTION, target: sections[5] },
   ] as const;
 
   const repRoleId = await roleId("Year/Program Rep");
   const scanners: { id: string }[] = [secretary];
   for (const spec of repSpecs) {
-    const user = await prisma.user.upsert({
-      where: { email: spec.email },
-      update: { name: spec.name, passwordHash },
-      create: { email: spec.email, name: spec.name, passwordHash, studentId: students[spec.studentIdx].id },
-    });
+    const student = students[spec.studentIdx];
     await prisma.userRole.create({
       data: {
-        userId: user.id,
+        userId: student.userId,
         roleId: repRoleId,
         scopeType: spec.scope,
         programYearId: spec.scope === ScopeType.PROGRAM_YEAR ? (spec.target as { id: string }).id : undefined,
@@ -491,33 +512,7 @@ async function seedUsers(
         assignedBy: superAdmin.id,
       },
     });
-    scanners.push(user);
-  }
-
-  // Plain student users (source of role requests)
-  const studentRoleId = await roleId("Student");
-  const studentUserSpecs = [
-    { email: "student1@fhusocom.edu", name: "Elaine Lopez", studentIdx: 4 },
-    { email: "student2@fhusocom.edu", name: "Francis Torres", studentIdx: 5 },
-    { email: "student3@fhusocom.edu", name: "Gina Navarro", studentIdx: 6 },
-    { email: "student4@fhusocom.edu", name: "Harold Pascual", studentIdx: 7 },
-    { email: "student5@fhusocom.edu", name: "Iris Domingo", studentIdx: 8 },
-    { email: "student6@fhusocom.edu", name: "Jerome Ortega", studentIdx: 9 },
-  ];
-  for (const spec of studentUserSpecs) {
-    const user = await prisma.user.upsert({
-      where: { email: spec.email },
-      update: { name: spec.name, passwordHash },
-      create: { email: spec.email, name: spec.name, passwordHash, studentId: students[spec.studentIdx].id },
-    });
-    await prisma.userRole.create({
-      data: {
-        userId: user.id,
-        roleId: studentRoleId,
-        scopeType: ScopeType.FACULTY,
-        assignedBy: superAdmin.id,
-      },
-    });
+    scanners.push({ id: student.userId });
   }
 
   return { secretary, treasurer, disciplineOfficer, scanners };
@@ -875,7 +870,7 @@ async function main(): Promise<void> {
   await seedRoles();
   const superAdmin = await seedSuperAdmin();
 
-  const { sections, yearLevels, programs, students } = await seedScopeStructure();
+  const { sections, yearLevels, programs, students } = await seedScopeStructure(superAdmin);
   const { secretary, treasurer, disciplineOfficer, scanners } = await seedUsers(
     superAdmin,
     students,

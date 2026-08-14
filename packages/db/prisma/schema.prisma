@@ -138,13 +138,14 @@ model Section {
 
 model Student {
   id          String     @id @default(cuid())
+  userId      String     @unique
   studentNo   String     @unique
   firstName   String
   lastName    String
   sectionId   String?
   suspended   Boolean    @default(false)
   section     Section?   @relation(fields: [sectionId], references: [id])
-  user        User?
+  user        User       @relation(fields: [userId], references: [id])
   attendances Attendance[]
   sanctions   Sanction[]
   flags       SanctionFlag[]
@@ -156,9 +157,8 @@ model User {
   email             String          @unique
   name              String
   passwordHash      String
-  studentId         String?         @unique
-  student           Student?        @relation(fields: [studentId], references: [id])
   deletedAt         DateTime?
+  student           Student?
   roles             UserRole[]
   roleRequests      RoleRequest[]
   auditLogs         AuditLog[]

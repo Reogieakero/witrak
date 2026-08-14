@@ -29,6 +29,10 @@ export default function LoginPage() {
             Officer sign in
           </Link>
           <span className={styles.divider}>·</span>
+          <Link href="/register" className={styles.switchLink}>
+            Create an account
+          </Link>
+          <span className={styles.divider}>·</span>
           <Link href="/" className={styles.switchLink}>
             Back to home
           </Link>

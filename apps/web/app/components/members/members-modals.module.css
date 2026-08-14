@@ -164,46 +164,33 @@
   flex-wrap: wrap;
 }
 
-.suspendBtn,
-.removeAuthBtn,
-.editBtnWide {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid var(--border-default);
+:global([data-theme="dark"]) .suspendBtn {
   background: var(--surface-card);
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-.suspendBtn {
-  color: var(--amber-700);
   border-color: var(--amber-100);
+  color: var(--amber-700);
 }
 
-.suspendBtn:hover {
+:global([data-theme="dark"]) .suspendBtn:hover {
   background: var(--amber-50);
 }
 
-.removeAuthBtn {
-  color: var(--red-700);
+:global([data-theme="dark"]) .removeAuthBtn {
+  background: var(--surface-card);
   border-color: var(--red-100);
+  color: var(--red-700);
 }
 
-.removeAuthBtn:hover {
+:global([data-theme="dark"]) .removeAuthBtn:hover {
   background: var(--red-50);
 }
 
-.editBtnWide {
-  color: var(--brand-600);
+:global([data-theme="dark"]) .editBtnWide {
+  background: var(--surface-card);
   border-color: var(--brand-100);
+  color: var(--brand-600);
 }
 
-.editBtnWide:hover {
+:global([data-theme="dark"]) .editBtnWide:hover {
   background: var(--brand-50);
 }
 

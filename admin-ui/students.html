@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50/50" data-role="super-admin">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHUSOCOM - Students</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#2563eb',
+                            secondary: '#3b82f6',
+                            light: '#93c5fd',
+                            subtle: '#eff6ff',
+                        },
+                        ink: {
+                            DEFAULT: '#0f172a',
+                            soft: '#334155',
+                            muted: '#64748b',
+                            faint: '#94a3b8',
+                        },
+                        line: { DEFAULT: '#e2e8f0', soft: '#eef2f7' },
+                    },
+                    boxShadow: {
+                        soft: '0 1px 2px rgba(15,23,42,0.04)',
+                        lift: '0 8px 24px -8px rgba(15,23,42,0.12), 0 2px 6px rgba(15,23,42,0.04)',
+                        ring: '0 0 0 4px rgba(37,99,235,0.12)',
+                    },
+                    backgroundImage: {
+                        'brand-gradient': 'linear-gradient(135deg, #2563eb, #3b82f6)',
+                        'brand-soft': 'linear-gradient(135deg, rgba(37,99,235,0.10), rgba(59,130,246,0.06))',
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --brand-primary: #2563eb;
+            --brand-secondary: #3b82f6;
+            --brand-light: #93c5fd;
+            --brand-gradient: linear-gradient(135deg, #2563eb, #3b82f6);
+        }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up { animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+        .row-hover { transition: background 0.15s ease; }
+        .row-hover:hover { background: #f8fafc; }
+    </style>
+</head>
+<body class="h-full font-sans text-gray-900 bg-gray-50/50 antialiased selection:bg-brand-primary selection:text-white">
+
+    <div class="min-h-screen flex flex-col">
+
+        <div id="sidebarBackdrop" class="fixed inset-0 z-40 bg-gray-900/20 backdrop-blur-xs hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 bottom-0 left-0 z-50 w-[180px] bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ease-in-out -translate-x-full lg:translate-x-0">
+            <div class="h-16 px-4 flex items-center justify-between border-b border-gray-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-6 h-6 rounded-lg bg-brand-gradient flex items-center justify-center text-white shadow-xs">
+                        <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-white"></i>
+                    </div>
+                    <span class="font-extrabold text-sm tracking-tight text-gray-900">FHUSOCOM</span>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden p-1 rounded hover:bg-brand-50 text-brand-primary transition-colors">
+                    <i data-lucide="x" class="w-4 h-4 text-brand-primary"></i>
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-2 space-y-0.5">
+                <div class="px-2 pt-2 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Main</div>
+
+                <a href="index.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <a href="events.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="calendar-check-2" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Events</span>
+                </a>
+
+                <a href="attendance.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="qr-code" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Attendance</span>
+                </a>
+
+                <a href="transparency.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="folder-open" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Transparency</span>
+                </a>
+
+                <a href="sanctions.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="shield-alert" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Sanctions</span>
+                </a>
+
+                <a href="fees.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="hand-coins" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Fees</span>
+                </a>
+
+                <a href="announcements.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="megaphone" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Announcements</span>
+                </a>
+
+                <a href="members.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="users" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Members</span>
+                </a>
+
+                <div class="px-2 pt-4 pb-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">System</div>
+
+                <a href="students.html" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg bg-brand-subtle text-brand-primary font-semibold text-xs transition-colors group">
+                    <i data-lucide="graduation-cap" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Students</span>
+                </a>
+
+                <a href="#" class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-gray-600 hover:bg-brand-subtle hover:text-brand-primary text-xs font-medium transition-colors group">
+                    <i data-lucide="scroll-text" class="w-4 h-4 text-brand-primary"></i>
+                    <span>Audit Log</span>
+                </a>
+            </div>
+
+            <div class="p-2 border-t border-gray-100 bg-gray-50/50">
+                <div class="flex items-center gap-2 p-1.5 rounded-lg">
+                    <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                        P
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <span class="text-xs font-semibold text-gray-900 block truncate">President</span>
+                        <span class="text-[10px] text-gray-500 block truncate" id="roleLabel">Super Admin</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="lg:pl-[180px] flex-1 flex flex-col min-w-0">
+
+            <header class="h-16 bg-white/90 backdrop-blur border-b border-gray-200 px-4 flex items-center justify-between sticky top-0 z-30">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 rounded-lg hover:bg-brand-subtle text-brand-primary transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5 text-brand-primary"></i>
+                    </button>
+                    <span class="text-xs font-medium text-gray-500">FHUSOCOM Admin</span>
+                    <span class="text-gray-300 text-xs">/</span>
+                    <span class="text-xs font-semibold text-gray-900">Students</span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <div class="relative hidden md:block">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-primary"></i>
+                        <input id="globalSearch" type="text" placeholder="Search students…" class="w-52 lg:w-64 pl-8 pr-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white focus:shadow-ring transition-all">
+                    </div>
+
+                    <div class="relative hidden lg:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-50 border border-gray-200" title="Preview the page as a role">
+                        <i data-lucide="eye" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Preview as</span>
+                        <select id="roleSelect" class="text-[11px] font-semibold text-brand-primary bg-transparent focus:outline-none cursor-pointer">
+                            <option value="super-admin">Super Admin</option>
+                            <option value="secretary">Secretary</option>
+                            <option value="treasurer">Treasurer</option>
+                            <option value="discipline">Disc. Officer</option>
+                            <option value="year-rep">Year Rep</option>
+                        </select>
+                    </div>
+
+                    <button class="p-1.5 text-brand-primary hover:bg-brand-subtle rounded-lg transition-colors relative" title="Notifications">
+                        <i data-lucide="bell" class="w-4 h-4 text-brand-primary"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-brand-primary rounded-full"></span>
+                    </button>
+                    <div class="h-4 w-px bg-gray-200"></div>
+                    <div class="flex items-center gap-2 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-7 h-7 rounded-full bg-brand-gradient text-white flex items-center justify-center text-xs font-semibold shadow-xs">
+                            P
+                        </div>
+                        <div class="hidden xl:block leading-tight">
+                            <span class="text-[11px] font-semibold text-gray-900 block">President</span>
+                            <span class="text-[9px] text-gray-400 block" id="headerRoleLabel">Super Admin</span>
+                        </div>
+                        <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-brand-primary"></i>
+                    </div>
+                </div>
+            </header>
+
+            <main class="w-full p-4 lg:p-5 flex flex-col gap-4 items-start">
+
+                <div class="flex-1 min-w-0 space-y-4 w-full" id="studentsContent">
+
+                    <div class="flex flex-wrap items-end justify-between gap-3 animate-fade-up">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h1 class="text-2xl font-extrabold tracking-tight text-gray-900">Students</h1>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-subtle text-brand-primary border border-brand-100">Accounts</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">All students with a system account. Suspend or reinstate access, reset passwords, and remove authorization.</p>
+                        </div>
+                        <div class="flex items-center gap-2 text-[11px] text-gray-500 bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-soft">
+                            <i data-lucide="info" class="w-3.5 h-3.5 text-brand-primary"></i>
+                            Students auto-register from the member roster
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 bg-white rounded-xl border border-gray-200 px-3 py-2.5 shadow-soft animate-fade-up" style="animation-delay: 40ms">
+                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-primary"></i>
+                        <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Account status</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">Active</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-100">Suspended</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500 border border-gray-200">No login yet</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 animate-fade-up" style="animation-delay: 80ms">
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-brand-soft text-brand-primary flex items-center justify-center">
+                                    <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-brand-primary bg-brand-subtle border border-brand-100 px-1.5 py-0.5 rounded-full">accounts</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">8</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Student Accounts</div>
+                            <div class="mt-1 text-[10px] text-gray-400">with login access</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <i data-lucide="circle-check" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full">active</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">5</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Active</div>
+                            <div class="mt-1 text-[10px] text-gray-400">can sign in</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                                    <i data-lucide="ban" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full">blocked</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">2</div>
+                            <div class="text-[11px] text-gray-500 font-medium">Suspended</div>
+                            <div class="mt-1 text-[10px] text-gray-400">until reinstated</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-soft hover:shadow-lift transition-shadow">
+                            <div class="flex items-center justify-between">
+                                <div class="w-9 h-9 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center">
+                                    <i data-lucide="clock-3" class="w-4 h-4"></i>
+                                </div>
+                                <span class="text-[10px] font-semibold text-gray-500 bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded-full">pending</span>
+                            </div>
+                            <div class="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">1</div>
+                            <div class="text-[11px] text-gray-500 font-medium">No Login Yet</div>
+                            <div class="mt-1 text-[10px] text-gray-400">account created</div>
+                        </div>
+
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-soft animate-fade-up" style="animation-delay: 120ms">
+                        <div class="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
+                            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100">
+                                <button data-filter="all" onclick="setFilter('all')" id="filterAllBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white text-gray-900 shadow-soft transition-all">
+                                    <i data-lucide="graduation-cap" class="w-3.5 h-3.5"></i>
+                                    All
+                                </button>
+                                <button data-filter="active" onclick="setFilter('active')" id="filterActiveBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all">
+                                    <i data-lucide="circle-check" class="w-3.5 h-3.5"></i>
+                                    Active
+                                </button>
+                                <button data-filter="suspended" onclick="setFilter('suspended')" id="filterSuspendedBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all">
+                                    <i data-lucide="ban" class="w-3.5 h-3.5"></i>
+                                    Suspended
+                                </button>
+                                <button data-filter="nologin" onclick="setFilter('nologin')" id="filterNologinBtn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all">
+                                    <i data-lucide="clock-3" class="w-3.5 h-3.5"></i>
+                                    No Login
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider" id="visibleCountLabel"></span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="studentList">
+
+                            <div data-status="active" class="student-item row-hover rounded-2xl border border-gray-100 bg-gradient-to-br from-brand-subtle/40 to-transparent p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Maria L. Santos</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSIT</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>3rd Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section A</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">m.santos@school.edu</div>
+                                        <div class="mt-1 text-[10px] text-gray-400">Last login · 2 days ago</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openUser('Maria L. Santos')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View student"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="reset" onclick="openResetModal('Maria L. Santos')" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Reset password"><i data-lucide="key-round" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="suspend" onclick="openSuspendModal('Maria L. Santos', false)" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Suspend account"><i data-lucide="ban" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="remove" onclick="openRemoveModal('Maria L. Santos')" class="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove authorization"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="active" class="student-item row-hover rounded-2xl border border-gray-100 p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Paulo D. Reyes</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSCS</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>2nd Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section B</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">p.reyes@school.edu</div>
+                                        <div class="mt-1 text-[10px] text-gray-400">Last login · today</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openUser('Paulo D. Reyes')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View student"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="reset" onclick="openResetModal('Paulo D. Reyes')" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Reset password"><i data-lucide="key-round" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="suspend" onclick="openSuspendModal('Paulo D. Reyes', false)" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Suspend account"><i data-lucide="ban" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="remove" onclick="openRemoveModal('Paulo D. Reyes')" class="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove authorization"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="active" class="student-item row-hover rounded-2xl border border-gray-100 p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Nina F. Garcia</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSBA</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>4th Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section A</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">n.garcia@school.edu</div>
+                                        <div class="mt-1 text-[10px] text-gray-400">Last login · 5 days ago</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openUser('Nina F. Garcia')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View student"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="reset" onclick="openResetModal('Nina F. Garcia')" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Reset password"><i data-lucide="key-round" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="suspend" onclick="openSuspendModal('Nina F. Garcia', false)" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Suspend account"><i data-lucide="ban" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="remove" onclick="openRemoveModal('Nina F. Garcia')" class="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove authorization"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="active" class="student-item row-hover rounded-2xl border border-gray-100 p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Rafael O. Delos Santos</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSIT</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>1st Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section B</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">r.delossantos@school.edu</div>
+                                        <div class="mt-1 text-[10px] text-gray-400">Last login · yesterday</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openUser('Rafael O. Delos Santos')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View student"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="reset" onclick="openResetModal('Rafael O. Delos Santos')" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Reset password"><i data-lucide="key-round" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="suspend" onclick="openSuspendModal('Rafael O. Delos Santos', false)" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Suspend account"><i data-lucide="ban" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="remove" onclick="openRemoveModal('Rafael O. Delos Santos')" class="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove authorization"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="active" class="student-item row-hover rounded-2xl border border-gray-100 p-4">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Sofia R. Ramirez</h3>
+                                            <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Active</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSBA</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>3rd Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section B</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">s.ramirez@school.edu</div>
+                                        <div class="mt-1 text-[10px] text-gray-400">Last login · 3 days ago</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openUser('Sofia R. Ramirez')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View student"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="reset" onclick="openResetModal('Sofia R. Ramirez')" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Reset password"><i data-lucide="key-round" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="suspend" onclick="openSuspendModal('Sofia R. Ramirez', false)" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Suspend account"><i data-lucide="ban" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="remove" onclick="openRemoveModal('Sofia R. Ramirez')" class="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove authorization"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="suspended" class="student-item row-hover rounded-2xl border border-gray-100 p-4 opacity-70">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Carlo M. Lim</h3>
+                                            <span class="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Suspended</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSHM</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>1st Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section A</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">c.lim@school.edu</div>
+                                        <div class="mt-1 text-[10px] font-semibold text-red-500">Suspended by President · 6 days ago</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openUser('Carlo M. Lim')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View student"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="suspend" onclick="openSuspendModal('Carlo M. Lim', true)" class="p-1.5 rounded-lg text-gray-400 hover:bg-emerald-50 hover:text-emerald-600 transition-colors" title="Reinstate account"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="remove" onclick="openRemoveModal('Carlo M. Lim')" class="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove authorization"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="suspended" class="student-item row-hover rounded-2xl border border-gray-100 p-4 opacity-70">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Miguel T. Aquino</h3>
+                                            <span class="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Suspended</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSIT</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>4th Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section A</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">m.aquino@school.edu</div>
+                                        <div class="mt-1 text-[10px] font-semibold text-red-500">Suspended by President · 2 weeks ago</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openUser('Miguel T. Aquino')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View student"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="suspend" onclick="openSuspendModal('Miguel T. Aquino', true)" class="p-1.5 rounded-lg text-gray-400 hover:bg-emerald-50 hover:text-emerald-600 transition-colors" title="Reinstate account"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="remove" onclick="openRemoveModal('Miguel T. Aquino')" class="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove authorization"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-status="nologin" class="student-item row-hover rounded-2xl border border-gray-100 p-4 opacity-80">
+                                <div class="flex flex-col gap-3">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h3 class="text-sm font-bold text-gray-900">Angela T. Bautista</h3>
+                                            <span class="text-[10px] font-bold text-gray-500 bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded-full uppercase tracking-wide">No Login</span>
+                                        </div>
+                                        <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-gray-500">
+                                            <span class="font-semibold text-brand-primary">BSCS</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>2nd Year</span>
+                                            <span class="text-gray-300">·</span>
+                                            <span>Section A</span>
+                                        </div>
+                                        <div class="mt-1 text-[10px] text-gray-400">a.bautista@school.edu</div>
+                                        <div class="mt-1 text-[10px] text-gray-400">Account created · never signed in</div>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1 shrink-0 pt-3 border-t border-gray-100">
+                                        <button data-action="view" onclick="openUser('Angela T. Bautista')" class="p-1.5 rounded-lg text-gray-400 hover:bg-brand-subtle hover:text-brand-primary transition-colors" title="View student"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+                                        <button data-action="reset" onclick="openResetModal('Angela T. Bautista')" class="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Reset password"><i data-lucide="key-round" class="w-3.5 h-3.5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <div id="modalOverlay" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm overflow-y-auto">
+        <div id="modalCard" class="w-full max-w-md bg-white rounded-2xl shadow-lift border border-gray-100 p-5 animate-fade-up my-8">
+
+            <div id="resetModal" class="hidden">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                        <i data-lucide="key-round" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-gray-900">Reset password</h3>
+                        <p class="text-[11px] text-gray-500" id="resetModalSub">Maria L. Santos</p>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 mb-3">The student will be signed out everywhere and must sign in with the new temporary password, then change it on next login.</p>
+                <form onsubmit="event.preventDefault(); handleConfirm('reset')" class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-600 mb-1">New temporary password</label>
+                        <input type="text" value="Reset@FHUSOCOM-2026" class="w-full px-3 py-2 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-primary focus:bg-white transition-all font-mono">
+                    </div>
+                    <div class="flex items-center justify-end gap-2 pt-1">
+                        <button type="button" onclick="closeModal()" class="px-3.5 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                        <button type="submit" class="px-3.5 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-soft transition-all">Reset password</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="confirmSuspendModal" class="hidden">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                        <i data-lucide="ban" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-gray-900" id="suspendModalTitle">Suspend account?</h3>
+                        <p class="text-xs text-gray-500 mt-0.5" id="suspendModalSub">Maria L. Santos</p>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 mb-4" id="suspendModalBody">The student is immediately signed out and blocked from checking in and all modules until reinstated.</p>
+                <div class="flex items-center justify-end gap-2">
+                    <button onclick="closeModal()" class="px-3.5 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                    <button onclick="handleConfirm('suspend')" class="px-3.5 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-soft transition-all" id="suspendConfirmBtn">Suspend account</button>
+                </div>
+            </div>
+
+            <div id="confirmRemoveModal" class="hidden">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center shrink-0">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-extrabold text-gray-900">Remove authorization?</h3>
+                        <p class="text-xs text-gray-500 mt-0.5" id="removeModalSub">Maria L. Santos</p>
+                    </div>
+                </div>
+                <div class="rounded-xl bg-red-50/60 border border-red-100 px-3 py-2.5 mb-4">
+                    <p class="text-[11px] text-red-600 leading-snug"><span class="font-bold">Note:</span> The student keeps their member record but loses all login access and can no longer check in.</p>
+                </div>
+                <div class="flex items-center justify-end gap-2">
+                    <button onclick="closeModal()" class="px-3.5 py-2 text-xs font-bold text-gray-500 hover:bg-gray-50 rounded-lg transition-colors">Cancel</button>
+                    <button onclick="handleConfirm('remove')" class="px-3.5 py-2 text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-soft transition-all">Remove authorization</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 z-[70] hidden items-center gap-2 bg-gray-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lift animate-fade-up">
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toastMsg">Done</span>
+    </div>
+
+    <script>
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalCard = document.getElementById('modalCard');
+
+        const modalSections = ['resetModal', 'confirmSuspendModal', 'confirmRemoveModal'];
+
+        function showModal(sectionId) {
+            modalSections.forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            modalOverlay.classList.remove('hidden');
+            modalOverlay.classList.add('flex');
+            modalCard.scrollTop = 0;
+        }
+
+        function closeModal() {
+            modalOverlay.classList.add('hidden');
+            modalOverlay.classList.remove('flex');
+        }
+
+        function openUser(student) {
+            showToast('Viewing profile of ' + student + ' — full detail view coming with the backend.');
+        }
+
+        function openResetModal(student) {
+            document.getElementById('resetModalSub').textContent = student;
+            showModal('resetModal');
+        }
+
+        function openRemoveModal(student) {
+            document.getElementById('removeModalSub').textContent = student;
+            showModal('confirmRemoveModal');
+        }
+
+        function openSuspendModal(student, isSuspended) {
+            document.getElementById('suspendModalSub').textContent = student;
+            if (isSuspended) {
+                document.getElementById('suspendModalTitle').textContent = 'Reinstate account?';
+                document.getElementById('suspendModalBody').textContent = 'The student will regain sign-in access and be able to check in to events again.';
+                document.getElementById('suspendConfirmBtn').textContent = 'Reinstate account';
+                document.getElementById('suspendConfirmBtn').className = 'px-3.5 py-2 text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg shadow-soft transition-all';
+            } else {
+                document.getElementById('suspendModalTitle').textContent = 'Suspend account?';
+                document.getElementById('suspendModalBody').textContent = 'The student is immediately signed out and blocked from checking in and all modules until reinstated.';
+                document.getElementById('suspendConfirmBtn').textContent = 'Suspend account';
+                document.getElementById('suspendConfirmBtn').className = 'px-3.5 py-2 text-xs font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-soft transition-all';
+            }
+            showModal('confirmSuspendModal');
+        }
+
+        function handleConfirm(action) {
+            closeModal();
+            const labels = {
+                reset: 'Password reset. The student must change it on next login.',
+                suspend: 'Account suspended until reinstated.',
+                remove: 'Authorization removed. The student keeps their member record.'
+            };
+            showToast(labels[action] || 'Done');
+        }
+
+        function showToast(msg) {
+            document.getElementById('toastMsg').textContent = msg;
+            const t = document.getElementById('toast');
+            t.classList.remove('hidden');
+            t.classList.add('flex');
+            setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, 2600);
+        }
+
+        function setFilter(filter) {
+            const active = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold bg-white text-gray-900 shadow-soft transition-all';
+            const idle = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-gray-400 hover:text-gray-700 transition-all';
+            ['all', 'active', 'suspended', 'nologin'].forEach(f => {
+                const btn = document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1) + 'Btn');
+                btn.className = f === filter ? active : idle;
+            });
+            const items = document.querySelectorAll('.student-item');
+            let visible = 0;
+            items.forEach(item => {
+                const status = item.dataset.status;
+                const show = filter === 'all' || status === filter;
+                item.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+            document.getElementById('visibleCountLabel').textContent = visible + ' shown';
+        }
+        setFilter('all');
+
+        document.getElementById('roleSelect').addEventListener('change', (e) => {
+            const label = e.target.options[e.target.selectedIndex].text;
+            document.getElementById('roleLabel').textContent = label;
+            document.getElementById('headerRoleLabel').textContent = label;
+            document.documentElement.setAttribute('data-role', e.target.value);
+            showToast('Previewing as ' + label);
+        });
+
+        document.getElementById('globalSearch').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            document.querySelectorAll('.student-item').forEach(item => {
+                const match = item.textContent.toLowerCase().includes(q);
+                item.style.display = match ? '' : 'none';
+                if (match) item.dataset.visible = '1';
+            });
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const bd = document.getElementById('sidebarBackdrop');
+            const hidden = sb.classList.toggle('-translate-x-full');
+            bd.classList.toggle('hidden', hidden);
+        }
+
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

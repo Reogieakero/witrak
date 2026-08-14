@@ -5,6 +5,7 @@ import {
   CheckCheck,
   Download,
   FolderOpen,
+  GraduationCap,
   HandCoins,
   LayoutDashboard,
   Megaphone,
@@ -54,7 +55,7 @@ export const MAIN_NAV: NavItem[] = [
 ];
 
 export const SYSTEM_NAV: NavItem[] = [
-  { label: "Users & Roles", href: "#", icon: UserCog },
+  { label: "Students", href: "/admin/students", icon: GraduationCap },
   { label: "Audit Log", href: "#", icon: ScrollText },
 ];
 
