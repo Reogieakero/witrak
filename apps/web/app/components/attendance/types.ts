@@ -4,6 +4,7 @@ export type AttendanceEventItem = {
   id: string;
   title: string;
   location: string | null;
+  programId: string | null;
   month: string;
   day: number;
   scheduleDate: string;
@@ -22,6 +23,7 @@ export type AttendanceStudentItem = {
   name: string;
   sectionName: string;
   studentNo: string;
+  programId: string | null;
   programCode: string;
   yearLevel: number;
   present: number;

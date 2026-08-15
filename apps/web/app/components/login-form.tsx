@@ -1,10 +1,10 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
+import { signInWithPassword } from "@/lib/auth-client";
 import styles from "./login-form.module.css";
 
 export type LoginFormProps = {
@@ -27,20 +27,19 @@ export function LoginForm({
     setError(null);
 
     const form = new FormData(e.currentTarget);
-    const result = await signIn("credentials", {
-      email: String(form.get("email") ?? ""),
-      password: String(form.get("password") ?? ""),
-      redirect: false,
-    });
+    const email = String(form.get("email") ?? "");
+    const password = String(form.get("password") ?? "");
+
+    const result = await signInWithPassword(email, password);
 
     setPending(false);
-    if (result?.error) {
+    if (!result.ok) {
       setError("Invalid email or password.");
       sileo.error({
         title: "Sign in failed",
         description: "Invalid email or password.",
       });
-    } else if (result?.ok) {
+    } else {
       window.location.href = callbackUrl;
     }
   }

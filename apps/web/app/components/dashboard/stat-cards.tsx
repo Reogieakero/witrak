@@ -27,6 +27,7 @@ export type StatCardsData = {
   eventCount: number;
   upcomingCount: number;
   presentRate: number;
+  avgPresentPerEvent: number;
   collected: number;
   collectedRate: number;
   pendingFeeProofCount: number;
@@ -141,15 +142,15 @@ export function StatCards({
           }
         />
         <MiniStat
-          label="Present"
+          label="Avg Present"
           icon={<UserCheck size={14} />}
-          value={`${data.presentRate}%`}
-          sub="avg rate"
+          value={data.avgPresentPerEvent.toLocaleString()}
+          sub={`${data.presentRate}% rate`}
           hint={
             <Hint
-              title="Average Attendance Rate"
-              body="Share of students present or late versus the expected roster for each event — the faculty-wide total, or the targeted program when the event is program-specific."
-              source="Source: Attendance table vs. event targets"
+              title="Average Present Per Event"
+              body="Average number of students marked present or late for each event that recorded attendance this term."
+              source="Source: Attendance table"
             />
           }
         />

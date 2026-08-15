@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CalendarRange, Check, GraduationCap, LogOut, Monitor, Moon, Sun, User } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut } from "@/lib/auth-client";
 import { useTheme } from "./theme-provider";
 import type { Theme } from "./theme-provider";
 import { ProgramManager } from "./program-manager";
@@ -127,7 +127,10 @@ export function UserMenu({ userName, roleLabel, isSuperAdmin = false }: UserMenu
           <button
             type="button"
             className={styles.logout}
-            onClick={() => signOut({ redirectTo: "/login" })}
+            onClick={async () => {
+              await signOut();
+              window.location.href = "/login";
+            }}
           >
             <LogOut size={15} />
             Log out

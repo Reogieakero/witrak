@@ -38,6 +38,37 @@ export function termRange(term: TermOption | null): DateRange | null {
   return { gte: term.startsOn, lte: term.endsOn };
 }
 
+/**
+ * Prisma `where` fragment that keeps only events occurring within the term
+ * period, keyed on the event's date (startsAt) rather than its creation date.
+ */
+export function eventInTerm(
+  term: TermOption | null,
+): { startsAt: { gte: Date; lte: Date } } | undefined {
+  if (!term) return undefined;
+  return { startsAt: { gte: term.startsOn, lte: term.endsOn } };
+}
+
+/**
+ * Prisma `where` fragment that keeps only sanctions tied to attendance evidence
+ * from events occurring within the term period (by event date). Sanctions with
+ * no evidence fall back to their issue date so they aren't hidden.
+ */
+export function sanctionsInTerm(
+  term: TermOption | null,
+): { OR: (
+  | { evidences: { some: { attendance: { event: { startsAt: { gte: Date; lte: Date } } } } } }
+  | { evidences: { none: object }; issuedAt: { gte: Date; lte: Date } }
+)[] } | undefined {
+  if (!term) return undefined;
+  return {
+    OR: [
+      { evidences: { some: { attendance: { event: { startsAt: { gte: term.startsOn, lte: term.endsOn } } } } } },
+      { evidences: { none: {} }, issuedAt: { gte: term.startsOn, lte: term.endsOn } },
+    ],
+  };
+}
+
 type ResolvedTerm = {
   term: TermOption | null;
   terms: TermSelectItem[];

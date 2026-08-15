@@ -1,0 +1,37 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.875rem;
+}
+
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.body {
+  border-radius: 1rem;
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  padding: 0.5rem 0.75rem;
+}

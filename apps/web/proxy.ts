@@ -1,8 +1,19 @@
-import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-const PUBLIC_PREFIXES = ["/login", "/api/auth", "/api/openapi", "/docs", "/_next", "/favicon.ico"];
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const PUBLIC_PREFIXES = [
+  "/login",
+  "/auth",
+  "/api/auth",
+  "/api/openapi",
+  "/docs",
+  "/_next",
+  "/favicon.ico",
+];
 
 function isPublic(pathname: string): boolean {
   if (pathname === "/") return true;
@@ -11,22 +22,48 @@ function isPublic(pathname: string): boolean {
   );
 }
 
+/**
+ * Next.js 16 "Proxy" (formerly Middleware). Performs an optimistic auth check
+ * against the Supabase session cookie and redirects unauthenticated users to
+ * /login. Authoritative authorization still happens per-route via `auth()`.
+ */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (isPublic(pathname)) return NextResponse.next();
 
-  const token = await getToken({
-    req: request,
-    secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  // Misconfigured auth env: fail open rather than locking everyone out, but
+  // this should never happen in a real deployment.
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    return NextResponse.next();
+  }
+
+  const response = NextResponse.next({ request });
+
+  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options),
+        );
+      },
+    },
   });
-  if (!token) {
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(url);
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

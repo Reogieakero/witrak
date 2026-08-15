@@ -1,11 +1,11 @@
 "use client";
 
-import { getSession, signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { sileo } from "sileo";
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
+import { signInWithPassword } from "@/lib/auth-client";
 import styles from "./officers.module.css";
 
 export function OfficerLoginForm() {
@@ -21,13 +21,12 @@ export function OfficerLoginForm() {
     setError(null);
 
     const form = new FormData(e.currentTarget);
-    const result = await signIn("credentials", {
-      email: String(form.get("email") ?? ""),
-      password: String(form.get("password") ?? ""),
-      redirect: false,
-    });
+    const email = String(form.get("email") ?? "");
+    const password = String(form.get("password") ?? "");
 
-    if (result?.error) {
+    const result = await signInWithPassword(email, password);
+
+    if (!result.ok) {
       setPending(false);
       const message =
         "We couldn't find an account with those details. Please check and try again.";
@@ -36,8 +35,22 @@ export function OfficerLoginForm() {
       return;
     }
 
-    const session = await getSession();
-    if ((session?.access?.permissions?.length ?? 0) === 0) {
+    // Gate the officer portal: only users with at least one permission may
+    // enter here. Fetch resolved access from the server session.
+    const meRes = await fetch("/api/auth/me");
+    if (!meRes.ok) {
+      setPending(false);
+      const message =
+        "This portal is for officers only. Use the student sign in instead.";
+      setError(message);
+      sileo.warning({ title: "Officer access required", description: message });
+      return;
+    }
+
+    const me = (await meRes.json()) as {
+      access: { permissions: string[] } | null;
+    };
+    if ((me.access?.permissions?.length ?? 0) === 0) {
       setPending(false);
       const message =
         "This portal is for officers only. Use the student sign in instead.";
@@ -47,7 +60,7 @@ export function OfficerLoginForm() {
     }
 
     setPending(false);
-    const isSuperAdmin = (session?.access?.permissions ?? []).includes(
+    const isSuperAdmin = (me.access?.permissions ?? []).includes(
       "users_manage_roles",
     );
     window.location.href = callbackUrl ?? (isSuperAdmin ? "/admin/dashboard" : "/dashboard");

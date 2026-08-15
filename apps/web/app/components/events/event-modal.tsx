@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { sileo } from "sileo";
 import { AlertTriangle, CalendarCheck, CalendarPlus, KeyRound, Loader2, MapPin } from "lucide-react";
 import type { EventItem, EventsAccess } from "./types";
@@ -11,6 +12,7 @@ import { Button } from "@/app/components/ui/button";
 import { DatePicker } from "@/app/components/ui/date-picker";
 import { TimePicker } from "@/app/components/ui/time-picker";
 import { Select } from "@/app/components/ui/select";
+import { LoadingOverlay } from "@/app/components/ui/loading-overlay";
 import styles from "./event-modal.module.css";
 
 export type EventModalProps = {
@@ -102,38 +104,39 @@ export function EventModal({
   };
 
   return (
-    <Drawer
-      open
-      onClose={onClose}
-      title={
-        <>
-          <span className={styles.headIcon}>
-            <CalendarPlus size={16} />
-          </span>
-          <span>
-            <span className={styles.titleLine}>
-              {isEdit ? "Edit Event" : "New Event"}
+    <>
+      <Drawer
+        open
+        onClose={onClose}
+        title={
+          <>
+            <span className={styles.headIcon}>
+              <CalendarPlus size={16} />
             </span>
-            <span className={styles.subtitle}>
-              {isEdit
-                ? "Update this scheduled activity"
-                : "Schedule a faculty-wide activity"}
+            <span>
+              <span className={styles.titleLine}>
+                {isEdit ? "Edit Event" : "New Event"}
+              </span>
+              <span className={styles.subtitle}>
+                {isEdit
+                  ? "Update this scheduled activity"
+                  : "Schedule a faculty-wide activity"}
+              </span>
             </span>
-          </span>
-        </>
-      }
-      footer={
-        <ModalActions
-          onCancel={onClose}
-          cancelLabel="Cancel"
-          confirmType="submit"
-          confirmForm="event-form"
-          confirmLabel={pending ? "Saving..." : "Save Event"}
-          disabled={pending}
-        />
-      }
-    >
-      <form id="event-form" action={action} className={styles.form}>
+          </>
+        }
+        footer={
+          <ModalActions
+            onCancel={onClose}
+            cancelLabel="Cancel"
+            confirmType="submit"
+            confirmForm="event-form"
+            confirmLabel={pending ? "Saving..." : "Save Event"}
+            disabled={pending}
+          />
+        }
+      >
+        <form id="event-form" action={action} className={styles.form}>
         <input type="hidden" name="id" value={event?.id ?? ""} />
 
         <div className={styles.field}>
@@ -269,7 +272,17 @@ export function EventModal({
         )}
 
         {error && <p className={styles.error}>{error}</p>}
-      </form>
-    </Drawer>
+        </form>
+      </Drawer>
+
+      {typeof document !== "undefined" &&
+        createPortal(
+          <LoadingOverlay
+            open={pending}
+            label={isEdit ? "Saving changes…" : "Creating event…"}
+          />,
+          document.body,
+        )}
+    </>
   );
 }

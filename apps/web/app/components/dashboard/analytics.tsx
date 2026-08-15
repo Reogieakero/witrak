@@ -129,7 +129,10 @@ export function Analytics({
             </div>
 
             {!selectedEvent || selectedEvent.bars.length === 0 ? (
-              <p className={styles.emptyText}>No attendance recorded yet.</p>
+              <div className={styles.empty}>
+                <BarChart2 size={20} className={styles.emptyIcon} />
+                <span>No attendance recorded yet.</span>
+              </div>
             ) : (
               <SectionPerformanceChart data={selectedEvent.bars} />
             )}

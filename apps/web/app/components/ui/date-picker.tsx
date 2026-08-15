@@ -7,6 +7,7 @@ import styles from "./date-picker.module.css";
 type DatePickerProps = {
   name: string;
   value?: string;
+  allowPast?: boolean;
 };
 
 const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -23,7 +24,7 @@ function toInputValue(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
-export function DatePicker({ name, value }: DatePickerProps) {
+export function DatePicker({ name, value, allowPast = false }: DatePickerProps) {
   const [date, setDate] = useState<Date | null>(() => toDate(value));
   const [open, setOpen] = useState(false);
   const [cursor, setCursor] = useState(() => {
@@ -80,6 +81,7 @@ export function DatePicker({ name, value }: DatePickerProps) {
   };
 
   const isPast = (day: number) => {
+    if (allowPast) return false;
     const d = new Date(cursor.year, cursor.month, day);
     const today = new Date();
     today.setHours(0, 0, 0, 0);

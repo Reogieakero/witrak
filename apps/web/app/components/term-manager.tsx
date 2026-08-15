@@ -88,7 +88,7 @@ export function TermManager({
   const refresh = () => {
     setLoading(true);
     setLoadError(null);
-    getTerms()
+    return getTerms()
       .then(setTerms)
       .catch((e) =>
         setLoadError(e instanceof Error ? e.message : "Could not load terms."),
@@ -116,7 +116,7 @@ export function TermManager({
         if (result.ok) {
           setAdding(false);
           setConfirmDelete(null);
-          refresh();
+          await refresh();
         }
       } finally {
         setBusy(false);
@@ -295,13 +295,13 @@ export function TermManager({
                 <label className={styles.label}>
                   Start date <span className={styles.required}>*</span>
                 </label>
-                <DatePicker name="startsOn" />
+                <DatePicker name="startsOn" allowPast />
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>
                   End date <span className={styles.required}>*</span>
                 </label>
-                <DatePicker name="endsOn" />
+                <DatePicker name="endsOn" allowPast />
               </div>
             </div>
             <label className={styles.checkRow}>
@@ -345,7 +345,7 @@ export function TermManager({
 
       {typeof document !== "undefined" &&
         createPortal(
-          <LoadingOverlay open={busy} label={busyLabel ?? "Working…"} />,
+          <LoadingOverlay open={busy || isMutating} label={busyLabel ?? "Working…"} />,
           document.body,
         )}
     </>

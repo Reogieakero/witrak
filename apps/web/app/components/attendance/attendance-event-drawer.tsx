@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import {
   AlertTriangle,
   CalendarCheck,
@@ -19,14 +20,17 @@ import { Button } from "@/app/components/ui/button";
 import { Badge } from "@/app/components/ui/badge";
 import { SearchInput } from "@/app/components/ui/search-input";
 import { Pagination } from "@/app/components/ui/pagination";
+import { LoadingOverlay } from "@/app/components/ui/loading-overlay";
 import { updateAttendanceStatus } from "@/app/admin/attendance/actions";
 import { sileo } from "sileo";
+import { SkeletonRows } from "@/app/components/ui/skeleton";
 import styles from "./attendance-event-drawer.module.css";
 
 export type AttendanceEventDrawerProps = {
   event: AttendanceEventItem;
-  students: { id: string; name: string; sectionName: string }[];
+  students: { id: string; name: string; sectionName: string; programId: string | null }[];
   records: AttendanceRecord[];
+  loading?: boolean;
   canScan: boolean;
   canEdit: boolean;
   onClose: () => void;
@@ -69,6 +73,7 @@ export function AttendanceEventDrawer({
   event,
   students,
   records,
+  loading = false,
   canScan,
   canEdit,
   onClose,
@@ -78,10 +83,23 @@ export function AttendanceEventDrawer({
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [busyLabel, setBusyLabel] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [optimisticStatus, setOptimisticStatus] = useState<
+    Map<string, { status: AttendanceStatus; scannedAt: string | null }>
+  >(new Map());
 
   const defaultStatus: AttendanceStatus | null =
     event.status === "past" ? "ABSENT" : null;
+
+  const roster = useMemo(
+    () =>
+      students.filter(
+        (s) => !event.programId || s.programId === event.programId,
+      ),
+    [students, event.programId],
+  );
 
   const recordByStudent = useMemo(
     () => new Map(records.map((r) => [r.studentId, r])),
@@ -90,19 +108,20 @@ export function AttendanceEventDrawer({
 
   const rows: Row[] = useMemo(
     () =>
-      students.map((s) => {
+      roster.map((s) => {
         const r = recordByStudent.get(s.id);
+        const optimistic = optimisticStatus.get(s.id);
         return {
           studentId: s.id,
           studentName: s.name,
           sectionName: s.sectionName,
-          status: r?.status ?? defaultStatus,
-          scannedAt: r?.scannedAt ?? null,
+          status: optimistic?.status ?? r?.status ?? defaultStatus,
+          scannedAt: optimistic?.scannedAt ?? r?.scannedAt ?? null,
           checkedInAt: r?.checkedInAt ?? null,
           checkedOutAt: r?.checkedOutAt ?? null,
         };
       }),
-    [students, recordByStudent, defaultStatus],
+    [roster, recordByStudent, defaultStatus, optimisticStatus],
   );
 
   const present = rows.filter((r) => r.status === "PRESENT").length;
@@ -139,7 +158,13 @@ export function AttendanceEventDrawer({
 
   const handleStatusChange = (studentId: string, value: string) => {
     if (!value) return;
+    const status = value as AttendanceStatus;
     setEditingId(null);
+    setOptimisticStatus((prev) => {
+      const next = new Map(prev);
+      next.set(studentId, { status, scannedAt: new Date().toISOString() });
+      return next;
+    });
     startTransition(async () => {
       try {
         await sileo.promise(
@@ -175,17 +200,25 @@ export function AttendanceEventDrawer({
         );
         onChanged();
       } catch {
-        // sileo already shows the error toast
+        setOptimisticStatus((prev) => {
+          const next = new Map(prev);
+          next.delete(studentId);
+          return next;
+        });
+      } finally {
+        setBusy(false);
+        setBusyLabel(null);
       }
     });
   };
 
   return (
-    <Drawer
-      open
-      onClose={onClose}
-      wide
-      title={
+    <>
+      <Drawer
+        open
+        onClose={onClose}
+        wide
+        title={
         <span className={styles.titleWrap}>
           <span className={styles.titleIcon}>
             <CalendarCheck size={16} />
@@ -259,10 +292,12 @@ export function AttendanceEventDrawer({
         </div>
 
         <div className={styles.records}>
-          {rows.length === 0 ? (
+          {loading ? (
+            <SkeletonRows rows={8} columns={6} />
+          ) : rows.length === 0 ? (
             <div className={styles.empty}>
               <QrCode size={20} />
-              <span>No students in your scope for this event.</span>
+              <span>No registered students for this event.</span>
             </div>
           ) : filtered.length === 0 ? (
             <div className={styles.empty}>
@@ -316,7 +351,7 @@ export function AttendanceEventDrawer({
                           {statusLabel(r.status)}
                         </Badge>
                       ) : (
-                        <span className={styles.cellMuted}>—</span>
+                        <Badge tone="gray">Not recorded</Badge>
                       )}
                     </td>
                     <td className={styles.right}>
@@ -393,5 +428,12 @@ export function AttendanceEventDrawer({
         )}
       </div>
     </Drawer>
+
+    {typeof document !== "undefined" &&
+      createPortal(
+        <LoadingOverlay open={busy || pending} label={busyLabel ?? "Working…"} />,
+        document.body,
+      )}
+    </>
   );
 }

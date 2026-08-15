@@ -11,9 +11,73 @@ import {
   SanctionStatus,
   ScopeType,
 } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const prisma = new PrismaClient();
+
+// ── Supabase Auth provisioning ───────────────────────────────────────────────
+// Accounts are linked to Supabase Auth identities via `User.supabaseId`. The
+// admin API creates the auth user; if it already exists (idempotent seeds) we
+// resolve its id from the project's user list. Falls back to `null` when the
+// Supabase env vars are absent (e.g. DB-only local runs).
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+let supabaseAdmin: SupabaseClient | null = null;
+let authUserByEmail: Map<string, string> | null = null;
+
+function getSupabaseAdmin(): SupabaseClient | null {
+  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
+  if (!supabaseAdmin) {
+    supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+  }
+  return supabaseAdmin;
+}
+
+async function ensureAuthUser(
+  email: string,
+  password: string,
+  name: string,
+): Promise<string | null> {
+  const admin = getSupabaseAdmin();
+  if (!admin) return null;
+
+  if (!authUserByEmail) {
+    authUserByEmail = new Map();
+    let page = 1;
+    // Supabase returns a max of 200 users per page.
+    for (;;) {
+      const { data, error } = await admin.auth.admin.listUsers({
+        page,
+        perPage: 200,
+      });
+      if (error) break;
+      for (const u of data.users) {
+        if (u.email) authUserByEmail.set(u.email, u.id);
+      }
+      if (data.users.length < 200) break;
+      page++;
+    }
+  }
+
+  const existing = authUserByEmail.get(email);
+  if (existing) return existing;
+
+  const { data, error } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { name },
+  });
+  if (error) {
+    console.warn(`Auth user for ${email} not created: ${error.message}`);
+    return null;
+  }
+  authUserByEmail.set(email, data.user.id);
+  return data.user.id;
+}
 
 type RoleSeed = {
   name: string;
@@ -278,13 +342,13 @@ async function seedSuperAdmin(): Promise<{ id: string; name: string; email: stri
     throw new Error("SEED_SUPER_ADMIN_EMAIL / SEED_SUPER_ADMIN_PASSWORD not set.");
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const supabaseId = await ensureAuthUser(email, password, name);
   const role = await prisma.role.findUniqueOrThrow({ where: { name: "Super Admin" } });
 
   const user = await prisma.user.upsert({
     where: { email },
-    update: { name, passwordHash },
-    create: { email, name, passwordHash },
+    update: { name, supabaseId },
+    create: { email, name, supabaseId },
   });
 
   const existing = await prisma.userRole.findFirst({
@@ -330,8 +394,8 @@ async function wipeMockData(): Promise<void> {
   await prisma.academicTerm.deleteMany({});
   await prisma.roleRequest.deleteMany({});
   await prisma.userRole.deleteMany({});
-  await prisma.user.deleteMany({});
   await prisma.student.deleteMany({});
+  await prisma.user.deleteMany({});
   await prisma.section.deleteMany({});
   await prisma.yearLevel.deleteMany({});
   await prisma.program.deleteMany({});
@@ -376,7 +440,7 @@ async function seedScopeStructure(
   // Every student must have an account: provision a User first, then create
   // the Student profile linked to it.
   const studentRole = await prisma.role.findUniqueOrThrow({ where: { name: "Student" } });
-  const passwordHash = await bcrypt.hash("password123", 10);
+  const DEFAULT_PASSWORD = "password123";
 
   const students: {
     id: string;
@@ -390,11 +454,14 @@ async function seedScopeStructure(
 
   async function addStudent(sectionId: string | null) {
     const name = studentNameFor(idx);
+    const fullName = `${name.firstName} ${name.lastName}`;
+    const email = `student${idx + 1}@fhusocom.edu`;
+    const supabaseId = await ensureAuthUser(email, DEFAULT_PASSWORD, fullName);
     const user = await prisma.user.create({
       data: {
-        email: `student${idx + 1}@fhusocom.edu`,
-        name: `${name.firstName} ${name.lastName}`,
-        passwordHash,
+        email,
+        name: fullName,
+        supabaseId,
       },
     });
     await prisma.userRole.create({
@@ -444,7 +511,7 @@ async function seedUsers(
   disciplineOfficer: { id: string };
   scanners: { id: string }[];
 }> {
-  const passwordHash = await bcrypt.hash("password123", 10);
+  const DEFAULT_PASSWORD = "password123";
   const roleCache = new Map<string, string>();
   async function roleId(name: string): Promise<string> {
     let id = roleCache.get(name);
@@ -468,10 +535,11 @@ async function seedUsers(
 
   const created: { id: string }[] = [];
   for (const spec of officerSpecs) {
+    const supabaseId = await ensureAuthUser(spec.email, DEFAULT_PASSWORD, spec.name);
     const user = await prisma.user.upsert({
       where: { email: spec.email },
-      update: { name: spec.name, passwordHash },
-      create: { email: spec.email, name: spec.name, passwordHash },
+      update: { name: spec.name, supabaseId },
+      create: { email: spec.email, name: spec.name, supabaseId },
     });
     await prisma.userRole.create({
       data: {

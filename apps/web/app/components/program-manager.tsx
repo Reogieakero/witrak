@@ -78,7 +78,7 @@ export function ProgramManager({
   const refresh = () => {
     setLoading(true);
     setLoadError(null);
-    getProgramStructure()
+    return getProgramStructure()
       .then(setPrograms)
       .catch((e) =>
         setLoadError(e instanceof Error ? e.message : "Could not load programs."),
@@ -103,7 +103,7 @@ export function ProgramManager({
         if (result.ok) {
           setMode(null);
           setConfirmDelete(null);
-          refresh();
+          await refresh();
         }
       } finally {
         setBusy(false);
@@ -356,7 +356,7 @@ export function ProgramManager({
 
       {typeof document !== "undefined" &&
         createPortal(
-          <LoadingOverlay open={busy} label={busyLabel ?? "Working…"} />,
+          <LoadingOverlay open={busy || isMutating} label={busyLabel ?? "Working…"} />,
           document.body,
         )}
     </>

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { AttendanceStatus, prisma, recomputeSanctionTriggers } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, studentInScope, type UserAccess } from "@/lib/permissions";
+import { invalidateByPrefix } from "@/lib/cache";
 
 type SessionWithUser = {
   user: { id: string };
@@ -107,6 +108,7 @@ export async function updateAttendanceStatus(input: {
 
   await recomputeSanctionTriggers(input.studentId);
 
+  await invalidateByPrefix("attendance:");
   revalidatePath("/admin/attendance");
   return { ok: true };
 }

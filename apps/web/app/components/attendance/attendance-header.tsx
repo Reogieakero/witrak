@@ -2,19 +2,16 @@
 
 import { useState } from "react";
 import { Info } from "lucide-react";
-import { Badge } from "@/app/components/ui/badge";
 import { Button } from "@/app/components/ui/button";
 import { InfoModal } from "@/app/components/ui/info-modal";
 import styles from "./attendance-header.module.css";
 
 export type AttendanceHeaderProps = {
-  termName: string;
   canScan: boolean;
   onScan?: () => void;
 };
 
 export function AttendanceHeader({
-  termName,
   canScan,
   onScan,
 }: AttendanceHeaderProps) {
@@ -25,7 +22,6 @@ export function AttendanceHeader({
       <div>
         <div className={styles.titleLine}>
           <h1 className={styles.title}>Attendance</h1>
-          <Badge tone="brand">{termName}</Badge>
         </div>
         <p className={styles.subtitle}>
           Track check-ins per event via QR scan, review records, and correct

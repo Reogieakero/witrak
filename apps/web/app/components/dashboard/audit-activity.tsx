@@ -13,7 +13,7 @@ export type AuditLog = {
   action: string;
   targetId: string | null;
   details: unknown;
-  timestamp: Date;
+  timestamp: string;
   actor: { name: string } | null;
 };
 
@@ -62,10 +62,9 @@ function detailText(details: unknown): string {
   return parts.join(" · ") || "—";
 }
 
-function formatDateTime(d: Date): string {
-  const date = d.toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" });
-  const time = d.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" });
-  return `${date} · ${time}`;
+function formatDateTime(d: string | Date): string {
+  const date = new Date(d);
+  return `${date.toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" })} · ${date.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
 export function AuditActivity({ logs, targetById }: AuditActivityProps) {

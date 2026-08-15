@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, type UserAccess } from "@/lib/permissions";
+import { invalidateByPrefix } from "@/lib/cache";
 
 type SessionWithUser = {
   user: { id: string };
@@ -55,6 +56,7 @@ export async function suspendStudentAccount(
     }),
   ]);
 
+  await invalidateByPrefix("students:");
   revalidatePath("/admin/students");
   return { ok: true };
 }

@@ -1,56 +1,52 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
+import "server-only";
 import { prisma } from "@fhusocom/db";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { resolveUserAccess } from "@/lib/access";
 import type { UserAccess } from "@/lib/permissions";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: "jwt", maxAge: 60 * 60 * 8 },
-  pages: { signIn: "/login" },
-  trustHost: true,
-  providers: [
-    Credentials({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const email = credentials?.email as string | undefined;
-        const password = credentials?.password as string | undefined;
-        if (!email || !password) return null;
+export type AppSession = {
+  user: { id: string; email?: string; name?: string };
+  access: UserAccess | null;
+};
 
-        const user = await prisma.user.findUnique({
-          where: { email, deletedAt: null },
-          include: { student: { select: { suspended: true } } },
-        });
-        if (!user) return null;
-        if (user.student?.suspended) return null;
+/**
+ * Resolves the current request's session.
+ *
+ * Replaces the previous NextAuth/Auth.js `auth()` call. The return shape is
+ * intentionally identical to the legacy contract so that every page, route
+ * handler, and server action that reads `session.user.id` / `session.access`
+ * keeps working unchanged.
+ *
+ * Identity is established from the Supabase Auth session cookie, then mapped to
+ * our `User` row (linked by `supabaseId`, falling back to email). RBAC access
+ * (`permissions` + resolved `scopeSectionIds`) is resolved from the database.
+ */
+export async function auth(): Promise<AppSession | null> {
+  const supabase = await getSupabaseServerClient();
 
-        const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) return null;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
 
-        return { id: user.id, email: user.email, name: user.name };
-      },
-    }),
-  ],
-  callbacks: {
-    async jwt({ token, user, trigger }) {
-      if (user?.id) token.userId = user.id;
+  let dbUser = await prisma.user.findFirst({
+    where: { supabaseId: user.id, deletedAt: null },
+    select: { id: true, email: true, name: true },
+  });
 
-      if (trigger === "signIn" && token.userId) {
-        token.access = await resolveUserAccess(token.userId);
-      }
+  if (!dbUser && user.email) {
+    dbUser = await prisma.user.findFirst({
+      where: { email: user.email, deletedAt: null },
+      select: { id: true, email: true, name: true },
+    });
+  }
 
-      return token;
-    },
-    async session({ session, token }) {
-      if (token.userId) {
-        session.user = { ...(session.user ?? {}), id: token.userId };
-      }
-      session.access = (token.access as UserAccess | undefined) ?? null;
-      return session;
-    },
-  },
-});
+  if (!dbUser) return null;
+
+  const access = await resolveUserAccess(dbUser.id);
+
+  return {
+    user: { id: dbUser.id, email: dbUser.email, name: dbUser.name },
+    access,
+  };
+}

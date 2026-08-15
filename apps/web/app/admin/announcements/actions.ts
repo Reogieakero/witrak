@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma, ScopeType } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, type UserAccess } from "@/lib/permissions";
+import { invalidateByPrefix } from "@/lib/cache";
 import { uploadAnnouncementImage } from "@/lib/supabase-storage";
 
 type SessionWithUser = {
@@ -38,9 +39,15 @@ export async function createAnnouncement(
 
   const title = String(formData.get("title") ?? "").trim();
   if (!title) return { ok: false, error: "Announcement title is required." };
+  if (title.length > 200) {
+    return { ok: false, error: "Title must be under 200 characters." };
+  }
 
   const body = String(formData.get("body") ?? "").trim();
   if (!body) return { ok: false, error: "Announcement message is required." };
+  if (body.length > 5000) {
+    return { ok: false, error: "Message must be under 5,000 characters." };
+  }
 
   const scopeRaw = String(formData.get("scope") ?? "all");
   const scopeType: ScopeType = scopeRaw === "program" ? ScopeType.PROGRAM : ScopeType.FACULTY;
@@ -86,6 +93,7 @@ export async function createAnnouncement(
     },
   });
 
+  await invalidateByPrefix("announcements:");
   revalidatePath("/admin/announcements");
   return { ok: true, id: created.id, imageUrl };
 }
@@ -106,9 +114,15 @@ export async function editAnnouncement(
 
   const title = String(formData.get("title") ?? "").trim();
   if (!title) return { ok: false, error: "Announcement title is required." };
+  if (title.length > 200) {
+    return { ok: false, error: "Title must be under 200 characters." };
+  }
 
   const body = String(formData.get("body") ?? "").trim();
   if (!body) return { ok: false, error: "Announcement message is required." };
+  if (body.length > 5000) {
+    return { ok: false, error: "Message must be under 5,000 characters." };
+  }
 
   const scopeRaw = String(formData.get("scope") ?? "all");
   const scopeType: ScopeType = scopeRaw === "program" ? ScopeType.PROGRAM : ScopeType.FACULTY;
@@ -155,6 +169,7 @@ export async function editAnnouncement(
     data: { title, body, scopeType, programId, imageUrl, imagePath },
   });
 
+  await invalidateByPrefix("announcements:");
   revalidatePath("/admin/announcements");
   return { ok: true, imageUrl };
 }
@@ -172,6 +187,7 @@ export async function deleteAnnouncement(
 
   await prisma.announcement.delete({ where: { id } });
 
+  await invalidateByPrefix("announcements:");
   revalidatePath("/admin/announcements");
   return { ok: true };
 }

@@ -58,6 +58,7 @@ export function AttendanceView({
   const [selectedStudent, setSelectedStudent] =
     useState<AttendanceStudentItem | null>(null);
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
+  const [loadingRecords, setLoadingRecords] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const router = useRouter();
 
@@ -69,6 +70,7 @@ export function AttendanceView({
     if (!openId) return;
     let cancelled = false;
     async function loadRecords() {
+      setLoadingRecords(true);
       try {
         const qs = openStudentId
           ? `studentId=${encodeURIComponent(openId ?? "")}`
@@ -94,6 +96,8 @@ export function AttendanceView({
         );
       } catch {
         if (!cancelled) setRecords([]);
+      } finally {
+        if (!cancelled) setLoadingRecords(false);
       }
     }
     void loadRecords();
@@ -111,7 +115,7 @@ export function AttendanceView({
 
   return (
     <div className={styles.page}>
-      <AttendanceHeader termName={stats.termName} canScan={false} />
+        <AttendanceHeader canScan={false} />
 
       <StatsGrid stats={stats} />
 
@@ -131,8 +135,10 @@ export function AttendanceView({
             id: s.id,
             name: s.name,
             sectionName: s.sectionName,
+            programId: s.programId,
           }))}
           records={records.filter((r) => r.eventId === selectedEvent.id)}
+          loading={loadingRecords}
           canScan={false}
           canEdit={access.edit}
           onScan={() => {}}
@@ -145,6 +151,7 @@ export function AttendanceView({
         <AttendanceStudentDrawer
           student={selectedStudent}
           records={records.filter((r) => r.studentId === selectedStudent.id)}
+          loading={loadingRecords}
           onClose={() => setSelectedStudent(null)}
         />
       )}

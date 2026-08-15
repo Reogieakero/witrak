@@ -7,6 +7,7 @@ import { Drawer } from "@/app/components/ui/drawer";
 import { Button } from "@/app/components/ui/button";
 import { Badge } from "@/app/components/ui/badge";
 import { SearchInput } from "@/app/components/ui/search-input";
+import { SkeletonRows } from "@/app/components/ui/skeleton";
 import styles from "./attendance-student-drawer.module.css";
 
 export type AttendanceStudentDrawerProps = {
@@ -20,6 +21,7 @@ export type AttendanceStudentDrawerProps = {
     checkedInAt: string | null;
     checkedOutAt: string | null;
   }[];
+  loading?: boolean;
   onClose: () => void;
 };
 
@@ -34,6 +36,7 @@ function formatTime(iso: string | null): string {
 export function AttendanceStudentDrawer({
   student,
   records,
+  loading = false,
   onClose,
 }: AttendanceStudentDrawerProps) {
   const [query, setQuery] = useState("");
@@ -120,7 +123,9 @@ export function AttendanceStudentDrawer({
         </div>
 
         <div className={styles.records}>
-          {records.length === 0 ? (
+          {loading ? (
+            <SkeletonRows rows={8} columns={6} />
+          ) : records.length === 0 ? (
             <div className={styles.empty}>
               <UserRound size={20} />
               <span>No attendance records for this student yet.</span>

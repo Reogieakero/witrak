@@ -136,6 +136,9 @@ input {
   font-family: inherit;
 }
 
-[data-sileo-viewport] {
-  z-index: 2000;
+/* Keep Sileo toasts above modals, drawers, and the loading overlay regardless
+   of CSS import order. The `html` prefix gives this higher specificity than
+   Sileo's own `[data-sileo-viewport] { z-index: 50 }` rule. */
+html [data-sileo-viewport] {
+  z-index: 9999;
 }

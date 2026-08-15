@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { isValidElement, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Bell, GraduationCap, Menu, Search, X } from "lucide-react";
 import { MAIN_NAV, SYSTEM_NAV } from "@/lib/constants/dashboard";
+import { savePersistedView, saveViewSnapshot } from "@/lib/view-store";
 import { UserMenu } from "./user-menu";
 import styles from "./admin-shell.module.css";
 
@@ -23,6 +24,7 @@ type AdminShellProps = {
   roleLabel: string;
   isSuperAdmin?: boolean;
   children: React.ReactNode;
+  snapshot?: boolean;
 };
 
 export function AdminShell({
@@ -30,9 +32,28 @@ export function AdminShell({
   roleLabel,
   isSuperAdmin = false,
   children,
+  snapshot = true,
 }: AdminShellProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    if (!snapshot) return;
+    saveViewSnapshot(pathname, {
+      view: children,
+      userName,
+      roleLabel,
+      isSuperAdmin,
+    });
+    if (isValidElement(children) && typeof children.props === "object" && children.props !== null) {
+      savePersistedView(pathname, {
+        props: children.props as Record<string, unknown>,
+        userName,
+        roleLabel,
+        isSuperAdmin,
+      });
+    }
+  }, [pathname, children, userName, roleLabel, isSuperAdmin, snapshot]);
 
   const canManagePrograms = isSuperAdmin || roleLabel === "Super Admin";
 

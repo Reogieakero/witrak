@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
+import { cached, CACHE_TTL } from "@/lib/cache";
 import { AdminShell } from "@/app/components/admin-shell";
 import { AuditLogView } from "@/app/components/audit-log/audit-log-view";
 import { getTermContext, termRange } from "@/lib/terms";
@@ -146,61 +147,69 @@ export default async function AdminAuditLogPage() {
 
   const { term } = await getTermContext();
   const range = termRange(term);
+  const termKey = term?.id ?? "none";
 
-  const [user, auditLogs] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        name: true,
-        roles: { include: { role: { select: { name: true } } } },
-      },
-    }),
-    prisma.auditLog.findMany({
-      where: range ? { timestamp: range } : undefined,
-      orderBy: { timestamp: "desc" },
-      take: 200,
-      include: { actor: { select: { name: true } } },
-    }),
-  ]);
-
-  const entries: AuditEntry[] = auditLogs.map((l) => {
-    const details = (l.details ?? {}) as Record<string, unknown>;
-    const mod = moduleForAction(l.action);
-    const targetName =
-      typeof details.member === "string"
-        ? String(details.member)
-        : typeof details.name === "string"
-          ? String(details.name)
-          : "—";
-    return {
-      id: l.id,
-      action: l.action,
-      module: mod,
-      actorName: l.actor?.name ?? "System",
-      actorInitial: initials(l.actor?.name ?? "System"),
-      targetName,
-      targetDetail: targetDetailFor(l.action, details),
-      summary: summaryFor(l.action, details),
-      details,
-      timestamp: formatDateTime(l.timestamp),
-      relative: relativeTime(l.timestamp),
-    };
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      name: true,
+      roles: { include: { role: { select: { name: true } } } },
+    },
   });
 
-  const stats: AuditStats = {
-    total: auditLogs.length,
-    thisWeek: auditLogs.filter((l) => isWithinLastWeek(l.timestamp)).length,
-    actors: new Set(auditLogs.map((l) => l.actorId ?? "system")).size,
-    systemIssued: auditLogs.filter((l) => !l.actorId).length,
-    byModule: (["roles", "sanctions", "fees", "members"] as AuditModuleKey[]).map(
-      (m) => ({
-        module: m,
-        label: m === "roles" ? "Roles & Access" : m === "members" ? "Members" : m[0].toUpperCase() + m.slice(1),
-        count: entries.filter((e) => e.module === m).length,
-      }),
-    ),
-    termName: term?.name ?? "Current Term",
-  };
+  const { entries, stats } = await cached(
+    `audit:${termKey}`,
+    CACHE_TTL.SHORT,
+    async () => {
+      const auditLogs = await prisma.auditLog.findMany({
+        where: range ? { timestamp: range } : undefined,
+        orderBy: { timestamp: "desc" },
+        take: 200,
+        include: { actor: { select: { name: true } } },
+      });
+
+      const entries: AuditEntry[] = auditLogs.map((l) => {
+        const details = (l.details ?? {}) as Record<string, unknown>;
+        const mod = moduleForAction(l.action);
+        const targetName =
+          typeof details.member === "string"
+            ? String(details.member)
+            : typeof details.name === "string"
+              ? String(details.name)
+              : "—";
+        return {
+          id: l.id,
+          action: l.action,
+          module: mod,
+          actorName: l.actor?.name ?? "System",
+          actorInitial: initials(l.actor?.name ?? "System"),
+          targetName,
+          targetDetail: targetDetailFor(l.action, details),
+          summary: summaryFor(l.action, details),
+          details,
+          timestamp: formatDateTime(l.timestamp),
+          relative: relativeTime(l.timestamp),
+        };
+      });
+
+      const stats: AuditStats = {
+        total: auditLogs.length,
+        thisWeek: auditLogs.filter((l) => isWithinLastWeek(l.timestamp)).length,
+        actors: new Set(auditLogs.map((l) => l.actorId ?? "system")).size,
+        systemIssued: auditLogs.filter((l) => !l.actorId).length,
+        byModule: (["roles", "sanctions", "fees", "members"] as AuditModuleKey[]).map(
+          (m) => ({
+            module: m,
+            label: m === "roles" ? "Roles & Access" : m === "members" ? "Members" : m[0].toUpperCase() + m.slice(1),
+            count: entries.filter((e) => e.module === m).length,
+          }),
+        ),
+        termName: term?.name ?? "Current Term",
+      };
+
+      return { entries, stats };
+    },
+  );
 
   const userName = user?.name ?? "Officer";
   const isSuperAdmin =

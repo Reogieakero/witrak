@@ -25,13 +25,29 @@ export async function POST(request: Request) {
 
     const userId = session.user.id;
     const formData = await request.formData();
-    const title = formData.get("title") as string;
-    const category = (formData.get("category") as string) ?? "reports";
+    const title = String(formData.get("title") ?? "").trim();
+    const category = String(formData.get("category") ?? "reports").trim();
     const file = formData.get("file") as File | null;
+
+    const VALID_CATEGORIES = ["financial", "events", "minutes", "reports"];
 
     if (!title || !file || file.size === 0) {
       return NextResponse.json(
         { ok: false, error: "Title and file are required." },
+        { status: 400 },
+      );
+    }
+
+    if (title.length > 200) {
+      return NextResponse.json(
+        { ok: false, error: "Title must be under 200 characters." },
+        { status: 400 },
+      );
+    }
+
+    if (!VALID_CATEGORIES.includes(category)) {
+      return NextResponse.json(
+        { ok: false, error: "Choose a valid file category." },
         { status: 400 },
       );
     }
