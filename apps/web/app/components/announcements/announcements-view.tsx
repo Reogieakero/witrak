@@ -112,7 +112,7 @@ export function AnnouncementsView({
             ...prev,
           ]);
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -138,7 +138,7 @@ export function AnnouncementsView({
         if (result.ok) {
           setItems((prev) => prev.filter((a) => a.id !== announcementId));
           setConfirmDelete(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -180,7 +180,7 @@ export function AnnouncementsView({
             ),
           );
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -276,7 +276,7 @@ export function AnnouncementsView({
         />
       )}
 
-      <LoadingOverlay open={busy} label={busyLabel ?? "Working…"} />
+      <LoadingOverlay open={busy || isMutating} label={busyLabel ?? "Working…"} />
     </div>
   );
 }

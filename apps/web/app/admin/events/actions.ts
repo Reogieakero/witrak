@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, type UserAccess } from "@/lib/permissions";
+import { invalidateByPrefix } from "@/lib/cache";
 
 export type SaveEventState = { ok: boolean; error?: string };
 
@@ -111,6 +112,7 @@ export async function saveEvent(
     });
   }
 
+  await invalidateByPrefix("events:list:");
   revalidatePath("/admin/events");
   return { ok: true };
 }
@@ -129,17 +131,20 @@ export async function deleteEvent(
     return { ok: false, error: "Year Reps can only delete events they created." };
   }
 
-  const attendanceRows = await prisma.attendance.findMany({
-    where: { eventId },
-    select: { id: true },
-  });
-  if (attendanceRows.length > 0) {
-    await prisma.sanctionEvidence.deleteMany({
-      where: { attendanceId: { in: attendanceRows.map((a) => a.id) } },
+  await prisma.$transaction(async (tx) => {
+    const attendanceRows = await tx.attendance.findMany({
+      where: { eventId },
+      select: { id: true },
     });
-  }
-  await prisma.attendance.deleteMany({ where: { eventId } });
-  await prisma.event.delete({ where: { id: eventId } });
+    if (attendanceRows.length > 0) {
+      await tx.sanctionEvidence.deleteMany({
+        where: { attendanceId: { in: attendanceRows.map((a) => a.id) } },
+      });
+    }
+    await tx.attendance.deleteMany({ where: { eventId } });
+    await tx.event.delete({ where: { id: eventId } });
+  });
+  await invalidateByPrefix("events:list:");
   revalidatePath("/admin/events");
   return { ok: true };
 }

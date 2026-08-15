@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma, AuditAction } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, type UserAccess } from "@/lib/permissions";
+import { invalidateByPrefix } from "@/lib/cache";
 
 type SessionWithUser = {
   user: { id: string };
@@ -54,6 +55,7 @@ export async function createFee(
     },
   });
 
+  await invalidateByPrefix("fees:");
   revalidatePath("/admin/fees");
   return { ok: true };
 }
@@ -89,6 +91,7 @@ export async function updateFee(
     data: { title, amount, dueDate },
   });
 
+  await invalidateByPrefix("fees:");
   revalidatePath("/admin/fees");
   return { ok: true };
 }
@@ -109,6 +112,7 @@ export async function deleteFee(
     await tx.fee.delete({ where: { id } });
   });
 
+  await invalidateByPrefix("fees:");
   revalidatePath("/admin/fees");
   return { ok: true };
 }
@@ -249,6 +253,7 @@ export async function upsertPaymentMethod(
     });
   }
 
+  await invalidateByPrefix("fees:");
   revalidatePath("/admin/fees");
   return { ok: true };
 }
@@ -265,6 +270,7 @@ export async function deletePaymentMethod(
   if (!existing) return { ok: false, error: "Payment method not found." };
 
   await prisma.paymentMethod.delete({ where: { id } });
+  await invalidateByPrefix("fees:");
   revalidatePath("/admin/fees");
   return { ok: true };
 }
@@ -332,6 +338,7 @@ export async function verifyFeeProof(
     });
   });
 
+  await invalidateByPrefix("fees:");
   revalidatePath("/admin/fees");
   return { ok: true };
 }

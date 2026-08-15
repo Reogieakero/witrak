@@ -85,7 +85,7 @@ export function StudentTotalCard({
         );
         if (result.ok) {
           setOpen(false);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -169,7 +169,7 @@ export function StudentTotalCard({
 
       {typeof document !== "undefined" &&
         createPortal(
-          <LoadingOverlay open={busy} label={busyLabel ?? "Working…"} />,
+          <LoadingOverlay open={busy || isPending} label={busyLabel ?? "Working…"} />,
           document.body,
         )}
     </>

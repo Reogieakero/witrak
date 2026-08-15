@@ -1,9 +1,9 @@
 "use server";
 
-import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { ScopeType } from "@fhusocom/db";
 import { prisma } from "@fhusocom/db";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export async function registerStudent(
   formData: FormData,
@@ -25,14 +25,40 @@ export async function registerStudent(
     return { ok: false, error: "Student number is required." };
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  // Provision the auth identity in Supabase, then link it to our User row via
+  // `supabaseId`. Best-effort: if the Supabase admin client is unavailable
+  // (e.g. local dev without the service role key) we continue without it.
+  let supabaseId: string | null = null;
+  try {
+    const supabase = getSupabaseAdmin();
+    const name = `${firstName} ${lastName}`.trim();
+    const { data: authData, error: authError } =
+      await supabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { firstName, lastName, name },
+      });
+    if (authError) {
+      if (!/already been registered/i.test(authError.message)) {
+        return { ok: false, error: "Could not create account. Please try again." };
+      }
+      const existing = await supabase.auth.admin.listUsers();
+      supabaseId =
+        existing.data.users.find((u) => u.email === email)?.id ?? null;
+    } else {
+      supabaseId = authData.user.id;
+    }
+  } catch {
+    supabaseId = null;
+  }
 
   try {
     const role = await prisma.role.findUnique({ where: { name: "Student" } });
 
     await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
-        data: { email, name: `${firstName} ${lastName}`.trim(), passwordHash },
+        data: { email, name: `${firstName} ${lastName}`.trim(), supabaseId },
       });
       if (role) {
         await tx.userRole.create({

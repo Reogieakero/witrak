@@ -79,7 +79,7 @@ export function FeesView({
         );
         if (result.ok) {
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -108,7 +108,7 @@ export function FeesView({
         );
         if (result.ok) {
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -133,7 +133,7 @@ export function FeesView({
         );
         if (result.ok) {
           setConfirmDelete(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -172,7 +172,7 @@ export function FeesView({
         if (result.ok) {
           setModal(null);
           setDrawer(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -202,7 +202,7 @@ export function FeesView({
         );
         if (result.ok) {
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -233,7 +233,7 @@ export function FeesView({
         );
         if (result.ok) {
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -257,7 +257,7 @@ export function FeesView({
         );
         if (result.ok) {
           setConfirmDeleteMethod(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -402,7 +402,7 @@ export function FeesView({
         />
       )}
 
-      <LoadingOverlay open={busy} label={busyLabel ?? "Working…"} />
+      <LoadingOverlay open={busy || isMutating} label={busyLabel ?? "Working…"} />
     </div>
   );
 }

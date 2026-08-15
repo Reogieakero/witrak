@@ -34,7 +34,7 @@ export function StudentsView({
   const [confirm, setConfirm] = useState<StudentConfirm>(null);
   const [busy, setBusy] = useState(false);
   const [busyLabel, setBusyLabel] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
+  const [isMutating, startTransition] = useTransition();
 
   const handleSuspend = (id: string) => {
     setBusy(true);
@@ -51,7 +51,7 @@ export function StudentsView({
         );
         if (result.ok) {
           setDrawer(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -146,7 +146,7 @@ export function StudentsView({
         );
       })()}
 
-      <LoadingOverlay open={busy} label={busyLabel ?? "Working…"} />
+      <LoadingOverlay open={busy || isMutating} label={busyLabel ?? "Working…"} />
     </div>
   );
 }

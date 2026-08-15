@@ -25,6 +25,10 @@ export default function LoginPage() {
         </Suspense>
 
         <div className={styles.switch}>
+          <Link href="/login/students" className={styles.switchLink}>
+            Student sign in
+          </Link>
+          <span className={styles.divider}>·</span>
           <Link href="/login/officers" className={styles.switchLink}>
             Officer sign in
           </Link>

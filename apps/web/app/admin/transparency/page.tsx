@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
+import { cached, CACHE_TTL } from "@/lib/cache";
 import { AdminShell } from "@/app/components/admin-shell";
 import { TransparencyView } from "@/app/components/transparency/transparency-view";
 import { getTermContext, termRange } from "@/lib/terms";
@@ -34,58 +35,65 @@ export default async function AdminTransparencyPage() {
   const { term } = await getTermContext();
   const range = termRange(term);
 
-  const [user, files] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        name: true,
-        roles: { include: { role: { select: { name: true } } } },
-      },
-    }),
-    prisma.transparencyFile.findMany({
-      where: range ? { uploadedAt: range } : undefined,
-      orderBy: { uploadedAt: "desc" },
-      include: { uploadedBy: { select: { name: true } } },
-    }),
-  ]);
-
   const canUpload = hasPermission(access, "transparency_upload");
   const canDelete = hasPermission(access, "transparency_delete");
 
-  const totalFiles = files.length;
-  const byCategory = files.reduce<Record<string, number>>((acc, f) => {
-    const cat = (f.category as Category) ?? "reports";
-    acc[cat] = (acc[cat] || 0) + 1;
-    return acc;
-  }, {});
-
-  const stats: TransparencyStats = {
-    totalFiles,
-    termName: term?.name ?? "Current Term",
-    financialCount: byCategory.financial || 0,
-    eventsCount: byCategory.events || 0,
-    minutesCount: byCategory.minutes || 0,
-    reportsCount: byCategory.reports || 0,
-  };
-
-  const items: TransparencyFileItem[] = files.map((f) => {
-    const category = (f.category as Category) ?? "reports";
-    const sizeMatch = (f.fileUrl || "").match(/(\d+(?:\.\d+)?)\s*(MB|KB|GB)/i);
-    const size = sizeMatch ? sizeMatch[0] : "";
-    return {
-      id: f.id,
-      title: f.title,
-      fileUrl: f.fileUrl,
-      fileType: f.fileUrl ? f.fileUrl.split(".").pop()?.toLowerCase() : undefined,
-      category,
-      categoryLabel: CATEGORY_META[category]?.label ?? category,
-      categoryTone: CATEGORY_META[category]?.tone ?? "brand",
-      uploadedBy: f.uploadedBy?.name ?? "Unknown",
-      uploadedAt: formatDate(f.uploadedAt),
-      size: size || undefined,
-      canDelete: canDelete,
-    };
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      name: true,
+      roles: { include: { role: { select: { name: true } } } },
+    },
   });
+
+  const { items, stats } = await cached(
+    `transparency:${session.user.id}`,
+    CACHE_TTL.MEDIUM,
+    async () => {
+      const files = await prisma.transparencyFile.findMany({
+        where: range ? { uploadedAt: range } : undefined,
+        orderBy: { uploadedAt: "desc" },
+        include: { uploadedBy: { select: { name: true } } },
+      });
+
+      const totalFiles = files.length;
+      const byCategory = files.reduce<Record<string, number>>((acc, f) => {
+        const cat = (f.category as Category) ?? "reports";
+        acc[cat] = (acc[cat] || 0) + 1;
+        return acc;
+      }, {});
+
+      const stats: TransparencyStats = {
+        totalFiles,
+        termName: term?.name ?? "Current Term",
+        financialCount: byCategory.financial || 0,
+        eventsCount: byCategory.events || 0,
+        minutesCount: byCategory.minutes || 0,
+        reportsCount: byCategory.reports || 0,
+      };
+
+      const items: TransparencyFileItem[] = files.map((f) => {
+        const category = (f.category as Category) ?? "reports";
+        const sizeMatch = (f.fileUrl || "").match(/(\d+(?:\.\d+)?)\s*(MB|KB|GB)/i);
+        const size = sizeMatch ? sizeMatch[0] : "";
+        return {
+          id: f.id,
+          title: f.title,
+          fileUrl: f.fileUrl,
+          fileType: f.fileUrl ? f.fileUrl.split(".").pop()?.toLowerCase() : undefined,
+          category,
+          categoryLabel: CATEGORY_META[category]?.label ?? category,
+          categoryTone: CATEGORY_META[category]?.tone ?? "brand",
+          uploadedBy: f.uploadedBy?.name ?? "Unknown",
+          uploadedAt: formatDate(f.uploadedAt),
+          size: size || undefined,
+          canDelete,
+        };
+      });
+
+      return { items, stats };
+    },
+  );
 
   const userName = user?.name ?? "Officer";
   const isSuperAdmin = user?.roles.some((r) => r.role.name === "Super Admin") ?? false;

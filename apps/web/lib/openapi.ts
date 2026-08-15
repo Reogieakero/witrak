@@ -169,9 +169,9 @@ export const openApiSpec = {
     },
     "/api/attendance": {
       get: {
-        summary: "List attendance records (scope-enforced)",
+        summary: "List attendance records (scope + term enforced)",
         description:
-          "Requires attendance.view. Records are filtered to the caller's scope sections: faculty-wide access sees all sections, scoped access only sees its own sections. Returns up to 100 records, newest first.",
+          "Requires attendance.view. Records are filtered to the caller's scope sections: faculty-wide access sees all sections, scoped access only sees its own sections. Results are also limited to the admin's currently selected academic term so drawers match the admin attendance aggregates. Returns newest first.",
         security: [{ sessionCookie: [] }],
         responses: {
           "200": {

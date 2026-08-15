@@ -2,17 +2,15 @@
 
 import { useState } from "react";
 import { Info } from "lucide-react";
-import { Badge } from "@/app/components/ui/badge";
 import { Button } from "@/app/components/ui/button";
 import { InfoModal } from "@/app/components/ui/info-modal";
 import styles from "./event-header.module.css";
 
 export type EventHeaderProps = {
-  termName: string;
   onCreate?: () => void;
 };
 
-export function EventHeader({ termName, onCreate }: EventHeaderProps) {
+export function EventHeader({ onCreate }: EventHeaderProps) {
   const [infoOpen, setInfoOpen] = useState(false);
 
   return (
@@ -20,7 +18,6 @@ export function EventHeader({ termName, onCreate }: EventHeaderProps) {
       <div>
         <div className={styles.titleLine}>
           <h1 className={styles.title}>Events</h1>
-          <Badge tone="brand">{termName}</Badge>
         </div>
         <p className={styles.subtitle}>
           Plan and manage faculty-wide student government events. Attendance

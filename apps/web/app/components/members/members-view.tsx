@@ -73,7 +73,7 @@ export function MembersView({
         );
         if (result.ok) {
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -97,7 +97,7 @@ export function MembersView({
         );
         if (result.ok) {
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -121,7 +121,7 @@ export function MembersView({
         );
         if (result.ok) {
           setRequestAction(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -145,7 +145,7 @@ export function MembersView({
         );
         if (result.ok) {
           setRequestAction(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -168,7 +168,7 @@ export function MembersView({
           },
         );
         if (result.ok) {
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -192,7 +192,7 @@ export function MembersView({
         );
         if (result.ok) {
           setDrawer(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setBusy(false);
@@ -389,7 +389,7 @@ export function MembersView({
         );
       })()}
 
-      <LoadingOverlay open={busy} label={busyLabel ?? "Working…"} />
+      <LoadingOverlay open={busy || isMutating} label={busyLabel ?? "Working…"} />
     </div>
   );
 }

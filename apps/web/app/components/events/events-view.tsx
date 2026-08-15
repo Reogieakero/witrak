@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { sileo } from "sileo";
 import { AlertTriangle, CalendarX2, Loader2 } from "lucide-react";
 import type { EventItem, EventsAccess, EventsStats } from "./types";
@@ -11,6 +12,7 @@ import { EventSidebar } from "./event-sidebar";
 import { EventModal } from "./event-modal";
 import { EventView } from "./event-view";
 import { ConfirmationModal } from "@/app/components/ui/confirmation-modal";
+import { LoadingOverlay } from "@/app/components/ui/loading-overlay";
 import { deleteEvent } from "@/app/admin/events/actions";
 import styles from "./events-view.module.css";
 
@@ -38,7 +40,9 @@ export function EventsView({ items, stats, access, programs }: EventsViewProps) 
   const [page, setPage] = useState(1);
   const [modal, setModal] = useState<ModalState>({ mode: "closed" });
   const [confirm, setConfirm] = useState<ConfirmState>({ mode: "closed" });
-  const [, startDelete] = useTransition();
+  const [busy, setBusy] = useState(false);
+  const [busyLabel, setBusyLabel] = useState<string | null>(null);
+  const [isMutating, startDelete] = useTransition();
 
   const handleFilter = (f: "all" | EventItem["status"]) => {
     setFilter(f);
@@ -64,13 +68,16 @@ export function EventsView({ items, stats, access, programs }: EventsViewProps) 
     if (confirm.mode !== "delete") return;
     const event = confirm.event;
     setConfirm({ mode: "closed" });
-    startDelete(() => {
-      void sileo.promise(
-        async () => {
-          const result = await deleteEvent(event.id);
-          if (!result.ok) throw new Error(result.error ?? "Failed to delete.");
-          return result;
-        },
+    setBusy(true);
+    setBusyLabel(`Deleting "${event.title}"…`);
+    startDelete(async () => {
+      try {
+        await sileo.promise(
+          async () => {
+            const result = await deleteEvent(event.id);
+            if (!result.ok) throw new Error(result.error ?? "Failed to delete.");
+            return result;
+          },
         {
           loading: {
             title: "Deleting event",
@@ -90,13 +97,17 @@ export function EventsView({ items, stats, access, programs }: EventsViewProps) 
           }),
         },
       );
+      } finally {
+        setBusy(false);
+        setBusyLabel(null);
+      }
     });
   };
 
   return (
     <div className={styles.page}>
       <div className={styles.mainCol}>
-        <EventHeader termName={stats.termName} onCreate={access.create ? () => setModal({ mode: "create" }) : undefined} />
+        <EventHeader onCreate={access.create ? () => setModal({ mode: "create" }) : undefined} />
 
         <EventStats stats={stats} items={items} />
 
@@ -185,6 +196,12 @@ export function EventsView({ items, stats, access, programs }: EventsViewProps) 
           onClose={() => setConfirm({ mode: "closed" })}
         />
       )}
+
+      {typeof document !== "undefined" &&
+        createPortal(
+          <LoadingOverlay open={busy || isMutating} label={busyLabel ?? "Working…"} />,
+          document.body,
+        )}
     </div>
   );
 }

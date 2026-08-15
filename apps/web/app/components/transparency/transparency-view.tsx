@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Upload, Trash2, FileText, Loader2 } from "lucide-react";
 import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
+import { LoadingOverlay } from "@/app/components/ui/loading-overlay";
 import { ModalActions } from "@/app/components/ui/modal-actions";
+import { ConfirmationModal } from "@/app/components/ui/confirmation-modal";
 import { Select } from "@/app/components/ui/select";
 import type { TransparencyFileItem, TransparencyStats } from "./types";
 import { TransparencyStatsGrid } from "./transparency-stats";
@@ -28,8 +31,11 @@ export function TransparencyView({ items, stats, canUpload }: TransparencyViewPr
   const [deleteTarget, setDeleteTarget] = useState<TransparencyFileItem | null>(null);
   const [viewTarget, setViewTarget] = useState<TransparencyFileItem | null>(null);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [, startUpload] = useTransition();
-  const [, startDelete] = useTransition();
+  const [isUploading, startUpload] = useTransition();
+  const [isDeleting, startDelete] = useTransition();
+  const [busy, setBusy] = useState(false);
+  const [busyLabel, setBusyLabel] = useState<string | null>(null);
+  const router = useRouter();
 
   const filtered = items.filter((f) => {
     const matchesCategory = category === "all" || f.category === category;
@@ -58,82 +64,96 @@ export function TransparencyView({ items, stats, canUpload }: TransparencyViewPr
   };
 
   const handleUploadSubmit = async (formData: FormData) => {
+    setBusy(true);
+    setBusyLabel("Uploading file…");
     startUpload(async () => {
-      const uploadFormData = new FormData();
-      const category = (formData.get("category") as string) || "reports";
-      const title = (formData.get("title") as string) ?? "";
-      uploadFormData.append("title", title.trim());
-      uploadFormData.append("category", category);
-      const file = formData.get("file") as File | null;
-      if (file) uploadFormData.append("file", file);
+      try {
+        const uploadFormData = new FormData();
+        const category = (formData.get("category") as string) || "reports";
+        const title = (formData.get("title") as string) ?? "";
+        uploadFormData.append("title", title.trim());
+        uploadFormData.append("category", category);
+        const file = formData.get("file") as File | null;
+        if (file) uploadFormData.append("file", file);
 
-      const result = await sileo.promise(
-        async () => {
-          const res = await fetch("/api/transparency/upload", {
-            method: "POST",
-            body: uploadFormData,
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error ?? "Upload failed.");
-          return data;
-        },
-        {
-          loading: {
-            title: "Uploading file",
-            description: "Publishing your document...",
-            icon: <Loader2 />,
+        const result = await sileo.promise(
+          async () => {
+            const res = await fetch("/api/transparency/upload", {
+              method: "POST",
+              body: uploadFormData,
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error ?? "Upload failed.");
+            return data;
           },
-          success: {
-            title: "File uploaded",
-            description: "The document is now visible to all members.",
-            icon: <Upload />,
+          {
+            loading: {
+              title: "Uploading file",
+              description: "Publishing your document...",
+              icon: <Loader2 />,
+            },
+            success: {
+              title: "File uploaded",
+              description: "The document is now visible to all members.",
+              icon: <Upload />,
+            },
+            error: (err) => ({
+              title: "Upload failed",
+              description: err instanceof Error ? err.message : "Please try again.",
+              icon: <FileText />,
+            }),
           },
-          error: (err) => ({
-            title: "Upload failed",
-            description: err instanceof Error ? err.message : "Please try again.",
-            icon: <FileText />,
-          }),
-        },
-      );
-      if (result.ok) {
-        setModal("closed");
-        setUploadFile(null);
-        window.location.reload();
+        );
+        if (result.ok) {
+          setModal("closed");
+          setUploadFile(null);
+          router.refresh();
+        }
+      } finally {
+        setBusy(false);
+        setBusyLabel(null);
       }
     });
   };
 
   const handleDeleteConfirm = () => {
     if (!deleteTarget) return;
+    setBusy(true);
+    setBusyLabel("Deleting file…");
     startDelete(async () => {
-      const result = await sileo.promise(
-        async () => {
-          const res = await deleteTransparencyFile(deleteTarget.id);
-          if (!res.ok) throw new Error(res.error ?? "Delete failed.");
-          return res;
-        },
-        {
-          loading: {
-            title: "Deleting file",
-            description: `Removing "${deleteTarget.title}"...`,
-            icon: <Trash2 />,
+      try {
+        const result = await sileo.promise(
+          async () => {
+            const res = await deleteTransparencyFile(deleteTarget.id);
+            if (!res.ok) throw new Error(res.error ?? "Delete failed.");
+            return res;
           },
-          success: {
-            title: "File deleted",
-            description: `"${deleteTarget.title}" was removed.`,
-            icon: <Trash2 />,
+          {
+            loading: {
+              title: "Deleting file",
+              description: `Removing "${deleteTarget.title}"...`,
+              icon: <Trash2 />,
+            },
+            success: {
+              title: "File deleted",
+              description: `"${deleteTarget.title}" was removed.`,
+              icon: <Trash2 />,
+            },
+            error: (err) => ({
+              title: "Delete failed",
+              description: err instanceof Error ? err.message : "Please try again.",
+              icon: <FileText />,
+            }),
           },
-          error: (err) => ({
-            title: "Delete failed",
-            description: err instanceof Error ? err.message : "Please try again.",
-            icon: <FileText />,
-          }),
-        },
-      );
-      if (result.ok) {
-        setModal("closed");
-        setDeleteTarget(null);
-        window.location.reload();
+        );
+        if (result.ok) {
+          setModal("closed");
+          setDeleteTarget(null);
+          router.refresh();
+        }
+      } finally {
+        setBusy(false);
+        setBusyLabel(null);
       }
     });
   };
@@ -321,24 +341,25 @@ export function TransparencyView({ items, stats, canUpload }: TransparencyViewPr
       )}
 
       {modal === "delete" && deleteTarget && (
-        <div className={styles.modalOverlay} onClick={() => setModal("closed")}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.deleteIconWrap}>
-              <Trash2 size={20} className={styles.deleteIcon} />
-            </div>
-            <h3 className={styles.deleteTitle}>Delete this file?</h3>
-            <p className={styles.deleteDesc}>
-              <span className={styles.deleteFileName}>{deleteTarget.title}</span> will be removed from the public transparency list. This cannot be undone.
-            </p>
-            <ModalActions
-              onCancel={() => setModal("closed")}
-              cancelLabel="Cancel"
-              confirmLabel="Delete"
-              onConfirm={handleDeleteConfirm}
-            />
-          </div>
-        </div>
+        <ConfirmationModal
+          open
+          title="Delete this file?"
+          description={
+            <>
+              You are about to delete <strong>{deleteTarget.title}</strong> from the
+              public transparency list. This cannot be undone. Type the file title to
+              continue.
+            </>
+          }
+          confirmLabel="Delete File"
+          confirmToken={deleteTarget.title}
+          variant="danger"
+          onConfirm={handleDeleteConfirm}
+          onClose={() => setModal("closed")}
+        />
       )}
+
+      <LoadingOverlay open={busy || isUploading || isDeleting} label={busyLabel ?? "Working…"} />
     </div>
   );
 }

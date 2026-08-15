@@ -151,13 +151,16 @@ model Student {
   sanctions   Sanction[]
   flags       SanctionFlag[]
   feeProofs   FeeProof[]
+
+  @@index([sectionId])
+  @@index([lastName, firstName])
 }
 
 model User {
   id                String          @id @default(cuid())
   email             String          @unique
   name              String
-  passwordHash      String
+  supabaseId        String?         @unique
   deletedAt         DateTime?
   student           Student?
   roles             UserRole[]
@@ -233,6 +236,7 @@ model RoleRequest {
   requestedRole          Role          @relation(fields: [requestedRoleId], references: [id])
 
   @@index([status])
+  @@index([userId])
 }
 
 model AcademicTerm {
@@ -259,6 +263,9 @@ model Event {
   createdById        String
   createdBy          User         @relation("EventCreatedBy", fields: [createdById], references: [id])
   attendances        Attendance[]
+
+  @@index([startsAt])
+  @@index([createdById])
 }
 
 model Attendance {
@@ -278,6 +285,7 @@ model Attendance {
   @@unique([eventId, studentId])
   @@index([studentId])
   @@index([status])
+  @@index([scannedAt])
 }
 
 model SanctionRule {
@@ -295,6 +303,9 @@ model SanctionRule {
   section          Section?       @relation(fields: [sectionId], references: [id])
   flags            SanctionFlag[]
   sanctions        Sanction[]
+
+  @@index([active])
+  @@index([scopeType])
 }
 
 model Sanction {
@@ -314,6 +325,11 @@ model Sanction {
   issuedBy     User?            @relation("SanctionIssuedBy", fields: [issuedById], references: [id])
   resolvedBy   User?            @relation("SanctionResolvedBy", fields: [resolvedById], references: [id])
   evidences    SanctionEvidence[]
+
+  @@index([studentId])
+  @@index([ruleId])
+  @@index([status])
+  @@index([issuedAt])
 }
 
 model SanctionEvidence {
@@ -324,6 +340,7 @@ model SanctionEvidence {
   attendance   Attendance @relation(fields: [attendanceId], references: [id])
 
   @@unique([sanctionId, attendanceId])
+  @@index([attendanceId])
 }
 
 model SanctionFlag {
@@ -353,6 +370,10 @@ model Fee {
   createdById String
   createdBy   User       @relation("FeeCreatedBy", fields: [createdById], references: [id])
   proofs      FeeProof[]
+
+  @@index([dueDate])
+  @@index([createdAt])
+  @@index([createdById])
 }
 
 model FeeProof {
@@ -373,7 +394,9 @@ model FeeProof {
   createdAt       DateTime      @default(now())
 
   @@index([studentId])
+  @@index([feeId])
   @@index([status])
+  @@index([createdAt])
 }
 
 model PaymentMethod {
@@ -395,6 +418,9 @@ model TransparencyFile {
   uploadedById String
   uploadedBy   User     @relation(fields: [uploadedById], references: [id])
   uploadedAt   DateTime @default(now())
+
+  @@index([uploadedAt])
+  @@index([uploadedById])
 }
 
 model Announcement {
@@ -409,6 +435,10 @@ model Announcement {
   createdById String
   createdBy   User      @relation(fields: [createdById], references: [id])
   createdAt   DateTime  @default(now())
+
+  @@index([createdAt])
+  @@index([createdById])
+  @@index([scopeType])
 }
 
 model AuditLog {
@@ -422,5 +452,6 @@ model AuditLog {
 
   @@index([actorId])
   @@index([action])
+  @@index([action, timestamp])
   @@index([timestamp])
 }

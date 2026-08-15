@@ -104,7 +104,7 @@ export function SanctionsView({
         if (result.ok) {
           setConfirmResolve(null);
           setDrawer(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setResolvingSanction(false);
@@ -126,11 +126,11 @@ export function SanctionsView({
           error: (err) => ({ title: "Could not save", description: err instanceof Error ? err.message : "Please try again.", icon: <ShieldAlert /> }),
         },
       );
-      if (result.ok) {
-        setModal(null);
-        setDrawer(null);
-        router.refresh();
-      }
+        if (result.ok) {
+          setModal(null);
+          setDrawer(null);
+          await router.refresh();
+        }
     });
   };
 
@@ -169,7 +169,7 @@ export function SanctionsView({
         );
         if (result.ok) {
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setRuleBusy(null);
@@ -191,7 +191,7 @@ export function SanctionsView({
           },
         );
         if (result.ok) {
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setDeletingRule(false);
@@ -236,7 +236,7 @@ export function SanctionsView({
         );
         if (result.ok) {
           setModal(null);
-          router.refresh();
+          await router.refresh();
         }
       } finally {
         setRuleBusy(null);
@@ -342,7 +342,7 @@ export function SanctionsView({
       )}
 
       <LoadingOverlay
-        open={deletingRule || resolvingSanction || ruleBusy !== null}
+        open={deletingRule || resolvingSanction || ruleBusy !== null || isMutating}
         label={
           deletingRule
             ? "Deleting sanction rule…"

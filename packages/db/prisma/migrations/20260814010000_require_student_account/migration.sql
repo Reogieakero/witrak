@@ -27,8 +27,9 @@ FROM "User" u
 WHERE u."studentId" = s."id";
 
 -- Auto-create default accounts for orphan students (no linked account yet).
--- These accounts can be claimed later via the officer portal; the default
--- password is "ChangeMe123!" (bcrypt, cost 10).
+-- These accounts can be claimed later via the officer portal. At this point the
+-- legacy `passwordHash` column still exists (NOT NULL) and is backfilled with a
+-- placeholder; it is dropped by a later migration when auth moves to Supabase.
 INSERT INTO "User" ("id", "email", "name", "passwordHash")
 SELECT
   'orphan-' || s."id",

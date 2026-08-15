@@ -1,11 +1,11 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-import { ScopeType } from "@fhusocom/db";
 import { revalidatePath } from "next/cache";
-import { prisma } from "@fhusocom/db";
+import { prisma, ScopeType } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, type UserAccess } from "@/lib/permissions";
+import { invalidateByPrefix } from "@/lib/cache";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 type SessionWithUser = {
   user: { id: string };
@@ -45,16 +45,52 @@ export async function createStudent(
   if (!studentNo) {
     return { ok: false, error: "Student number is required." };
   }
+  if (firstName.length > 100 || lastName.length > 100) {
+    return { ok: false, error: "Names must be under 100 characters." };
+  }
+  if (studentNo.length > 40) {
+    return { ok: false, error: "Student number is too long." };
+  }
 
   const email = `${studentNo.replace(/[^a-zA-Z0-9.-]/g, "").toLowerCase()}@fhusocom.edu`;
-  const passwordHash = await bcrypt.hash("ChangeMe123!", 10);
+
+  const existing = await prisma.student.findFirst({
+    where: { OR: [{ studentNo }, { user: { email } }] },
+    select: { id: true },
+  });
+  if (existing) {
+    return { ok: false, error: "A student with that student number or account already exists." };
+  }
+
+  // Provision a Supabase Auth identity (default password) so the officer can
+  // sign in. Best-effort: if the admin client is unavailable the account is
+  // still created without a linked auth identity.
+  let supabaseId: string | null = null;
+  try {
+    const supabase = getSupabaseAdmin();
+    const name = `${firstName} ${lastName}`.trim();
+    const { data, error } = await supabase.auth.admin.createUser({
+      email,
+      password: "ChangeMe123!",
+      email_confirm: true,
+      user_metadata: { name },
+    });
+    if (error && /already been registered/i.test(error.message)) {
+      const list = await supabase.auth.admin.listUsers();
+      supabaseId = list.data.users.find((u) => u.email === email)?.id ?? null;
+    } else if (data?.user) {
+      supabaseId = data.user.id;
+    }
+  } catch {
+    supabaseId = null;
+  }
 
   try {
     const role = await prisma.role.findUnique({ where: { name: "Student" } });
 
     await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
-        data: { email, name: `${firstName} ${lastName}`.trim(), passwordHash },
+        data: { email, name: `${firstName} ${lastName}`.trim(), supabaseId },
       });
       if (role) {
         await tx.userRole.create({
@@ -80,6 +116,7 @@ export async function createStudent(
     return { ok: false, error: "A student with that student number already exists." };
   }
 
+  await invalidateByPrefix("members:");
   revalidatePath("/admin/members");
   return { ok: true };
 }
@@ -102,6 +139,7 @@ export async function updateStudent(
 
   await prisma.student.update({ where: { id }, data: { sectionId } });
 
+  await invalidateByPrefix("members:");
   revalidatePath("/admin/members");
   return { ok: true };
 }
@@ -163,6 +201,7 @@ export async function approveRoleRequest(
     }),
   ]);
 
+  await invalidateByPrefix("members:");
   revalidatePath("/admin/members");
   return { ok: true };
 }
@@ -192,6 +231,7 @@ export async function suspendMember(
     }),
   ]);
 
+  await invalidateByPrefix("members:");
   revalidatePath("/admin/members");
   return { ok: true };
 }
@@ -237,6 +277,7 @@ export async function removeAuthorization(
     }),
   ]);
 
+  await invalidateByPrefix("members:");
   revalidatePath("/admin/members");
   return { ok: true };
 }
@@ -277,6 +318,7 @@ export async function rejectRoleRequest(
     }),
   ]);
 
+  await invalidateByPrefix("members:");
   revalidatePath("/admin/members");
   return { ok: true };
 }

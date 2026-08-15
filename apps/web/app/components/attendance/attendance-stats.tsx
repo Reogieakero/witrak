@@ -46,9 +46,9 @@ export function AttendanceStats({ stats }: AttendanceStatsProps) {
         className={styles.statTooltip}
         content={
           <Hint
-            title="Present Rate"
-            body="Share of captured attendance records marked present or late."
-            source="Source: Attendance table (PRESENT + LATE ÷ all records)"
+            title="Average Present per Event"
+            body="Average number of students marked present across each attended event."
+            source="Source: Attendance table (present total ÷ attended events)"
           />
         }
       >
@@ -57,12 +57,11 @@ export function AttendanceStats({ stats }: AttendanceStatsProps) {
             <BadgeCheck size={20} />
           </div>
           <div className={styles.statValue}>
-            {stats.presentRate}
-            <span className={styles.statValueSuffix}>%</span>
+            {stats.eventCount ? Math.round(stats.presentTotal / stats.eventCount) : 0}
           </div>
-          <div className={styles.statLabel}>Present Rate</div>
-          <div className={styles.statBar}>
-            <span style={{ width: `${stats.presentRate}%` }} />
+          <div className={styles.statLabel}>Avg Present / Event</div>
+          <div className={styles.statSub}>
+            {stats.presentTotal} present across {stats.eventCount} events
           </div>
         </div>
       </Tooltip>

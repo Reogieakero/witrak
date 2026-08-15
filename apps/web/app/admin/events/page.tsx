@@ -4,7 +4,8 @@ import { auth } from "@/auth";
 import { hasPermission } from "@/lib/permissions";
 import { AdminShell } from "@/app/components/admin-shell";
 import { EventsView } from "@/app/components/events/events-view";
-import { getTermContext, termRange } from "@/lib/terms";
+import { getTermContext, eventInTerm } from "@/lib/terms";
+import { cached, CACHE_TTL } from "@/lib/cache";
 import type { EventItem, EventsStats } from "@/app/components/events/types";
 
 const PRESENT_STATUSES = ["PRESENT", "LATE"];
@@ -48,131 +49,153 @@ export default async function AdminEventsPage() {
 
   const now = new Date();
 
-  const { term } = await getTermContext();
-  const range = termRange(term);
-
-  const [user, events, programs, attendanceRows, studentCount, studentProgramRows] =
-    await Promise.all([
-      prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          name: true,
-          roles: { include: { role: { select: { name: true } } } },
-        },
-      }),
-      prisma.event.findMany({
-        where: range ? { createdAt: range } : undefined,
-        orderBy: { startsAt: "desc" },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          startsAt: true,
-          endsAt: true,
-          location: true,
-          requiresAttendance: true,
-          scanPassword: true,
-          programId: true,
-          program: { select: { name: true } },
-          createdById: true,
-          createdBy: { select: { name: true } },
-        },
-      }),
-      prisma.program.findMany({ orderBy: { code: "asc" } }),
-      prisma.attendance.findMany({ select: { eventId: true, status: true } }),
-      prisma.student.count(),
-      prisma.student.findMany({
-        select: { section: { select: { programYear: { select: { programId: true } } } } },
-      }),
-    ]);
-
-  const termEventIds = new Set(events.map((e) => e.id));
-
-  const programStudentCount = new Map<string, number>();
-  for (const s of studentProgramRows) {
-    const pid = s.section?.programYear.programId;
-    if (pid) programStudentCount.set(pid, (programStudentCount.get(pid) ?? 0) + 1);
-  }
-  const programTargetById = new Map(programs.map((p) => [p.id, p.enrollmentTarget]));
-  const targetTotal = programs.reduce((sum, p) => sum + (p.enrollmentTarget ?? 0), 0);
-  const hasTargets = programs.some((p) => p.enrollmentTarget != null);
-  const displayedTotalStudents = hasTargets ? targetTotal : studentCount;
-
-  const expectedForEvent = (programId: string | null) => {
-    if (programId) {
-      return programTargetById.get(programId) ?? programStudentCount.get(programId) ?? 0;
-    }
-    return displayedTotalStudents;
-  };
-
-  const presentByEvent = new Map<string, number>();
-  const rowCountByEvent = new Map<string, number>();
-  let presentTotal = 0;
-  for (const row of attendanceRows) {
-    if (!termEventIds.has(row.eventId)) continue;
-    rowCountByEvent.set(row.eventId, (rowCountByEvent.get(row.eventId) ?? 0) + 1);
-    if (PRESENT_STATUSES.includes(row.status)) {
-      presentByEvent.set(row.eventId, (presentByEvent.get(row.eventId) ?? 0) + 1);
-      presentTotal += 1;
-    }
-  }
-
-  const expectedTotal = [...events].reduce(
-    (sum, e) => (rowCountByEvent.get(e.id) ? sum + expectedForEvent(e.programId) : sum),
-    0,
-  );
-
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      name: true,
+      roles: { include: { role: { select: { name: true } } } },
+    },
+  });
+  const isYearRep =
+    user?.roles.some((r) => r.role.name === "Year/Program Rep") ?? false;
   const canCreate = hasPermission(access, "events_create");
   const canEdit = hasPermission(access, "events_edit");
   const canDelete = hasPermission(access, "events_delete");
-  const isYearRep =
-    user?.roles.some((r) => r.role.name === "Year/Program Rep") ?? false;
 
-  const items: EventItem[] = events.map((e) => {
-    const expected = expectedForEvent(e.programId);
-    const present = presentByEvent.get(e.id) ?? 0;
-    const hasRows = (rowCountByEvent.get(e.id) ?? 0) > 0;
-    const rate = hasRows && expected ? Math.round((present / expected) * 100) : 0;
-    const status = eventStatus(e.startsAt, e.endsAt, now);
-    const schedule = formatSchedule(e.startsAt, e.endsAt);
-    const dm = formatDayMonth(e.startsAt);
-    return {
-      id: e.id,
-      title: e.title,
-      description: e.description,
-      location: e.location,
-      requiresAttendance: e.requiresAttendance,
-      scanPassword: e.scanPassword,
-      programId: e.programId,
-      programName: e.program?.name ?? null,
-      createdByName: e.createdBy.name,
-      startsAt: e.startsAt.toISOString(),
-      endsAt: e.endsAt.toISOString(),
-      month: dm.month,
-      day: dm.day,
-      scheduleDate: schedule.date,
-      scheduleTime: schedule.time,
-      status,
-      daysUntil: status === "upcoming" ? daysUntil(e.startsAt, now) : null,
-      attendanceTotal: hasRows ? expected : 0,
-      attendancePresent: present,
-      attendanceRate: hasRows && expected ? rate : null,
-      canEdit: canEdit && (!isYearRep || e.createdById === userId),
-      canDelete: canDelete && (!isYearRep || e.createdById === userId),
-    };
-  });
+  const { term } = await getTermContext();
+  const termKey = term?.id ?? "none";
 
-  const stats: EventsStats = {
-    total: items.length,
-    upcoming: items.filter((e) => e.status === "upcoming").length,
-    live: items.filter((e) => e.status === "live").length,
-    past: items.filter((e) => e.status === "past").length,
-    avgRate: expectedTotal ? Math.round((presentTotal / expectedTotal) * 100) : 0,
-    presentTotal,
-    attendanceTotal: expectedTotal,
-    studentCount,
-    termName: term?.name ?? "Current Term",
-  };
+  const { items, stats, programs } = await cached(
+    `events:list:${termKey}:${userId}`,
+    CACHE_TTL.MEDIUM,
+    async () => {
+      const [events, programs, studentCount, sectionProgramRows] =
+        await Promise.all([
+          prisma.event.findMany({
+            where: eventInTerm(term),
+            orderBy: { startsAt: "desc" },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              startsAt: true,
+              endsAt: true,
+              location: true,
+              requiresAttendance: true,
+              scanPassword: true,
+              programId: true,
+              program: { select: { name: true } },
+              createdById: true,
+              createdBy: { select: { name: true } },
+            },
+          }),
+          prisma.program.findMany({ orderBy: { code: "asc" } }),
+          prisma.student.count(),
+          prisma.section.findMany({
+            select: {
+              programYear: { select: { programId: true } },
+              _count: { select: { students: true } },
+            },
+          }),
+        ]);
+
+      const attendanceRows = events.length
+        ? await prisma.attendance.findMany({
+            where: { eventId: { in: events.map((e) => e.id) } },
+            select: { eventId: true, status: true },
+          })
+        : [];
+
+      const termEventIds = new Set(events.map((e) => e.id));
+
+      const programStudentCount = new Map<string, number>();
+      for (const s of sectionProgramRows) {
+        const pid = s.programYear.programId;
+        if (pid) {
+          programStudentCount.set(
+            pid,
+            (programStudentCount.get(pid) ?? 0) + s._count.students,
+          );
+        }
+      }
+      const programTargetById = new Map(programs.map((p) => [p.id, p.enrollmentTarget]));
+      const targetTotal = programs.reduce((sum, p) => sum + (p.enrollmentTarget ?? 0), 0);
+      const hasTargets = programs.some((p) => p.enrollmentTarget != null);
+      const displayedTotalStudents = hasTargets ? targetTotal : studentCount;
+
+      const expectedForEvent = (programId: string | null) => {
+        if (programId) {
+          return programTargetById.get(programId) ?? programStudentCount.get(programId) ?? 0;
+        }
+        return displayedTotalStudents;
+      };
+
+      const presentByEvent = new Map<string, number>();
+      const rowCountByEvent = new Map<string, number>();
+      let presentTotal = 0;
+      for (const row of attendanceRows) {
+        if (!termEventIds.has(row.eventId)) continue;
+        rowCountByEvent.set(row.eventId, (rowCountByEvent.get(row.eventId) ?? 0) + 1);
+        if (PRESENT_STATUSES.includes(row.status)) {
+          presentByEvent.set(row.eventId, (presentByEvent.get(row.eventId) ?? 0) + 1);
+          presentTotal += 1;
+        }
+      }
+
+      const expectedTotal = [...events].reduce(
+        (sum, e) => (rowCountByEvent.get(e.id) ? sum + expectedForEvent(e.programId) : sum),
+        0,
+      );
+
+      const items: EventItem[] = events.map((e) => {
+        const expected = expectedForEvent(e.programId);
+        const present = presentByEvent.get(e.id) ?? 0;
+        const hasRows = (rowCountByEvent.get(e.id) ?? 0) > 0;
+        const rate = hasRows && expected ? Math.round((present / expected) * 100) : 0;
+        const status = eventStatus(e.startsAt, e.endsAt, now);
+        const schedule = formatSchedule(e.startsAt, e.endsAt);
+        const dm = formatDayMonth(e.startsAt);
+        return {
+          id: e.id,
+          title: e.title,
+          description: e.description,
+          location: e.location,
+          requiresAttendance: e.requiresAttendance,
+          scanPassword: e.scanPassword,
+          programId: e.programId,
+          programName: e.program?.name ?? null,
+          createdByName: e.createdBy.name,
+          startsAt: e.startsAt.toISOString(),
+          endsAt: e.endsAt.toISOString(),
+          month: dm.month,
+          day: dm.day,
+          scheduleDate: schedule.date,
+          scheduleTime: schedule.time,
+          status,
+          daysUntil: status === "upcoming" ? daysUntil(e.startsAt, now) : null,
+          attendanceTotal: hasRows ? expected : 0,
+          attendancePresent: present,
+          attendanceRate: hasRows && expected ? rate : null,
+          canEdit: canEdit && (!isYearRep || e.createdById === userId),
+          canDelete: canDelete && (!isYearRep || e.createdById === userId),
+        };
+      });
+
+      const stats: EventsStats = {
+        total: items.length,
+        upcoming: items.filter((e) => e.status === "upcoming").length,
+        live: items.filter((e) => e.status === "live").length,
+        past: items.filter((e) => e.status === "past").length,
+        avgRate: expectedTotal ? Math.round((presentTotal / expectedTotal) * 100) : 0,
+        presentTotal,
+        attendanceTotal: expectedTotal,
+        studentCount,
+        termName: term?.name ?? "Current Term",
+      };
+
+      return { items, stats, programs };
+    },
+  );
 
   const userName = user?.name ?? "Officer";
   const isSuperAdmin = user?.roles.some((r) => r.role.name === "Super Admin") ?? false;

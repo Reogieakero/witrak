@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, type UserAccess } from "@/lib/permissions";
+import { invalidateByPrefix } from "@/lib/cache";
 
 type SessionWithUser = {
   user: { id: string };
@@ -33,6 +34,7 @@ export async function deleteTransparencyFile(
   }
 
   await prisma.transparencyFile.delete({ where: { id: fileId } });
+  await invalidateByPrefix("transparency:");
   revalidatePath("/admin/transparency");
   return { ok: true };
 }

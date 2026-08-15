@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, ShieldCheck } from "lucide-react";
 import { initials, shortName, studentSectionLabel } from "@/lib/dashboard-utils";
 import type { ScopedSection } from "@/lib/dashboard-utils";
 import { Badge } from "@/app/components/ui/badge";
@@ -11,7 +11,7 @@ import styles from "./sanction-flags.module.css";
 export type ActiveSanction = {
   id: string;
   title: string;
-  issuedAt: Date;
+  issuedAt: string;
   rule: { absenceThreshold: number } | null;
   student: {
     firstName: string;
@@ -35,7 +35,7 @@ function riskOf(flag: ActiveSanction): { label: string; cls: string } {
   return { label: "Moderate", cls: styles.riskModerate };
 }
 
-function flaggedDate(d: Date): string {
+function flaggedDate(d: string | Date): string {
   return new Date(d).toLocaleDateString("en-PH", { month: "short", day: "numeric" });
 }
 
@@ -66,7 +66,10 @@ export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
         onMouseLeave={() => setPaused(false)}
       >
         {!flag ? (
-          <p className={styles.emptyText}>No open sanctions.</p>
+          <div className={styles.empty}>
+            <ShieldCheck size={20} className={styles.emptyIcon} />
+            <span>No open sanctions.</span>
+          </div>
         ) : (
           <div key={flag.id} className={styles.slide}>
             <div className={styles.flagRow}>

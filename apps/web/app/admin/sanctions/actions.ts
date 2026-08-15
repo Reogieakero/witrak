@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma, AuditAction, backfillSanctionRule } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, type UserAccess } from "@/lib/permissions";
+import { invalidateByPrefix } from "@/lib/cache";
 
 type SessionWithUser = {
   user: { id: string };
@@ -70,6 +71,7 @@ export async function resolveSanction(
     });
   });
 
+  await invalidateByPrefix("sanctions:");
   revalidatePath("/admin/sanctions");
   return { ok: true };
 }
@@ -105,6 +107,7 @@ export async function updateSanction(
     },
   });
 
+  await invalidateByPrefix("sanctions:");
   revalidatePath("/admin/sanctions");
   return { ok: true };
 }
@@ -152,6 +155,7 @@ export async function createSanctionRule(
     await backfillSanctionRule(rule.id);
   }
 
+  await invalidateByPrefix("sanctions:");
   revalidatePath("/admin/sanctions");
   return { ok: true };
 }
@@ -194,6 +198,7 @@ export async function updateSanctionRule(
     await backfillSanctionRule(rule.id);
   }
 
+  await invalidateByPrefix("sanctions:");
   revalidatePath("/admin/sanctions");
   return { ok: true };
 }
@@ -226,6 +231,7 @@ export async function deleteSanctionRule(
     await tx.sanctionRule.delete({ where: { id } });
   });
 
+  await invalidateByPrefix("sanctions:");
   revalidatePath("/admin/sanctions");
   return { ok: true };
 }
