@@ -12,4 +12,4 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 export { AuditAction, AttendanceStatus, FlagStatus, ScopeType } from "@prisma/client";
 export type { PermissionKey } from "@prisma/client";
-export { recomputeSanctionTriggers } from "./flags";
+export { recomputeSanctionTriggers, recomputeAllSanctions } from "./flags";

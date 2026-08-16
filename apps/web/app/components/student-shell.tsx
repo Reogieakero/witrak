@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, GraduationCap } from "lucide-react";
+import { GraduationCap } from "lucide-react";
 import { UserMenu } from "./user-menu";
 import { StudentProfileModal } from "./student/student-profile-modal";
 import { getStudentAvatar } from "@/app/dashboard/profile/actions";
@@ -44,11 +44,6 @@ export function StudentShell({ userName, roleLabel, crumb, children }: StudentSh
           </div>
 
           <div className={styles.headerRight}>
-            <button type="button" className={styles.iconBtn} title="Notifications">
-              <Bell size={16} />
-              <span className={styles.bellDot} />
-            </button>
-            <span className={styles.divider} />
             <UserMenu
               userName={userName}
               roleLabel={roleLabel}

@@ -207,7 +207,6 @@ export function AnnouncementsView({
           <div>
             <div className={styles.titleRow}>
               <h1 className={styles.pageTitle}>Announcements</h1>
-              <span className={styles.termBadge}>{stats.termName}</span>
             </div>
             <p className={styles.pageSubtitle}>
               Publish updates that every member will see. Announcements are shared
@@ -217,7 +216,7 @@ export function AnnouncementsView({
           {canCreate && (
             <div className={styles.actions}>
               <Button
-                variant="secondary"
+                variant="primary"
                 size="md"
                 onClick={() => setModal({ kind: "create" })}
                 disabled={isMutating}

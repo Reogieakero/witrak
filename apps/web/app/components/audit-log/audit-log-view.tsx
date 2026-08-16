@@ -35,7 +35,6 @@ export function AuditLogView({ entries, stats }: AuditLogViewProps) {
             <div>
               <div className={styles.titleRow}>
                 <h1 className={styles.pageTitle}>Audit Log</h1>
-                <span className={styles.termBadge}>Super Admin only</span>
               </div>
               <p className={styles.pageSubtitle}>
                 A running record of important actions, like assigning roles and verifying

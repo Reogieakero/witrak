@@ -6,6 +6,7 @@ import { cached, CACHE_TTL } from "@/lib/cache";
 import { AdminShell } from "@/app/components/admin-shell";
 import { SanctionsView } from "@/app/components/sanctions/sanctions-view";
 import { getTermContext, termRange, sanctionsInTerm } from "@/lib/terms";
+import { maybeRunScheduledSanctionRecompute } from "@/lib/sanction-scheduler";
 import type {
   SanctionItem,
   SanctionStats,
@@ -52,6 +53,8 @@ export default async function AdminSanctionsPage() {
 
   const scope = access?.scopeSectionIds ?? null;
   const studentWhere = scope ? { sectionId: { in: scope } } : undefined;
+
+  await maybeRunScheduledSanctionRecompute();
 
   const { term } = await getTermContext();
   const range = termRange(term);

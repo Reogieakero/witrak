@@ -3,9 +3,15 @@
 import { isValidElement, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, GraduationCap, Menu, Search, X } from "lucide-react";
+import { GraduationCap, Menu, X } from "lucide-react";
 import { MAIN_NAV, SYSTEM_NAV } from "@/lib/constants/dashboard";
 import { savePersistedView, saveViewSnapshot } from "@/lib/view-store";
+import {
+  PATH_TO_SECTION,
+  type BadgeSection,
+  type SidebarBadges,
+} from "@/lib/sidebar-badges-nav";
+import { fetchSidebarBadges, setSectionSeen } from "@/app/admin/badges/actions";
 import { UserMenu } from "./user-menu";
 import styles from "./admin-shell.module.css";
 
@@ -36,6 +42,32 @@ export function AdminShell({
 }: AdminShellProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const [badges, setBadges] = useState<SidebarBadges | null>(null);
+
+  const activeSection = PATH_TO_SECTION[pathname] as BadgeSection | undefined;
+
+  useEffect(() => {
+    let active = true;
+    fetchSidebarBadges().then((b) => {
+      if (active && b) setBadges(b);
+    });
+    return () => {
+      active = false;
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!activeSection) return;
+    setSectionSeen(activeSection).then(() => {
+      setBadges((prev) => (prev ? { ...prev, [activeSection]: 0 } : prev));
+    });
+  }, [activeSection]);
+
+  const badgeFor = (href: string): number => {
+    const section = PATH_TO_SECTION[href];
+    if (!section || !badges) return 0;
+    return badges[section] ?? 0;
+  };
 
   useEffect(() => {
     if (!snapshot) return;
@@ -85,6 +117,7 @@ export function AdminShell({
           {MAIN_NAV.map((item) => {
             const Icon = item.icon;
             const active = item.active ?? isActive(item.href);
+            const count = badgeFor(item.href);
             return (
               <Link
                 key={item.label}
@@ -92,7 +125,12 @@ export function AdminShell({
                 className={active ? styles.navLinkActive : styles.navLink}
               >
                 <Icon size={16} />
-                <span>{item.label}</span>
+                <span className={styles.navLabel}>{item.label}</span>
+                {count > 0 && (
+                  <span className={styles.navBadge}>
+                    {count > 99 ? "99+" : count}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -137,15 +175,6 @@ export function AdminShell({
           </div>
 
           <div className={styles.headerRight}>
-            <div className={styles.search}>
-              <Search size={14} />
-              <input type="text" placeholder="Search..." className={styles.searchInput} />
-            </div>
-            <button type="button" className={styles.iconBtn} title="Notifications">
-              <Bell size={16} />
-              <span className={styles.bellDot} />
-            </button>
-            <span className={styles.divider} />
             <UserMenu userName={userName} roleLabel={roleLabel} isSuperAdmin={canManagePrograms} />
           </div>
         </header>

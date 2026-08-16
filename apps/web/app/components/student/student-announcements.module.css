@@ -1,0 +1,65 @@
+.modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.modalTitleIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--brand-50);
+  color: var(--brand-600);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.article {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.articleBadge {
+  align-self: flex-start;
+}
+
+.articleTitle {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  color: var(--text-strong);
+}
+
+.articleMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.6875rem;
+  color: var(--ink-500);
+}
+
+.metaDot {
+  color: var(--text-faint);
+}
+
+.articleBody {
+  margin-top: 0.375rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--ink-700);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

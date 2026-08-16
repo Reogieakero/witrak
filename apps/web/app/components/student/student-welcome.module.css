@@ -49,3 +49,15 @@
     align-items: flex-start;
   }
 }
+
+:global([data-theme="dark"]) .bannerBtn {
+  background: var(--surface-card);
+  border-color: var(--line);
+  color: var(--ink-700);
+}
+
+:global([data-theme="dark"]) .bannerBtn:hover {
+  background: var(--brand-50);
+  border-color: var(--brand-300);
+  color: var(--brand-600);
+}

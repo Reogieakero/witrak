@@ -72,7 +72,6 @@ export function StudentsView({
             <div>
               <div className={styles.titleRow}>
                 <h1 className={styles.pageTitle}>Students</h1>
-                <span className={styles.termBadge}>Accounts</span>
               </div>
               <p className={styles.pageSubtitle}>
                 All students with a system account. Suspend or reinstate access.

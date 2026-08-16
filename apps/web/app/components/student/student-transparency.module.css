@@ -405,6 +405,17 @@
   background: var(--surface-muted);
 }
 
+:global([data-theme="dark"]) .primaryBtn {
+  background: var(--surface-card);
+  border: 1px solid var(--brand-100);
+  color: var(--brand-600);
+}
+
+:global([data-theme="dark"]) .primaryBtn:hover {
+  background: var(--brand-50);
+  color: var(--brand-700);
+}
+
 @media (max-width: 640px) {
   .folderGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));

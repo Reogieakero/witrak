@@ -78,13 +78,11 @@ export function StudentEvents({ events }: StudentEventsProps) {
   const [open, setOpen] = useState(false);
   const [initial, setInitial] = useState<StudentEventItem | null>(null);
   const { trigger } = useEventsModal();
-  const skipFirst = useRef(true);
+  const lastTrigger = useRef(0);
 
   useEffect(() => {
-    if (skipFirst.current) {
-      skipFirst.current = false;
-      return;
-    }
+    if (trigger === lastTrigger.current) return;
+    lastTrigger.current = trigger;
     setInitial(null);
     setOpen(true);
   }, [trigger]);
@@ -417,49 +415,12 @@ function StudentCalendar({
                   : undefined
               }
             >
-              <div className={styles.calCellTop}>
-                <span
-                  className={styles.calDayNum}
-                  data-today={today || undefined}
-                >
-                  {day}
-                </span>
-                {count > 0 && (
-                  <span className={styles.calCount} data-tone={tone}>
-                    {count}
-                  </span>
-                )}
-              </div>
-              <div className={styles.calEvents}>
-                {dayEvents.slice(0, 2).map((ev) => (
-                  <span
-                    key={ev.id}
-                    className={styles.calEventRow}
-                    data-status={tone}
-                    title={ev.title}
-                    onClick={(evt) => {
-                      evt.stopPropagation();
-                      onSelect(ev);
-                    }}
-                  >
-                    <span className={styles.calEventTime}>
-                      {ev.scheduleTime}
-                    </span>
-                    <span className={styles.calEventName}>{ev.title}</span>
-                    {ev.requiresAttendance && (
-                      <span
-                        className={styles.calEventAtt}
-                        title="Requires attendance"
-                      >
-                        QR
-                      </span>
-                    )}
-                  </span>
-                ))}
-                {count > 2 && (
-                  <span className={styles.calMore}>+{count - 2} more</span>
-                )}
-              </div>
+              <span
+                className={styles.calDayNum}
+                data-today={today || undefined}
+              >
+                {day}
+              </span>
             </button>
           );
         })}

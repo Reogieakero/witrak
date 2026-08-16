@@ -20,6 +20,10 @@ function getClient(): Redis | null {
   return client;
 }
 
+export function getRedisClient(): Redis | null {
+  return getClient();
+}
+
 export const CACHE_TTL = {
   SHORT: 15,
   MEDIUM: 60,

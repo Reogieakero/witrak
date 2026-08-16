@@ -213,7 +213,7 @@ export function StudentTransparency({ items, allItems, count }: StudentTranspare
           </div>
         )}
       </Drawer>
-    <Drawer
+      <Drawer
         open={showAll}
         onClose={() => setShowAll(false)}
         wide

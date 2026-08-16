@@ -83,3 +83,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+:global([data-theme="dark"]) .tile:hover .tileIcon {
+  background: var(--brand-50);
+  border-color: var(--brand-100);
+  color: var(--brand-600);
+}

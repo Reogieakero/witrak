@@ -165,7 +165,6 @@ export function TransparencyView({ items, stats, canUpload }: TransparencyViewPr
           <div>
             <div className={styles.titleRow}>
               <h1 className={styles.pageTitle}>Transparency</h1>
-              <span className={styles.termBadge}>{stats.termName}</span>
             </div>
             <p className={styles.pageSubtitle}>
               Publish budgets, reports, minutes, and org documents for the whole student body.

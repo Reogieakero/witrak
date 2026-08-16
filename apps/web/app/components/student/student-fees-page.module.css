@@ -1,6 +1,6 @@
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
 
@@ -625,10 +625,6 @@
   .pageHeader {
     align-items: flex-start;
     gap: 1rem;
-  }
-
-  .statsGrid {
-    grid-template-columns: 1fr;
   }
 
   .bodyGrid {

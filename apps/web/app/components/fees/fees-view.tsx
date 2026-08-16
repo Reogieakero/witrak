@@ -278,7 +278,6 @@ export function FeesView({
           <div>
             <div className={styles.titleRow}>
               <h1 className={styles.pageTitle}>Fees</h1>
-              <span className={styles.termBadge}>{stats.termName}</span>
             </div>
             <p className={styles.pageSubtitle}>
               Post student fees (e.g. membership fee, org shirt) and track every
@@ -289,7 +288,7 @@ export function FeesView({
           {canCreate && (
             <div className={styles.actions}>
               <Button
-                variant="secondary"
+                variant="primary"
                 size="md"
                 onClick={() => setModal({ kind: "fee" })}
                 disabled={isMutating}

@@ -107,3 +107,11 @@
   border-top: 1px solid var(--border-subtle);
   flex: none;
 }
+
+@media (max-width: 560px) {
+  .panel,
+  .panelWide {
+    width: 100%;
+    max-width: 100%;
+  }
+}

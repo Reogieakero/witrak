@@ -188,7 +188,6 @@ export function SanctionsView({
           <div>
             <div className={styles.titleRow}>
               <h1 className={styles.pageTitle}>Sanctions</h1>
-              <span className={styles.termBadge}>{stats.termName}</span>
             </div>
             <p className={styles.pageSubtitle}>
               Sanctions are issued automatically based on each student&apos;s
@@ -198,28 +197,26 @@ export function SanctionsView({
           {canCreate && (
             <div className={styles.actions}>
               <Button
-                variant="secondary"
+                variant="primary"
                 size="md"
                 onClick={() => setDrawer({ kind: "activity" })}
               >
                 Activity Logs
               </Button>
               <Button
-                variant="secondary"
+                variant="primary"
                 size="md"
                 onClick={() => setModal({ kind: "fines" })}
                 disabled={isMutating}
               >
-                <PencilLine size={14} />
                 Sanction Fines
               </Button>
               <Button
-                variant="secondary"
+                variant="primary"
                 size="md"
                 onClick={handleRecompute}
                 disabled={isMutating}
               >
-                <RefreshCw size={14} />
                 Recompute
               </Button>
             </div>

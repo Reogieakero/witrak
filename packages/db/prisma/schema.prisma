@@ -175,6 +175,18 @@ model User {
   resolvedSanctions Sanction[]      @relation("SanctionResolvedBy")
   transparencyFiles TransparencyFile[]
   announcements     Announcement[]
+  seenStates        SeenState[]
+}
+
+model SeenState {
+  id      String   @id @default(cuid())
+  userId  String
+  section String
+  seenAt  DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, section])
+  @@index([userId])
 }
 
 model Role {

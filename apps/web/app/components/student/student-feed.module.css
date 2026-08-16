@@ -58,10 +58,15 @@
   display: flex;
   align-items: flex-start;
   gap: 0.625rem;
+  width: 100%;
   padding: 0.625rem;
   border-radius: 8px;
   background: var(--surface-muted);
   border: 1px solid var(--line);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
   transition: border-color 0.15s ease;
 }
 

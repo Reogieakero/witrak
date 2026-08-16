@@ -298,3 +298,24 @@
   font-size: 0.6875rem;
   color: var(--text-muted, #6b7280);
 }
+
+:global([data-theme="dark"]) .cameraBtn {
+  background: var(--surface-card);
+  border-color: var(--brand-100);
+  color: var(--brand-600);
+}
+
+:global([data-theme="dark"]) .cameraBtn:hover {
+  background: var(--brand-50);
+}
+
+:global([data-theme="dark"]) .saveBtn {
+  background: var(--surface-card);
+  border-color: var(--brand-100);
+  color: var(--brand-600);
+}
+
+:global([data-theme="dark"]) .saveBtn:hover {
+  background: var(--brand-50);
+  color: var(--brand-700);
+}

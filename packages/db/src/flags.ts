@@ -2,6 +2,21 @@ import { prisma, FlagStatus, AuditAction } from "./index";
 
 export type RecomputeResult = "none" | "created" | "updated";
 
+export async function recomputeAllSanctions(): Promise<{
+  created: number;
+  updated: number;
+}> {
+  const students = await prisma.student.findMany({ select: { id: true } });
+  let created = 0;
+  let updated = 0;
+  for (const s of students) {
+    const result = await recomputeSanctionTriggers(s.id);
+    if (result === "created") created += 1;
+    else if (result === "updated") updated += 1;
+  }
+  return { created, updated };
+}
+
 /**
  * Resolve the sanction requirement for a given absence count. Students are
  * sanctioned purely by how many absences they have — no threshold rules. The

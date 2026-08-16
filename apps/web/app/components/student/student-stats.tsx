@@ -28,7 +28,7 @@ type StudentStatsProps = {
   pendingFeesText?: string;
 };
 
-function StatCard({
+export function StatCard({
   title,
   icon,
   cells,
@@ -48,7 +48,7 @@ function StatCard({
   );
 }
 
-function MiniCell({
+export function MiniCell({
   label,
   icon,
   value,

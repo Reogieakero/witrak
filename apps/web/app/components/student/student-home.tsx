@@ -11,6 +11,7 @@ import { StudentTransparency } from "@/app/components/student/student-transparen
 import { StudentSanctions } from "@/app/components/student/student-sanctions";
 import { StudentFees } from "@/app/components/student/student-fees";
 import { StudentQuickLinks } from "@/app/components/student/student-quick-links";
+import { StudentKpiOverview } from "@/app/components/student/student-kpi-overview";
 import { EventsModalProvider } from "@/app/components/student/events-modal-context";
 import type { StudentHomeData } from "@/app/components/student/types";
 import styles from "./student-home.module.css";
@@ -318,24 +319,43 @@ export default async function StudentHomeView({
         termName={data.termName}
       />
 
-      <div className={styles.statGrid}>
-        <StudentStats
-          absences={data.absences}
-          balance={data.balance}
-          paidAmount={money.format(data.totalPaid)}
-          paidPct={
-            data.totalFees > 0 ? Math.round((data.totalPaid / data.totalFees) * 100) : 0
-          }
-          totalEvents={data.totalEvents}
-          upcomingEvents={data.upcomingEvents}
-          liveEvents={data.liveEvents}
-          completedEvents={data.completedEvents}
-          attendedEvents={data.attendedEvents}
-          openSanctions={data.openSanctions}
-          transparencyCount={data.transparencyCount}
-          pendingFeesText={pendingFees > 0 ? `${pendingFees} pending` : undefined}
-        />
+      <div className={styles.statsDesktop}>
+        <div className={styles.statGrid}>
+          <StudentStats
+            absences={data.absences}
+            balance={data.balance}
+            paidAmount={money.format(data.totalPaid)}
+            paidPct={
+              data.totalFees > 0 ? Math.round((data.totalPaid / data.totalFees) * 100) : 0
+            }
+            totalEvents={data.totalEvents}
+            upcomingEvents={data.upcomingEvents}
+            liveEvents={data.liveEvents}
+            completedEvents={data.completedEvents}
+            attendedEvents={data.attendedEvents}
+            openSanctions={data.openSanctions}
+            transparencyCount={data.transparencyCount}
+            pendingFeesText={pendingFees > 0 ? `${pendingFees} pending` : undefined}
+          />
+        </div>
       </div>
+
+      <StudentKpiOverview
+        totalEvents={data.totalEvents}
+        completedEvents={data.completedEvents}
+        absences={data.absences}
+        balance={money.format(data.balance)}
+        paidAmount={money.format(data.totalPaid)}
+        paidPct={
+          data.totalFees > 0 ? Math.round((data.totalPaid / data.totalFees) * 100) : 0
+        }
+        pendingFeesText={pendingFees > 0 ? `${pendingFees} pending` : undefined}
+        upcomingEvents={data.upcomingEvents}
+        liveEvents={data.liveEvents}
+        attendedEvents={data.attendedEvents}
+        openSanctions={data.openSanctions}
+        transparencyCount={data.transparencyCount}
+      />
 
       <EventsModalProvider>
         <div className={styles.dashGrid}>

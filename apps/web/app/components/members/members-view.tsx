@@ -221,7 +221,6 @@ export function MembersView({
             <div>
               <div className={styles.titleRow}>
                 <h1 className={styles.pageTitle}>Members</h1>
-                <span className={styles.termBadge}>Directory</span>
               </div>
             </div>
             {canManage && (

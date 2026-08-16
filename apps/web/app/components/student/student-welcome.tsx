@@ -19,11 +19,11 @@ export function WelcomeBanner({ firstName, sectionLabel, termName }: WelcomeBann
         </p>
       </div>
       <div className={styles.actions}>
-        <Button href="/dashboard/fees" variant="outline" size="md">
+        <Button href="/dashboard/fees" variant="outline" size="md" className={styles.bannerBtn}>
           <Upload size={16} />
           Upload Fee Proof
         </Button>
-        <Button href="/dashboard#events" size="md">
+        <Button href="/dashboard#events" size="md" className={styles.bannerBtn}>
           <CalendarPlus size={16} />
           View Events
         </Button>
