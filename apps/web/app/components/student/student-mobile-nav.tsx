@@ -76,7 +76,7 @@ export function StudentMobileNav() {
 
   useEffect(() => {
     const sections = ITEMS.map((i) => i.target)
-      .filter(Boolean)
+      .filter((t): t is string => Boolean(t))
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
     if (sections.length === 0) return;
