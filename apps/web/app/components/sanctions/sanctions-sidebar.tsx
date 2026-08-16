@@ -1,109 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { SlidersHorizontal, ShieldCheck, Pencil, Trash2, ExternalLink, X } from "lucide-react";
-import type { SanctionRuleOption } from "./types";
+import { SlidersHorizontal, ShieldCheck, ExternalLink } from "lucide-react";
+import type { SanctionFineRow } from "./types";
 import styles from "./sanctions-sidebar.module.css";
 
-export function SanctionsSidebar({
-  rules,
-  canEdit,
-  onEditRule,
-  onDeleteRule,
-}: {
-  rules: SanctionRuleOption[];
-  canEdit: boolean;
-  onEditRule: (ruleId: string) => void;
-  onDeleteRule: (ruleId: string) => void;
-}) {
-  const [confirmId, setConfirmId] = useState<string | null>(null);
-  const activeCount = rules.filter((r) => r.active).length;
-
+export function SanctionsSidebar({ fines }: { fines: SanctionFineRow[] }) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.card}>
         <div className={styles.cardHead}>
           <h3 className={styles.cardTitle}>
             <SlidersHorizontal size={16} />
-            Sanction Rules
+            Absence Requirements
           </h3>
-          <span className={styles.cardCount}>
-            {activeCount} active / {rules.length}
-          </span>
+          <span className={styles.cardCount}>{fines.length}</span>
         </div>
 
         <div className={styles.list}>
-          {rules.length === 0 && (
-            <p className={styles.empty}>No sanction rules yet. Add one to start issuing.</p>
+          {fines.length === 0 && (
+            <p className={styles.empty}>No requirements defined yet.</p>
           )}
-          {rules.map((r) =>
-            confirmId === r.id ? (
-              <div key={r.id} className={styles.item} data-confirm>
-                <div className={styles.confirmHead}>
-                  <span className={styles.confirmText}>Delete this rule?</span>
-                  <button
-                    type="button"
-                    className={styles.confirmBtn}
-                    data-tone="danger"
-                    onClick={() => onDeleteRule(r.id)}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.confirmBtn}
-                    onClick={() => setConfirmId(null)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.confirmClose}
-                    title="Cancel"
-                    onClick={() => setConfirmId(null)}
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-                <span className={styles.confirmScope}>
-                  {r.threshold} absences · {r.scopeLabel}
+          {fines.map((f) => (
+            <div key={f.absenceCount} className={styles.item}>
+              <div className={styles.ruleHead}>
+                <span className={styles.ruleBadge}>
+                  {f.absenceCount} {f.absenceCount === 1 ? "absence" : "absences"}
                 </span>
               </div>
-            ) : (
-              <div key={r.id} className={styles.item} data-inactive={!r.active || undefined}>
-                <div className={styles.ruleHead}>
-                  <span className={styles.ruleBadge}>{r.threshold} absences</span>
-                  {canEdit && (
-                    <div className={styles.ruleActions}>
-                      <button
-                        type="button"
-                        className={styles.editBtn}
-                        title="Edit rule"
-                        onClick={() => onEditRule(r.id)}
-                      >
-                        <Pencil size={13} />
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.deleteBtn}
-                        title="Delete rule"
-                        onClick={() => setConfirmId(r.id)}
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <span className={styles.ruleScope}>{r.scopeLabel}</span>
-                <div className={styles.ruleMeta}>
-                  <span>{r.period === "SEMESTER" ? "Semester" : "Event series"}</span>
-                  <span className={r.active ? styles.stateActive : styles.stateInactive}>
-                    {r.active ? "Active" : "Paused"}
-                  </span>
-                </div>
-              </div>
-            ),
-          )}
+              <span className={styles.ruleScope}>{f.title}</span>
+              <span className={styles.policyText}>{f.description}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -115,13 +42,13 @@ export function SanctionsSidebar({
           </h3>
         </div>
         <p className={styles.policyText}>
-          When a student&apos;s absences reach the set limit, a sanction is issued
-          automatically. The admin or president clears it once the student meets the
-          requirement. Only the admin, the Discipline Officer, and the student involved
-          can see these records.
+          When a student reaches an absence count, a sanction is issued automatically
+          and tied to the requirement for that count. The admin or president clears it
+          once the student meets the requirement. Only the admin, the Discipline
+          Officer, and the student involved can see these records.
         </p>
         <div className={styles.policyFooter}>
-          <span>Admin edits rules</span>
+          <span>Edit via Sanction Fines</span>
           <ExternalLink size={12} />
         </div>
       </div>

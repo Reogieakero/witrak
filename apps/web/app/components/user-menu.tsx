@@ -22,9 +22,19 @@ type UserMenuProps = {
   userName: string;
   roleLabel: string;
   isSuperAdmin?: boolean;
+  logoutHref?: string;
+  avatarUrl?: string | null;
+  onProfile?: () => void;
 };
 
-export function UserMenu({ userName, roleLabel, isSuperAdmin = false }: UserMenuProps) {
+export function UserMenu({
+  userName,
+  roleLabel,
+  isSuperAdmin = false,
+  logoutHref = "/login/officers",
+  avatarUrl,
+  onProfile,
+}: UserMenuProps) {
   const [open, setOpen] = useState(false);
   const [programsOpen, setProgramsOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
@@ -58,7 +68,12 @@ export function UserMenu({ userName, roleLabel, isSuperAdmin = false }: UserMenu
         aria-expanded={open}
       >
         <span className={styles.avatarIcon}>
-          <User size={16} />
+          {avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avatarUrl} alt="" className={styles.avatarImg} />
+          ) : (
+            <User size={16} />
+          )}
         </span>
       </button>
 
@@ -91,7 +106,7 @@ export function UserMenu({ userName, roleLabel, isSuperAdmin = false }: UserMenu
             })}
           </div>
 
-          {isSuperAdmin && (
+{isSuperAdmin && (
             <>
               <div className={styles.divider} />
               <div className={styles.sectionLabel}>System</div>
@@ -122,6 +137,24 @@ export function UserMenu({ userName, roleLabel, isSuperAdmin = false }: UserMenu
             </>
           )}
 
+          {onProfile && (
+            <>
+              <div className={styles.divider} />
+              <button
+                type="button"
+                className={styles.themeItem}
+                onClick={() => {
+                  setOpen(false);
+                  onProfile();
+                }}
+                role="menuitem"
+              >
+                <User size={15} className={styles.themeIcon} />
+                <span className={styles.themeLabel}>My Profile</span>
+              </button>
+            </>
+          )}
+
           <div className={styles.divider} />
 
           <button
@@ -129,7 +162,7 @@ export function UserMenu({ userName, roleLabel, isSuperAdmin = false }: UserMenu
             className={styles.logout}
             onClick={async () => {
               await signOut();
-              window.location.href = "/login";
+              window.location.href = logoutHref;
             }}
           >
             <LogOut size={15} />

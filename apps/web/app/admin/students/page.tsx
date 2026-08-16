@@ -15,7 +15,7 @@ import type {
 
 export default async function AdminStudentsPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
   // Temporary gate: allow any authenticated officer to reach the student
@@ -32,7 +32,7 @@ export default async function AdminStudentsPage() {
       roles: { include: { role: { select: { name: true } } } },
     },
   });
-  if (!user) redirect("/login");
+  if (!user) redirect("/login/officers");
 
   const { items, stats, programOptions } = await cached(
     `students:${session.user.id}`,

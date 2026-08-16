@@ -12,7 +12,7 @@ export type ActiveSanction = {
   id: string;
   title: string;
   issuedAt: string;
-  rule: { absenceThreshold: number } | null;
+  absences: number;
   student: {
     firstName: string;
     lastName: string;
@@ -22,14 +22,13 @@ export type ActiveSanction = {
 
 type SanctionFlagsProps = {
   count: number;
-  threshold: number;
   flags: ActiveSanction[];
 };
 
 const INTERVAL_MS = 4000;
 
 function riskOf(flag: ActiveSanction): { label: string; cls: string } {
-  const t = flag.rule?.absenceThreshold || 1;
+  const t = flag.absences || 1;
   if (t >= 10) return { label: "Critical", cls: styles.riskCritical };
   if (t >= 5) return { label: "High", cls: styles.riskHigh };
   return { label: "Moderate", cls: styles.riskModerate };
@@ -39,7 +38,7 @@ function flaggedDate(d: string | Date): string {
   return new Date(d).toLocaleDateString("en-PH", { month: "short", day: "numeric" });
 }
 
-export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
+export function SanctionFlags({ count, flags }: SanctionFlagsProps) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -88,7 +87,7 @@ export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
                 <span className={styles.rowSub}>{studentSectionLabel(flag.student)}</span>
                 <span className={styles.rowTitle}>{flag.title}</span>
                 <span className={styles.flagMeta}>
-                  <span>{flag.rule?.absenceThreshold ?? threshold} absences</span>
+                  <span>{flag.absences} absences</span>
                   <span>Issued {flaggedDate(flag.issuedAt)}</span>
                 </span>
               </span>
@@ -113,7 +112,7 @@ export function SanctionFlags({ count, threshold, flags }: SanctionFlagsProps) {
       )}
 
       <div className={styles.panelFooter}>
-        <span>Threshold: &gt;{threshold} absences</span>
+        <span>Issued by absence count</span>
         <Link href="/admin/sanctions" className={styles.panelLink}>
           View all
         </Link>

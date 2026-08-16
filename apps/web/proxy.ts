@@ -25,7 +25,7 @@ function isPublic(pathname: string): boolean {
 /**
  * Next.js 16 "Proxy" (formerly Middleware). Performs an optimistic auth check
  * against the Supabase session cookie and redirects unauthenticated users to
- * /login. Authoritative authorization still happens per-route via `auth()`.
+ * /login/officers. Authoritative authorization still happens per-route via `auth()`.
  */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -58,7 +58,7 @@ export async function proxy(request: NextRequest) {
 
   if (!session) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/login/officers";
     url.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(url);
   }

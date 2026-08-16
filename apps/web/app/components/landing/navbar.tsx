@@ -36,10 +36,10 @@ export function Navbar() {
         </nav>
 
         <div className={styles.actions}>
-          <Link href="/login" className={styles.signIn}>
+          <Link href="/login/students" className={styles.signIn}>
             Sign in
           </Link>
-          <Button href="/login" size="sm">
+          <Button href="/login/students" size="sm">
             Get started
           </Button>
           <button
@@ -65,7 +65,7 @@ export function Navbar() {
             </a>
           ))}
           <Button
-            href="/login"
+            href="/login/students"
             className={styles.mobileCta}
             onClick={() => setOpen(false)}
           >

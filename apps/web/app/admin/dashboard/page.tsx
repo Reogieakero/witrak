@@ -5,7 +5,7 @@ import DashboardView from "@/app/components/dashboard-view";
 
 export default async function AdminDashboardPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },

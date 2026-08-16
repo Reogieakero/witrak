@@ -14,7 +14,7 @@ type SessionWithUser = {
 
 async function currentSession(): Promise<SessionWithUser> {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
   return { user: { id: session.user.id }, access: session.access ?? null };
 }
 

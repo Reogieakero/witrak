@@ -91,7 +91,12 @@ export function FeesModals({
         />
       )}
       {drawer?.kind === "proof" && drawerProof && (
-        <ProofDrawer proof={drawerProof} onClose={onCloseDrawer} />
+        <ProofDrawer
+          proof={drawerProof}
+          busy={busy}
+          onClose={onCloseDrawer}
+          onVerify={onVerify}
+        />
       )}
     </>
   );
@@ -622,11 +627,24 @@ function PaymentMethodModal({
 
 function ProofDrawer({
   proof,
+  busy,
   onClose,
+  onVerify,
 }: {
   proof: FeeProofRow;
+  busy: boolean;
   onClose: () => void;
+  onVerify: FeesModalsProps["onVerify"];
 }) {
+  const [rejecting, setRejecting] = useState(false);
+  const [reason, setReason] = useState("");
+
+  const submitReject = () => {
+    const trimmed = reason.trim();
+    if (!trimmed) return;
+    onVerify(proof.id, "reject", trimmed);
+  };
+
   return (
     <Drawer
       open
@@ -722,7 +740,53 @@ function ProofDrawer({
           </div>
         )}
 
-                <p className={styles.parLight}>
+        {proof.status === "PENDING" && (
+          <div className={styles.drawerDecision}>
+            <span className={styles.sectionLabel}>Verify payment</span>
+            <div className={styles.decisionGrid}>
+              <button
+                type="button"
+                className={`${styles.decisionBtn} ${styles.decisionApprove}`}
+                onClick={() => onVerify(proof.id, "approve")}
+                disabled={busy}
+              >
+                <CheckCheck size={14} />
+                Confirm received
+              </button>
+              <button
+                type="button"
+                className={`${styles.decisionBtn} ${styles.decisionReject}`}
+                onClick={() => setRejecting(true)}
+                disabled={busy}
+              >
+                <XCircle size={14} />
+                Reject
+              </button>
+            </div>
+
+            {rejecting && (
+              <div className={styles.rejectPanel}>
+                <textarea
+                  className={styles.area}
+                  rows={3}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Explain why the proof is being rejected (shown to the student)…"
+                />
+                <button
+                  type="button"
+                  className={`${styles.decisionBtn} ${styles.decisionReject}`}
+                  onClick={submitReject}
+                  disabled={busy || !reason.trim()}
+                >
+                  Confirm rejection
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        <p className={styles.parLight}>
           Check that the file matches the student&apos;s name and the fee amount before
           approving. Rejections need a reason.
         </p>

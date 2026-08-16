@@ -2,28 +2,6 @@
 
 export type SanctionsListTab = "all" | "active" | "resolved";
 
-export type SanctionScopeType = "FACULTY" | "PROGRAM" | "PROGRAM_YEAR" | "SECTION";
-export type SanctionPeriodType = "SEMESTER" | "EVENT_SERIES";
-
-export interface SanctionRuleOption {
-  id: string;
-  label: string;
-  threshold: number;
-  scopeType: SanctionScopeType;
-  scopeLabel: string;
-  programId?: string;
-  programYearId?: string;
-  sectionId?: string;
-  period: SanctionPeriodType;
-  active: boolean;
-}
-
-export interface SanctionScopeOptions {
-  programs: { id: string; code: string; name: string }[];
-  programYears: { id: string; programId: string; level: number }[];
-  sections: { id: string; name: string; programYearId: string }[];
-}
-
 export interface EvidenceRow {
   eventTitle: string;
   date: string;
@@ -47,22 +25,28 @@ export interface SanctionItem {
   programCode: string;
   title: string;
   reason: string;
-  ruleThreshold: number;
-  triggerCount: number;
+  absences: number;
+  fineTitle: string | null;
+  requirement: string | null;
   outcome: "Open" | "Cleared";
   createdAt: string;
   resolvedBy?: string;
   evidence: EvidenceRow[];
 }
 
+export interface SanctionFineRow {
+  absenceCount: number;
+  title: string;
+  description: string;
+}
+
 export interface SanctionsViewProps {
   sanctions: SanctionItem[];
   stats: SanctionStats;
-  rules: SanctionRuleOption[];
   activityLogs: SanctionsActivityItem[];
+  fines: SanctionFineRow[];
   canCreate: boolean;
   canResolve: boolean;
-  scopeOptions: SanctionScopeOptions;
 }
 
 export interface SanctionsStatsGridProps {
@@ -88,7 +72,7 @@ export interface SanctionsTablesProps {
 export type FormHandler = (formData: FormData) => void;
 
 export type SanctionsModal = {
-  kind: "rule" | "editRule" | "edit";
+  kind: "edit" | "fines";
   id?: string;
 };
 export type SanctionsDrawer = { kind: "sanction" | "activity"; id?: string };
@@ -104,17 +88,15 @@ export interface SanctionsActivityItem {
 
 export interface SanctionsModalsProps {
   sanctions: SanctionItem[];
-  rules: SanctionRuleOption[];
   activityLogs: SanctionsActivityItem[];
+  fines: SanctionFineRow[];
   modal: SanctionsModal | null;
   drawer: SanctionsDrawer | null;
   onCloseModal: () => void;
   onCloseDrawer: () => void;
-  onCreateRule: FormHandler;
-  onEditRule: FormHandler;
   onEdit: FormHandler;
+  onSaveFines: (rows: SanctionFineRow[]) => void;
   canCreate: boolean;
-  scopeOptions: SanctionScopeOptions;
   onEditFor: (sanctionId: string) => void;
   onResolve: (sanctionId: string) => void;
 }

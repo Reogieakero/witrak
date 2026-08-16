@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldAlert, Loader2, PencilLine, Trash2 } from "lucide-react";
+import { RefreshCw, ShieldAlert, Loader2, PencilLine } from "lucide-react";
 import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
 import { LoadingOverlay } from "@/app/components/ui/loading-overlay";
@@ -13,50 +13,27 @@ import { SanctionsModals } from "./sanctions-modals";
 import { SanctionsSidebar } from "./sanctions-sidebar";
 import {
   resolveSanction,
-  createSanctionRule,
-  updateSanctionRule,
-  deleteSanctionRule,
   updateSanction,
+  recomputeSanctions,
 } from "@/app/admin/sanctions/actions";
+import { saveSanctionFines } from "@/app/admin/sanctions/fines-actions";
 import type {
   SanctionsViewProps,
   SanctionsListTab,
-  SanctionRuleOption,
   SanctionItem,
   SanctionsModal,
   SanctionsDrawer,
+  SanctionFineRow,
 } from "./types";
 import styles from "./sanctions-view.module.css";
-
-const DEFAULT_RULES: SanctionRuleOption[] = [
-  {
-    id: "__default_warn",
-    label: "3 absences",
-    threshold: 3,
-    scopeType: "FACULTY",
-    scopeLabel: "Faculty-wide",
-    period: "SEMESTER",
-    active: true,
-  },
-  {
-    id: "__default_flag",
-    label: "5 absences",
-    threshold: 5,
-    scopeType: "FACULTY",
-    scopeLabel: "Faculty-wide",
-    period: "SEMESTER",
-    active: true,
-  },
-];
 
 export function SanctionsView({
   sanctions,
   stats,
-  rules,
   activityLogs,
+  fines,
   canCreate,
   canResolve,
-  scopeOptions,
 }: SanctionsViewProps) {
   const router = useRouter();
   const [tab, setTab] = useState<SanctionsListTab>("all");
@@ -64,13 +41,12 @@ export function SanctionsView({
   const [page, setPage] = useState(1);
   const [modal, setModal] = useState<SanctionsModal | null>(null);
   const [drawer, setDrawer] = useState<SanctionsDrawer | null>(null);
-  const [deletingRule, setDeletingRule] = useState(false);
-  const [ruleBusy, setRuleBusy] = useState<null | "adding" | "saving">(null);
   const [resolvingSanction, setResolvingSanction] = useState(false);
   const [confirmResolve, setConfirmResolve] = useState<SanctionItem | null>(null);
+  const [recomputing, setRecomputing] = useState(false);
+  const [savingFines, setSavingFines] = useState(false);
   const [isMutating, startTransition] = useTransition();
 
-  const flagRuleSource = rules.filter((r) => r.active).length ? rules.filter((r) => r.active) : DEFAULT_RULES;
   const canEdit = canCreate;
 
   const handleTab = (next: SanctionsListTab) => {
@@ -134,112 +110,73 @@ export function SanctionsView({
     });
   };
 
-  const handleCreateRule = (formData: FormData) => {
-    const absenceThreshold = Number(formData.get("absenceThreshold"));
-    const scopeType = String(formData.get("scopeType") || "FACULTY") as
-      | "FACULTY"
-      | "PROGRAM"
-      | "PROGRAM_YEAR"
-      | "SECTION";
-    const period = String(formData.get("period") || "SEMESTER") as "SEMESTER" | "EVENT_SERIES";
-    const programId = String(formData.get("programId") || "") || undefined;
-    const programYearId = String(formData.get("programYearId") || "") || undefined;
-    const sectionId = String(formData.get("sectionId") || "") || undefined;
-    const active = formData.get("active") === "on";
-    if (!Number.isFinite(absenceThreshold) || absenceThreshold < 1) return;
-    setRuleBusy("adding");
+  const handleRecompute = () => {
+    setRecomputing(true);
     startTransition(async () => {
       try {
+        let createdCount = 0;
+        let updatedCount = 0;
         const result = await sileo.promise(
           () =>
-            createSanctionRule({
-              absenceThreshold,
-              scopeType,
-              period,
-              programId,
-              programYearId,
-              sectionId,
-              active,
+            recomputeSanctions().then((r) => {
+              createdCount = r.created;
+              updatedCount = r.updated;
+              return r;
             }),
           {
-            loading: { title: "Adding rule", description: "Creating the sanction rule...", icon: <Loader2 /> },
-            success: { title: "Rule added", description: "New sanction rule is active.", icon: <ShieldAlert /> },
-            error: (err) => ({ title: "Could not add rule", description: err instanceof Error ? err.message : "Please try again.", icon: <ShieldAlert /> }),
+            loading: {
+              title: "Recomputing sanctions",
+              description: "Checking students against their absence counts…",
+              icon: <Loader2 />,
+            },
+            success: () => {
+              const parts: string[] = [];
+              if (createdCount > 0)
+                parts.push(
+                  `${createdCount} sanction${createdCount === 1 ? "" : "s"} issued`,
+                );
+              if (updatedCount > 0)
+                parts.push(
+                  `${updatedCount} updated to match absence count`,
+                );
+              return {
+                title: "Sanctions recomputed",
+                description:
+                  parts.length > 0 ? parts.join(", ") + "." : "No changes needed.",
+                icon: <RefreshCw />,
+              };
+            },
+            error: (err) => ({
+              title: "Could not recompute",
+              description: err instanceof Error ? err.message : "Please try again.",
+              icon: <ShieldAlert />,
+            }),
           },
         );
+        if (result.ok) {
+          await router.refresh();
+        }
+      } finally {
+        setRecomputing(false);
+      }
+    });
+  };
+
+  const handleSaveFines = (rows: SanctionFineRow[]) => {
+    setSavingFines(true);
+    startTransition(async () => {
+      try {
+        const result = await sileo.promise(() => saveSanctionFines(rows), {
+          loading: { title: "Saving requirements", description: "Updating sanction requirements…", icon: <Loader2 /> },
+          success: { title: "Requirements saved", description: "Sanction requirements were updated.", icon: <PencilLine /> },
+          error: (err) => ({ title: "Could not save", description: err instanceof Error ? err.message : "Please try again.", icon: <ShieldAlert /> }),
+        });
         if (result.ok) {
           setModal(null);
           await router.refresh();
         }
       } finally {
-        setRuleBusy(null);
-      }
-    });
-  };
-
-  const handleDeleteRule = (ruleId: string) => {
-    const rule = rules.find((r) => r.id === ruleId);
-    setDeletingRule(true);
-    startTransition(async () => {
-      try {
-        const result = await sileo.promise(
-          () => deleteSanctionRule(ruleId),
-          {
-            loading: { title: "Deleting rule", description: "Removing the sanction rule...", icon: <Loader2 /> },
-            success: { title: "Rule deleted", description: rule ? `${rule.label} was removed.` : "The rule was removed.", icon: <Trash2 /> },
-            error: (err) => ({ title: "Could not delete rule", description: err instanceof Error ? err.message : "Please try again.", icon: <ShieldAlert /> }),
-          },
-        );
-        if (result.ok) {
-          await router.refresh();
-        }
-      } finally {
-        setDeletingRule(false);
-      }
-    });
-  };
-
-  const handleEditRule = (formData: FormData) => {
-    const id = String(formData.get("id") || "");
-    const absenceThreshold = Number(formData.get("absenceThreshold"));
-    const scopeType = String(formData.get("scopeType") || "FACULTY") as
-      | "FACULTY"
-      | "PROGRAM"
-      | "PROGRAM_YEAR"
-      | "SECTION";
-    const period = String(formData.get("period") || "SEMESTER") as "SEMESTER" | "EVENT_SERIES";
-    const programId = String(formData.get("programId") || "") || undefined;
-    const programYearId = String(formData.get("programYearId") || "") || undefined;
-    const sectionId = String(formData.get("sectionId") || "") || undefined;
-    const active = formData.get("active") === "on";
-    if (!id || !Number.isFinite(absenceThreshold) || absenceThreshold < 1) return;
-    setRuleBusy("saving");
-    startTransition(async () => {
-      try {
-        const result = await sileo.promise(
-          () =>
-            updateSanctionRule({
-              id,
-              absenceThreshold,
-              scopeType,
-              period,
-              programId,
-              programYearId,
-              sectionId,
-              active,
-            }),
-          {
-            loading: { title: "Saving rule", description: "Updating the sanction rule...", icon: <Loader2 /> },
-            success: { title: "Rule updated", description: "The sanction rule was saved.", icon: <PencilLine /> },
-            error: (err) => ({ title: "Could not save rule", description: err instanceof Error ? err.message : "Please try again.", icon: <ShieldAlert /> }),
-          },
-        );
-        if (result.ok) {
-          setModal(null);
-          await router.refresh();
-        }
-      } finally {
-        setRuleBusy(null);
+        setSavingFines(false);
       }
     });
   };
@@ -254,28 +191,38 @@ export function SanctionsView({
               <span className={styles.termBadge}>{stats.termName}</span>
             </div>
             <p className={styles.pageSubtitle}>
-              Sanctions are issued automatically when a student&apos;s absences reach
-              the set limit.
+              Sanctions are issued automatically based on each student&apos;s
+              number of absences.
             </p>
           </div>
           {canCreate && (
-<div className={styles.actions}>
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={() => setDrawer({ kind: "activity" })}
-            >
-              Activity Logs
-            </Button>
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={() => setModal({ kind: "rule" })}
-              disabled={isMutating}
-            >
-              Add Rule
-            </Button>
-          </div>
+            <div className={styles.actions}>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setDrawer({ kind: "activity" })}
+              >
+                Activity Logs
+              </Button>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setModal({ kind: "fines" })}
+                disabled={isMutating}
+              >
+                <PencilLine size={14} />
+                Sanction Fines
+              </Button>
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={handleRecompute}
+                disabled={isMutating}
+              >
+                <RefreshCw size={14} />
+                Recompute
+              </Button>
+            </div>
           )}
         </div>
 
@@ -298,26 +245,19 @@ export function SanctionsView({
         />
       </div>
 
-      <SanctionsSidebar
-        rules={rules}
-        canEdit={canEdit}
-        onEditRule={(ruleId) => setModal({ kind: "editRule", id: ruleId })}
-        onDeleteRule={handleDeleteRule}
-      />
+      <SanctionsSidebar fines={fines} />
 
       <SanctionsModals
         sanctions={sanctions}
-        rules={flagRuleSource}
         activityLogs={activityLogs}
+        fines={fines}
         modal={modal}
         drawer={drawer}
         onCloseModal={() => setModal(null)}
         onCloseDrawer={() => setDrawer(null)}
-        onCreateRule={handleCreateRule}
-        onEditRule={handleEditRule}
         onEdit={handleEdit}
+        onSaveFines={handleSaveFines}
         canCreate={canCreate}
-        scopeOptions={scopeOptions}
         onEditFor={(sanctionId) => setModal({ kind: "edit", id: sanctionId })}
         onResolve={requestResolve}
       />
@@ -330,7 +270,7 @@ export function SanctionsView({
             <>
               You are about to mark the sanction for{" "}
               <strong>{confirmResolve.studentName}</strong> as Cleared. This records the
-              resolution and cannot be undone. Type the student's name to continue.
+              resolution and cannot be undone. Type the student&apos;s name to continue.
             </>
           }
           confirmLabel="Clear Sanction"
@@ -342,15 +282,13 @@ export function SanctionsView({
       )}
 
       <LoadingOverlay
-        open={deletingRule || resolvingSanction || ruleBusy !== null || isMutating}
+        open={resolvingSanction || isMutating || recomputing || savingFines}
         label={
-          deletingRule
-            ? "Deleting sanction rule…"
+          recomputing
+            ? "Recomputing sanctions…"
             : resolvingSanction
               ? "Clearing sanction…"
-              : ruleBusy === "saving"
-                ? "Saving sanction rule…"
-                : "Adding sanction rule…"
+              : "Saving…"
         }
       />
     </div>

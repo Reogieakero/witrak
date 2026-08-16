@@ -42,6 +42,49 @@
   color: var(--text-faint);
 }
 
+.headRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.deleteAllBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--red-100);
+  background: var(--red-50);
+  color: var(--red-600);
+  font-size: 0.625rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.deleteAllBtn:hover {
+  background: var(--red-600);
+  border-color: var(--red-600);
+  color: #fff;
+}
+
+.confirmAll {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.confirmAllText {
+  flex: 1;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--red-600);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .list {
   margin-top: 0.75rem;
   display: flex;

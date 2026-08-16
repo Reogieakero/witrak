@@ -232,7 +232,7 @@ export function SanctionsTables({
     sectionName: s.sectionName,
     yearLevel: s.yearLevel,
     headline: s.title,
-    sub: `${s.ruleThreshold} absences · ${s.createdAt}`,
+    sub: `${s.absences} absences · ${s.createdAt}${s.requirement ? ` · ${s.requirement}` : ""}`,
     pillLabel: s.outcome === "Open" ? "Active" : s.outcome,
     pillTone: s.outcome === "Open" ? "amber" : "green",
     outcome: s.outcome,
@@ -393,7 +393,8 @@ function ActiveTable({
               <td>
                 <span className={styles.reasonTitle}>{s.title}</span>
                 <span className={styles.reasonSub}>
-                  {s.ruleThreshold} absences · {s.createdAt}
+                  {s.absences} absences · {s.createdAt}
+                  {s.requirement ? ` · ${s.requirement}` : ""}
                 </span>
               </td>
               <td className={styles.muted}>{s.createdAt}</td>

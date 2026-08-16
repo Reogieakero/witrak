@@ -51,20 +51,21 @@ export function eventInTerm(
 
 /**
  * Prisma `where` fragment that keeps only sanctions tied to attendance evidence
- * from events occurring within the term period (by event date). Sanctions with
- * no evidence fall back to their issue date so they aren't hidden.
+ * from events occurring within the term period (by event date). Sanctions
+ * issued within the term always appear (fallback on their issue date), even
+ * when their evidence references events from another term.
  */
 export function sanctionsInTerm(
   term: TermOption | null,
 ): { OR: (
   | { evidences: { some: { attendance: { event: { startsAt: { gte: Date; lte: Date } } } } } }
-  | { evidences: { none: object }; issuedAt: { gte: Date; lte: Date } }
+  | { issuedAt: { gte: Date; lte: Date } }
 )[] } | undefined {
   if (!term) return undefined;
   return {
     OR: [
       { evidences: { some: { attendance: { event: { startsAt: { gte: term.startsOn, lte: term.endsOn } } } } } },
-      { evidences: { none: {} }, issuedAt: { gte: term.startsOn, lte: term.endsOn } },
+      { issuedAt: { gte: term.startsOn, lte: term.endsOn } },
     ],
   };
 }

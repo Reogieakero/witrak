@@ -35,7 +35,7 @@ function isSameDay(a: Date, b: Date): boolean {
 
 export default async function AdminAttendancePage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
   const userId = session.user.id;
 
   const access = session.access;

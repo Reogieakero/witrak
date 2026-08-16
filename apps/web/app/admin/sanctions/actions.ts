@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma, AuditAction, backfillSanctionRule } from "@fhusocom/db";
+import { prisma, AuditAction, recomputeSanctionTriggers } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, type UserAccess } from "@/lib/permissions";
 import { invalidateByPrefix } from "@/lib/cache";
@@ -112,126 +112,35 @@ export async function updateSanction(
   return { ok: true };
 }
 
-export type CreateSanctionRuleInput = {
-  absenceThreshold: number;
-  scopeType: "FACULTY" | "PROGRAM" | "PROGRAM_YEAR" | "SECTION";
-  programId?: string;
-  programYearId?: string;
-  sectionId?: string;
-  period: "SEMESTER" | "EVENT_SERIES";
-  active: boolean;
-};
-
-export async function createSanctionRule(
-  input: CreateSanctionRuleInput,
-): Promise<{ ok: boolean; error?: string }> {
+export async function recomputeSanctions(): Promise<{
+  ok: boolean;
+  error?: string;
+  created: number;
+  updated: number;
+}> {
   const session = await currentSession();
   if (!hasPermission(session.access, "sanctions_create")) {
-    return { ok: false, error: "Missing permission: sanctions.create." };
+    return { ok: false, error: "Missing permission: sanctions.create.", created: 0, updated: 0 };
   }
 
-  const threshold = Number(input.absenceThreshold);
-  if (!Number.isInteger(threshold) || threshold < 1 || threshold > 100) {
-    return {
-      ok: false,
-      error: "Absence threshold must be a whole number between 1 and 100.",
-    };
-  }
-
-  const rule = await prisma.sanctionRule.create({
-    data: {
-      absenceThreshold: threshold,
-      scopeType: input.scopeType,
-      programId: input.scopeType === "PROGRAM" ? (input.programId ?? null) : null,
-      programYearId:
-        input.scopeType === "PROGRAM_YEAR" ? (input.programYearId ?? null) : null,
-      sectionId: input.scopeType === "SECTION" ? (input.sectionId ?? null) : null,
-      period: input.period,
-      active: input.active,
-    },
+  const scopeSectionIds = session.access?.scopeSectionIds ?? null;
+  const studentWhere = scopeSectionIds
+    ? { sectionId: { in: scopeSectionIds } }
+    : {};
+  const students = await prisma.student.findMany({
+    where: studentWhere,
+    select: { id: true },
   });
 
-  if (input.active) {
-    await backfillSanctionRule(rule.id);
+  let created = 0;
+  let updated = 0;
+  for (const s of students) {
+    const result = await recomputeSanctionTriggers(s.id);
+    if (result === "created") created += 1;
+    else if (result === "updated") updated += 1;
   }
 
   await invalidateByPrefix("sanctions:");
   revalidatePath("/admin/sanctions");
-  return { ok: true };
-}
-
-export type UpdateSanctionRuleInput = CreateSanctionRuleInput & { id: string };
-export async function updateSanctionRule(
-  input: UpdateSanctionRuleInput,
-): Promise<{ ok: boolean; error?: string }> {
-  const session = await currentSession();
-  if (!hasPermission(session.access, "sanctions_create")) {
-    return { ok: false, error: "Missing permission: sanctions.create." };
-  }
-
-  const threshold = Number(input.absenceThreshold);
-  if (!Number.isInteger(threshold) || threshold < 1 || threshold > 100) {
-    return {
-      ok: false,
-      error: "Absence threshold must be a whole number between 1 and 100.",
-    };
-  }
-
-  const rule = await prisma.sanctionRule.findUnique({ where: { id: input.id } });
-  if (!rule) return { ok: false, error: "Sanction rule not found." };
-
-  await prisma.sanctionRule.update({
-    where: { id: rule.id },
-    data: {
-      absenceThreshold: threshold,
-      scopeType: input.scopeType,
-      programId: input.scopeType === "PROGRAM" ? (input.programId ?? null) : null,
-      programYearId:
-        input.scopeType === "PROGRAM_YEAR" ? (input.programYearId ?? null) : null,
-      sectionId: input.scopeType === "SECTION" ? (input.sectionId ?? null) : null,
-      period: input.period,
-      active: input.active,
-    },
-  });
-
-  if (input.active) {
-    await backfillSanctionRule(rule.id);
-  }
-
-  await invalidateByPrefix("sanctions:");
-  revalidatePath("/admin/sanctions");
-  return { ok: true };
-}
-
-export async function deleteSanctionRule(
-  id: string,
-): Promise<{ ok: boolean; error?: string }> {
-  const session = await currentSession();
-  if (!hasPermission(session.access, "sanctions_create")) {
-    return { ok: false, error: "Missing permission: sanctions.create." };
-  }
-
-  const rule = await prisma.sanctionRule.findUnique({ where: { id } });
-  if (!rule) return { ok: false, error: "Sanction rule not found." };
-
-  await prisma.$transaction(async (tx) => {
-    const sanctions = await tx.sanction.findMany({
-      where: { ruleId: id },
-      select: { id: true },
-    });
-    const sanctionIds = sanctions.map((s) => s.id);
-
-    if (sanctionIds.length) {
-      await tx.sanctionEvidence.deleteMany({
-        where: { sanctionId: { in: sanctionIds } },
-      });
-    }
-    await tx.sanction.deleteMany({ where: { ruleId: id } });
-    await tx.sanctionFlag.deleteMany({ where: { ruleId: id } });
-    await tx.sanctionRule.delete({ where: { id } });
-  });
-
-  await invalidateByPrefix("sanctions:");
-  revalidatePath("/admin/sanctions");
-  return { ok: true };
+  return { ok: true, created, updated };
 }

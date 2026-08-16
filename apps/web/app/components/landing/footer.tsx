@@ -12,7 +12,7 @@ const PRODUCT = [
 const RESOURCES = [
   { href: "#faq", label: "FAQ" },
   { href: "/docs", label: "API docs" },
-  { href: "/login", label: "Sign in" },
+  { href: "/login/students", label: "Sign in" },
 ];
 
 export function Footer() {

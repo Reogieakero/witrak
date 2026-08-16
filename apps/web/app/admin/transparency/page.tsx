@@ -27,7 +27,7 @@ function formatDate(date: Date): string {
 
 export default async function AdminTransparencyPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
   if (!hasPermission(access, "transparency_view")) redirect("/dashboard");

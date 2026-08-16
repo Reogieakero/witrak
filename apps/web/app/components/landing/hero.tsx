@@ -32,7 +32,7 @@ export function Hero() {
             </p>
 
             <div className={styles.ctaRow}>
-              <Button href="/login">
+              <Button href="/login/students">
                 Get started <ArrowRight size={16} />
               </Button>
               <Button href="#workflow" variant="secondary">

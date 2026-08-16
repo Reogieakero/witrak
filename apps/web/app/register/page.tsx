@@ -24,7 +24,7 @@ export default function RegisterPage() {
 
         <div className={styles.switch}>
           <span className={styles.switchText}>Already have an account?</span>
-          <Link href="/login" className={styles.switchLink}>
+          <Link href="/login/students" className={styles.switchLink}>
             Sign in
           </Link>
         </div>

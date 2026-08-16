@@ -41,7 +41,7 @@ function daysUntil(d: Date, now: Date): number {
 
 export default async function AdminEventsPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
   const userId = session.user.id;
 
   const access = session.access;

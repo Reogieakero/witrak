@@ -87,5 +87,5 @@ export async function registerStudent(
     return { ok: false, error: "Registration failed. Please check your details and try again." };
   }
 
-  redirect("/login?registered=1");
+  redirect("/login/students?registered=1");
 }

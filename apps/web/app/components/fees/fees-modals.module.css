@@ -227,6 +227,22 @@
   color: var(--red-700);
 }
 
+.drawerDecision {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: 0.75rem;
+  background: var(--surface-muted);
+}
+
+.rejectPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .drawerBody {
   display: flex;
   flex-direction: column;

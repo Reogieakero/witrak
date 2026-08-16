@@ -52,7 +52,9 @@ export function EventModal({
     return () => el.removeEventListener("input", resize);
   }, []);
 
-  const action = (formData: FormData) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     setPending(true);
     setError(null);
     void sileo
@@ -136,7 +138,7 @@ export function EventModal({
           />
         }
       >
-        <form id="event-form" action={action} className={styles.form}>
+        <form id="event-form" onSubmit={handleSubmit} className={styles.form}>
         <input type="hidden" name="id" value={event?.id ?? ""} />
 
         <div className={styles.field}>

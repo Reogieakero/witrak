@@ -9,9 +9,7 @@ import { getTermContext, termRange, sanctionsInTerm } from "@/lib/terms";
 import type {
   SanctionItem,
   SanctionStats,
-  SanctionRuleOption,
   SanctionsActivityItem,
-  SanctionScopeOptions,
 } from "@/app/components/sanctions/types";
 
 function formatDate(d: Date): string {
@@ -47,7 +45,7 @@ const SANCTION_AUDIT_ACTIONS: AuditAction[] = [
 
 export default async function AdminSanctionsPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
   if (!hasPermission(access, "sanctions_view")) redirect("/dashboard");
@@ -70,11 +68,11 @@ export default async function AdminSanctionsPage() {
     },
   });
 
-  const { sanctionItems, stats, ruleOptions, activityLogs, scopeOptions } = await cached(
+  const { sanctionItems, stats, activityLogs, fines } = await cached(
     `sanctions:${termKey}:${session.user.id}`,
     CACHE_TTL.MEDIUM,
     async () => {
-      const [sanctions, rules, auditLogs] = await Promise.all([
+      const [sanctions, auditLogs, fines] = await Promise.all([
         prisma.sanction.findMany({
           where: { ...studentWhere, ...sanctionsInTerm(term) },
           orderBy: { issuedAt: "desc" },
@@ -94,7 +92,9 @@ export default async function AdminSanctionsPage() {
                 },
               },
             },
-            rule: true,
+            fine: {
+              select: { id: true, title: true, description: true },
+            },
             evidences: {
               include: {
                 attendance: {
@@ -108,14 +108,6 @@ export default async function AdminSanctionsPage() {
             resolvedBy: { select: { name: true } },
           },
         }),
-        prisma.sanctionRule.findMany({
-          orderBy: { absenceThreshold: "asc" },
-          include: {
-            program: { select: { code: true, name: true } },
-            programYear: { select: { level: true } },
-            section: { select: { name: true, programYear: { select: { level: true } } } },
-          },
-        }),
         prisma.auditLog.findMany({
           where: {
             action: { in: SANCTION_AUDIT_ACTIONS },
@@ -125,30 +117,16 @@ export default async function AdminSanctionsPage() {
           take: 50,
           include: { actor: { select: { name: true } } },
         }),
+        prisma.sanctionFine.findMany({ orderBy: { absenceCount: "asc" } }),
       ]);
 
-      const [scopePrograms, scopeProgramYears, scopeSections] = canCreate
-        ? await prisma.$transaction([
-            prisma.program.findMany({
-              select: { id: true, code: true, name: true },
-              orderBy: { code: "asc" },
-            }),
-            prisma.yearLevel.findMany({
-              select: { id: true, programId: true, level: true },
-              orderBy: { level: "asc" },
-            }),
-            prisma.section.findMany({
-              select: { id: true, name: true, programYearId: true },
-              orderBy: { name: "asc" },
-            }),
-          ])
-        : [[], [], []];
-
-      const scopeOptions: SanctionScopeOptions = {
-        programs: scopePrograms,
-        programYears: scopeProgramYears,
-        sections: scopeSections,
-      };
+      const flagRows = await prisma.sanctionFlag.findMany({
+        where: { studentId: { in: sanctions.map((s) => s.studentId) } },
+        select: { studentId: true, triggerCount: true },
+      });
+      const absenceByStudent = new Map(
+        flagRows.map((f) => [f.studentId, f.triggerCount]),
+      );
 
       const sanctionItems: SanctionItem[] = sanctions.map((s) => {
         const st = s.student;
@@ -162,8 +140,9 @@ export default async function AdminSanctionsPage() {
           programCode: st.section?.programYear.program.code ?? "—",
           title: s.title,
           reason: s.reason,
-          ruleThreshold: s.rule?.absenceThreshold ?? 0,
-          triggerCount: s.rule?.absenceThreshold ?? 0,
+          absences: absenceByStudent.get(s.studentId) ?? 0,
+          fineTitle: s.fine?.title ?? null,
+          requirement: s.fine?.description ?? null,
           outcome: s.status === "RESOLVED" ? "Cleared" : "Open",
           createdAt: formatDate(s.issuedAt),
           resolvedBy: s.resolvedBy?.name,
@@ -182,35 +161,6 @@ export default async function AdminSanctionsPage() {
         termName: term?.name ?? "Current Term",
       };
 
-      const ruleOptions: SanctionRuleOption[] = rules.map((r) => {
-        const scopeLabel =
-          r.scopeType === "PROGRAM"
-            ? r.program
-              ? `${r.program.code} — ${r.program.name}`
-              : "Program"
-            : r.scopeType === "PROGRAM_YEAR"
-              ? r.programYear
-                ? `Year ${r.programYear.level}`
-                : "Program year"
-              : r.scopeType === "SECTION"
-                ? r.section
-                  ? `Year ${r.section.programYear?.level ?? "?"} — ${r.section.name}`
-                  : "Section"
-                : "Faculty-wide";
-        return {
-          id: r.id,
-          label: `${r.absenceThreshold} absences`,
-          threshold: r.absenceThreshold,
-          scopeType: r.scopeType,
-          scopeLabel,
-          programId: r.programId ?? undefined,
-          programYearId: r.programYearId ?? undefined,
-          sectionId: r.sectionId ?? undefined,
-          period: r.period,
-          active: r.active,
-        };
-      });
-
       const activityLogs: SanctionsActivityItem[] = auditLogs.map((l) => ({
         id: l.id,
         action: l.action,
@@ -220,7 +170,7 @@ export default async function AdminSanctionsPage() {
         when: formatDateTime(l.timestamp),
       }));
 
-      return { sanctionItems, stats, ruleOptions, activityLogs, scopeOptions };
+      return { sanctionItems, stats, activityLogs, fines };
     },
   );
 
@@ -233,14 +183,13 @@ export default async function AdminSanctionsPage() {
 
   return (
     <AdminShell userName={userName} roleLabel={roleLabel}>
-      <SanctionsView
+       <SanctionsView
         sanctions={sanctionItems}
         stats={stats}
-        rules={ruleOptions}
         activityLogs={activityLogs}
+        fines={fines}
         canCreate={canCreate}
         canResolve={canResolve}
-        scopeOptions={scopeOptions}
       />
     </AdminShell>
   );

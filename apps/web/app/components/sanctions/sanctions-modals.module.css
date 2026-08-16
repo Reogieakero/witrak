@@ -116,6 +116,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.875rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.body::-webkit-scrollbar {
+  display: none;
 }
 
 .field {
@@ -254,6 +260,12 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.drawerBody::-webkit-scrollbar {
+  display: none;
 }
 
 .metrics {
@@ -434,5 +446,120 @@
 
 .activityMeta {
   font-size: 0.5625rem;
+  color: var(--text-faint);
+}
+
+.fineBanner {
+  background: var(--surface-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.875rem;
+}
+
+.fineBannerTitle {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: var(--text-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fineBannerText {
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.fineList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.fineRow {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  gap: 0.875rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: 0.75rem;
+  background: var(--surface-card);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.fineRow:focus-within {
+  border-color: var(--brand-300);
+  box-shadow: 0 0 0 3px var(--brand-100);
+}
+
+.fineCount {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  border-radius: 0.625rem;
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
+  color: var(--brand-700);
+}
+
+.fineCountValue {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.fineCountUnit {
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--brand-600);
+}
+
+.fineFields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.fineField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.fineFieldLabel {
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fineInput {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+  border-radius: 0.5rem;
+  color: var(--text-strong);
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.fineInput:focus {
+  outline: none;
+  border-color: var(--brand-400);
+  background: var(--surface-card);
+  box-shadow: 0 0 0 3px var(--brand-100);
+}
+
+.fineInput::placeholder {
   color: var(--text-faint);
 }

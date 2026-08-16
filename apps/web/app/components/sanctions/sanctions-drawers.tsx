@@ -69,7 +69,7 @@ export function SanctionDrawer({
       <div className={styles.drawerBody}>
         <div className={styles.metrics}>
           <div className={styles.metricTile}>
-            <div className={`${styles.metricValue} ${styles.metricValueRose}`}>{item.ruleThreshold}</div>
+            <div className={`${styles.metricValue} ${styles.metricValueRose}`}>{item.absences}</div>
             <div className={styles.metricLabel}>Absences</div>
           </div>
           <div className={styles.metricTile}>
@@ -83,6 +83,15 @@ export function SanctionDrawer({
           <span className={styles.sectionLabel}>Reason</span>
           <p className={styles.par}>{item.reason}</p>
         </div>
+        {item.requirement ? (
+          <div>
+            <span className={styles.sectionLabel}>Requirement</span>
+            {item.fineTitle ? (
+              <p className={styles.par}>{item.fineTitle}</p>
+            ) : null}
+            <p className={styles.par}>{item.requirement}</p>
+          </div>
+        ) : null}
         <div>
           <span className={styles.sectionLabel}>Attached evidence</span>
           <EvidenceTable rows={item.evidence} />

@@ -5,6 +5,8 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export const TRANSPARENCY_BUCKET = "transparency";
 export const ANNOUNCEMENTS_BUCKET = "announcements";
+export const STUDENTS_BUCKET = "students";
+export const FEE_PROOFS_BUCKET = "fee-proofs";
 
 let client: SupabaseClient | null = null;
 
@@ -67,6 +69,54 @@ export async function uploadAnnouncementImage(
   }
 
   const { data } = supabase.storage.from(ANNOUNCEMENTS_BUCKET).getPublicUrl(path);
+  return { publicUrl: data.publicUrl };
+}
+
+export async function uploadStudentImage(
+  path: string,
+  body: ArrayBuffer,
+  contentType: string,
+): Promise<{ publicUrl: string }> {
+  const supabase = getSupabaseStorage();
+  await ensureBucket(supabase, STUDENTS_BUCKET);
+
+  const { error } = await supabase.storage
+    .from(STUDENTS_BUCKET)
+    .upload(path, body, {
+      contentType,
+      upsert: true,
+      cacheControl: "3600",
+    });
+
+  if (error) {
+    throw new Error(`Supabase upload failed: ${error.message}`);
+  }
+
+  const { data } = supabase.storage.from(STUDENTS_BUCKET).getPublicUrl(path);
+  return { publicUrl: data.publicUrl };
+}
+
+export async function uploadFeeProof(
+  path: string,
+  body: ArrayBuffer,
+  contentType: string,
+): Promise<{ publicUrl: string }> {
+  const supabase = getSupabaseStorage();
+  await ensureBucket(supabase, FEE_PROOFS_BUCKET);
+
+  const { error } = await supabase.storage
+    .from(FEE_PROOFS_BUCKET)
+    .upload(path, body, {
+      contentType,
+      upsert: true,
+      cacheControl: "3600",
+    });
+
+  if (error) {
+    throw new Error(`Supabase upload failed: ${error.message}`);
+  }
+
+  const { data } = supabase.storage.from(FEE_PROOFS_BUCKET).getPublicUrl(path);
   return { publicUrl: data.publicUrl };
 }
 

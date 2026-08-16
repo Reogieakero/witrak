@@ -388,7 +388,6 @@ async function wipeMockData(): Promise<void> {
   await prisma.sanctionEvidence.deleteMany({});
   await prisma.sanction.deleteMany({});
   await prisma.sanctionFlag.deleteMany({});
-  await prisma.sanctionRule.deleteMany({});
   await prisma.attendance.deleteMany({});
   await prisma.event.deleteMany({});
   await prisma.academicTerm.deleteMany({});
@@ -729,44 +728,9 @@ async function seedSanctions(
   activeTermId: string,
   disciplineOfficer: { id: string },
   students: Awaited<ReturnType<typeof prisma.student.findMany>>,
-  programs: Awaited<ReturnType<typeof prisma.program.findMany>>,
-  yearLevels: Awaited<ReturnType<typeof prisma.yearLevel.findMany>>,
-  sections: Awaited<ReturnType<typeof prisma.section.findMany>>,
 ): Promise<void> {
-  const byCode = new Map(programs.map((p) => [p.code, p]));
-  const polSci2 = yearLevels.find((y) => y.level === 2 && y.programId === byCode.get("AB-POLSCI")!.id)!;
-  const psych3 = yearLevels.find((y) => y.level === 3 && y.programId === byCode.get("BSPSYCH")!.id)!;
-  const devcom1a = sections.find((s) => s.name === "A" && s.programYearId === yearLevels.find((y) => y.level === 1 && y.programId === byCode.get("BS-DEVCOM")!.id)!.id)!;
-  const psych1b = sections.find((s) => s.name === "B" && s.programYearId === yearLevels.find((y) => y.level === 1 && y.programId === byCode.get("BSPSYCH")!.id)!.id)!;
-
-  const ruleSpecs = [
-    { scopeType: ScopeType.FACULTY, threshold: 3, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.FACULTY, threshold: 5, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.FACULTY, threshold: 7, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.FACULTY, threshold: 2, period: PeriodType.EVENT_SERIES },
-    { scopeType: ScopeType.PROGRAM, programId: byCode.get("AB-POLSCI")!.id, threshold: 4, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.PROGRAM, programId: byCode.get("BSPSYCH")!.id, threshold: 4, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.PROGRAM_YEAR, programYearId: polSci2.id, threshold: 3, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.PROGRAM_YEAR, programYearId: psych3.id, threshold: 3, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.SECTION, sectionId: devcom1a.id, threshold: 2, period: PeriodType.SEMESTER },
-    { scopeType: ScopeType.SECTION, sectionId: psych1b.id, threshold: 2, period: PeriodType.SEMESTER },
-  ];
-
-  await prisma.sanctionRule.createMany({
-    data: ruleSpecs.map((r) => ({
-      scopeType: r.scopeType,
-      programId: "programId" in r ? r.programId : undefined,
-      programYearId: "programYearId" in r ? r.programYearId : undefined,
-      sectionId: "sectionId" in r ? r.sectionId : undefined,
-      absenceThreshold: r.threshold,
-      period: r.period,
-      action: "FLAG_FOR_REVIEW",
-      active: true,
-    })),
-  });
-  const rules = await prisma.sanctionRule.findMany();
-  const ruleByThreshold = new Map(rules.map((r) => [r.absenceThreshold, r]));
-  const rule3 = ruleByThreshold.get(3)!;
+  // Sanctions are now issued by absence count against the SanctionFine catalog
+  // (see seedSanctionFines). No threshold rules are created here.
 
   // Absence counts per student
   const absences = await prisma.attendance.groupBy({
@@ -786,7 +750,6 @@ async function seedSanctions(
     const reviewed = status === FlagStatus.PENDING ? null : disciplineOfficer.id;
     flags.push({
       studentId: s.id,
-      ruleId: rule3.id,
       periodRef: activeTermId,
       triggerCount: count,
       status,
@@ -801,7 +764,6 @@ async function seedSanctions(
   const sanctionStudents = students.slice(0, 10);
   const sanctions = sanctionStudents.map((s, i) => ({
     studentId: s.id,
-    ruleId: rule3.id,
     title: "Excessive Absences — Attendance Policy",
     reason: `Reached ${absentCount.get(s.id) ?? 0} unexcused absences under the faculty-wide attendance policy.`,
     status: i % 2 === 0 ? SanctionStatus.OPEN : SanctionStatus.RESOLVED,
@@ -826,7 +788,7 @@ async function seedSanctions(
   }
   await prisma.sanctionEvidence.createMany({ data: evidences });
 
-  console.log(`Sanction rules: ${rules.length}, flags: ${flags.length}, sanctions: ${sanctionRows.length}, evidences: ${evidences.length}`);
+  console.log(`flags: ${flags.length}, sanctions: ${sanctionRows.length}, evidences: ${evidences.length}`);
 }
 
 async function seedFees(
@@ -932,6 +894,30 @@ async function seedContentAndAudit(
   console.log(`Transparency files: ${transparencyCount}, announcements: ${announcementCount}, audit logs: ${logs.length}`);
 }
 
+const SANCTION_FINE_DEFAULTS: { absenceCount: number; title: string; description: string }[] = [
+  { absenceCount: 1, title: "1 Absence", description: "Submit 1 ballpen to your officer." },
+  { absenceCount: 2, title: "2 Absences", description: "Submit 1 notebook to your officer." },
+  { absenceCount: 3, title: "3 Absences", description: "Submit 1 pad of intermediate paper (½) to your officer." },
+  { absenceCount: 4, title: "4 Absences", description: "Submit 1 long brown envelope to your officer." },
+  { absenceCount: 5, title: "5 Absences", description: "Submit 1 box of crayons to your officer." },
+  { absenceCount: 6, title: "6 Absences", description: "Submit 1 ruler to your officer." },
+  { absenceCount: 7, title: "7 Absences", description: "Submit 2 pencils to your officer." },
+  { absenceCount: 8, title: "8 Absences", description: "Submit 1 eraser to your officer." },
+  { absenceCount: 9, title: "9 Absences", description: "Submit 1 set of paper clips to your officer." },
+  { absenceCount: 10, title: "10 Absences", description: "Submit 1 folder to your officer." },
+];
+
+async function seedSanctionFines(): Promise<void> {
+  for (const fine of SANCTION_FINE_DEFAULTS) {
+    await prisma.sanctionFine.upsert({
+      where: { absenceCount: fine.absenceCount },
+      create: fine,
+      update: {},
+    });
+  }
+  console.log(`SanctionFines: ${SANCTION_FINE_DEFAULTS.length} defaults seeded`);
+}
+
 async function main(): Promise<void> {
   await wipeMockData();
   await seedPermissions();
@@ -948,7 +934,8 @@ async function main(): Promise<void> {
   await seedRoleRequests(superAdmin, students, yearLevels, sections);
   const { activeTermId } = await seedAcademicTerms();
   await seedEvents(secretary, students, scanners);
-  await seedSanctions(activeTermId, disciplineOfficer, students, programs, yearLevels, sections);
+  await seedSanctions(activeTermId, disciplineOfficer, students);
+  await seedSanctionFines();
   await seedFees(treasurer, students);
 
   const pio = await prisma.user.findUniqueOrThrow({ where: { email: "pio@fhusocom.edu" } });

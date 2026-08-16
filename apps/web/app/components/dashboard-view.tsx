@@ -16,7 +16,7 @@ import styles from "./dashboard-view.module.css";
 
 export default async function DashboardView() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
 
   const userWithRoles = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -41,7 +41,6 @@ export default async function DashboardView() {
     enrollmentTargets,
     canEditEnrollment,
     activeSanctionCount,
-    threshold,
     flags,
     pendingRoleRequestCount,
     requests,
@@ -148,7 +147,7 @@ export default async function DashboardView() {
               section: { include: { programYear: { include: { program: true } } } },
             },
           },
-          rule: true,
+          fine: { select: { title: true } },
         },
       }),
       prisma.roleRequest.count({ where: { status: "PENDING" } }),
@@ -181,6 +180,16 @@ export default async function DashboardView() {
         select: { id: true, code: true, name: true, enrollmentTarget: true },
       }),
     ]);
+
+    const flagRows = activeSanctions.length
+      ? await prisma.sanctionFlag.findMany({
+          where: { studentId: { in: activeSanctions.map((s) => s.studentId) } },
+          select: { studentId: true, triggerCount: true },
+        })
+      : [];
+    const absenceByStudent = new Map(
+      flagRows.map((f) => [f.studentId, f.triggerCount]),
+    );
 
     const totalFee = fees.reduce((sum, f) => sum + Number(f.amount), 0);
     const enrollmentTargets = programs.map((p) => ({
@@ -317,8 +326,6 @@ export default async function DashboardView() {
       : [];
     const targetById = Object.fromEntries(targetUsers.map((u) => [u.id, u.name]));
 
-    const threshold = activeSanctions[0]?.rule?.absenceThreshold ?? 3;
-
     const statData = {
       totalStudents: displayedTotalStudents,
       accountCount: totalStudents,
@@ -339,7 +346,7 @@ export default async function DashboardView() {
       id: s.id,
       title: s.title,
       issuedAt: s.issuedAt.toISOString(),
-      rule: s.rule ? { absenceThreshold: s.rule.absenceThreshold } : null,
+      absences: absenceByStudent.get(s.studentId) ?? 0,
       student: {
         firstName: s.student.firstName,
         lastName: s.student.lastName,
@@ -378,7 +385,6 @@ export default async function DashboardView() {
       enrollmentTargets,
       canEditEnrollment: isSuperAdmin,
       activeSanctionCount,
-      threshold,
       flags,
       pendingRoleRequestCount,
       requests,
@@ -423,7 +429,7 @@ export default async function DashboardView() {
 
       <div className={styles.dashGrid}>
         <div className={styles.leftCol}>
-          <SanctionFlags count={activeSanctionCount} threshold={threshold} flags={flags} />
+          <SanctionFlags count={activeSanctionCount} flags={flags} />
           <RoleRequests
             count={pendingRoleRequestCount}
             requests={requests}

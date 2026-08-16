@@ -1,0 +1,199 @@
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.iconBrand {
+  color: #2563eb;
+}
+
+.iconGreen {
+  color: var(--green-600);
+}
+
+.iconAmber {
+  color: var(--amber-600);
+}
+
+.badge,
+.badgeGreen,
+.badgeAmber,
+.badgeGray {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badgeGreen {
+  color: var(--green-600);
+  background: var(--green-50);
+  border: 1px solid var(--green-100);
+}
+
+.badgeAmber {
+  color: var(--amber-600);
+  background: var(--amber-50);
+  border: 1px solid var(--amber-100);
+}
+
+.badgeGray {
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  border: 1px solid var(--border-default);
+}
+
+.text {
+  margin: 0.5rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--ink-500);
+}
+
+.link {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.625rem;
+  border-radius: 8px;
+  background: var(--green-50);
+  border: 1px solid var(--green-100);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--green-600);
+}
+
+.list {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.feesList {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 286px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.feesList::-webkit-scrollbar {
+  display: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem;
+  border-radius: 8px;
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  transition: border-color 0.15s ease;
+}
+
+.row:hover {
+  border-color: var(--border-default);
+}
+
+.rowIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
+  border-radius: 6px;
+}
+
+.rowIconGreen {
+  background: var(--green-50);
+  color: var(--green-600);
+}
+
+.rowIconAmber {
+  background: var(--amber-50);
+  color: var(--amber-600);
+}
+
+.rowIconGray {
+  background: var(--surface-muted);
+  color: var(--ink-500);
+}
+
+.rowIconBrand {
+  background: var(--brand-50);
+  color: #2563eb;
+}
+
+.rowBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.rowTitle {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.rowMeta {
+  display: block;
+  font-size: 0.625rem;
+  color: var(--ink-500);
+  margin-top: 0.125rem;
+}
+
+.rowHint {
+  display: block;
+  font-size: 0.625rem;
+  color: var(--amber-600);
+  margin-top: 0.125rem;
+  font-weight: 600;
+}
+
+.uploadBtn {
+  width: 100%;
+  margin-top: 0.75rem;
+}

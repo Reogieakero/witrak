@@ -1,0 +1,139 @@
+.tableWrap {
+  margin-top: 0.75rem;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table th {
+  padding: 0.5rem 0.625rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0.625rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tbody tr:hover {
+  background: var(--surface-muted);
+}
+
+.table th.thCenter,
+.table td.thCenter {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.eventTitle {
+  display: block;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.eventMeta {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.625rem;
+  color: var(--ink-500);
+}
+
+.empty {
+  margin-top: 0.75rem;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: var(--surface-muted);
+}
+
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: var(--brand-50);
+  color: #2563eb;
+  margin-bottom: 0.25rem;
+}
+
+.emptyTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.emptySub {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+/* ── Modal ─────────────────────────────────────────────────── */
+
+.modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.modalTitleIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  flex: none;
+  background: var(--brand-50);
+  color: #2563eb;
+}
+
+.modalTitleLine {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+  line-height: 1.2;
+}
+
+.modalSubtitle {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}

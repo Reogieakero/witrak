@@ -24,7 +24,7 @@ function yearLabel(level: number | null): string {
 
 export default async function AdminMembersPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
   // Temporary gate: the `members_view` permission isn't in the DB until
@@ -42,7 +42,7 @@ export default async function AdminMembersPage() {
       roles: { include: { role: { select: { name: true } } } },
     },
   });
-  if (!user) redirect("/login");
+  if (!user) redirect("/login/officers");
 
   const {
     items,

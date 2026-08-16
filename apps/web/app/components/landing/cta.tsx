@@ -16,10 +16,10 @@ export function Cta() {
             FHUSOCOM.
           </p>
           <div className={styles.actions}>
-            <Button href="/login" variant="white">
+            <Button href="/login/students" variant="white">
               Get started <ArrowRight size={16} />
             </Button>
-            <Button href="/login" variant="outline">
+            <Button href="/login/students" variant="outline">
               Sign in
             </Button>
           </div>

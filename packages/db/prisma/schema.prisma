@@ -105,9 +105,8 @@ model Program {
   enrollmentTarget Int?
   yearLevels      YearLevel[]
   sections        Section[]
-  userRoles       UserRole[]
-  sanctionRules   SanctionRule[]
-  events          Event[]
+   userRoles       UserRole[]
+   events          Event[]
   announcements   Announcement[]
 }
 
@@ -117,10 +116,9 @@ model YearLevel {
   level         Int
   program       Program         @relation(fields: [programId], references: [id])
   sections      Section[]
-  userRoles     UserRole[]
-  sanctionRules SanctionRule[]
+   userRoles     UserRole[]
 
-  @@unique([programId, level])
+   @@unique([programId, level])
 }
 
 model Section {
@@ -131,10 +129,9 @@ model Section {
   program       Program?        @relation(fields: [programId], references: [id])
   programYear   YearLevel       @relation(fields: [programYearId], references: [id])
   students      Student[]
-  userRoles     UserRole[]
-  sanctionRules SanctionRule[]
+   userRoles     UserRole[]
 
-  @@unique([programYearId, name])
+   @@unique([programYearId, name])
 }
 
 model Student {
@@ -143,8 +140,11 @@ model Student {
   studentNo   String     @unique
   firstName   String
   lastName    String
+  suffix      String?
   sectionId   String?
   suspended   Boolean    @default(false)
+  imageUrl    String?
+  imagePath   String?
   section     Section?   @relation(fields: [sectionId], references: [id])
   user        User       @relation(fields: [userId], references: [id])
   attendances Attendance[]
@@ -288,30 +288,9 @@ model Attendance {
   @@index([scannedAt])
 }
 
-model SanctionRule {
-  id               String         @id @default(cuid())
-  scopeType        ScopeType      @default(FACULTY)
-  programId        String?
-  programYearId    String?
-  sectionId        String?
-  absenceThreshold Int
-  period           PeriodType     @default(SEMESTER)
-  action           SanctionAction @default(FLAG_FOR_REVIEW)
-  active           Boolean        @default(true)
-  program          Program?       @relation(fields: [programId], references: [id])
-  programYear      YearLevel?     @relation(fields: [programYearId], references: [id])
-  section          Section?       @relation(fields: [sectionId], references: [id])
-  flags            SanctionFlag[]
-  sanctions        Sanction[]
-
-  @@index([active])
-  @@index([scopeType])
-}
-
 model Sanction {
   id           String           @id @default(cuid())
   studentId    String
-  ruleId       String?
   title        String
   reason       String
   status       SanctionStatus   @default(OPEN)
@@ -320,16 +299,29 @@ model Sanction {
   resolvedById String?
   resolvedAt   DateTime?
   resolvedNote String?
+  fineId       String?
+  fine         SanctionFine?    @relation(fields: [fineId], references: [id])
   student      Student          @relation(fields: [studentId], references: [id])
-  rule         SanctionRule?    @relation(fields: [ruleId], references: [id])
   issuedBy     User?            @relation("SanctionIssuedBy", fields: [issuedById], references: [id])
   resolvedBy   User?            @relation("SanctionResolvedBy", fields: [resolvedById], references: [id])
   evidences    SanctionEvidence[]
 
   @@index([studentId])
-  @@index([ruleId])
   @@index([status])
   @@index([issuedAt])
+  @@index([fineId])
+}
+
+model SanctionFine {
+  id           String   @id @default(cuid())
+  absenceCount Int      @unique
+  title        String
+  description   String
+  updatedAt     DateTime @updatedAt
+
+  sanctions    Sanction[]
+
+  @@index([absenceCount])
 }
 
 model SanctionEvidence {
@@ -346,7 +338,6 @@ model SanctionEvidence {
 model SanctionFlag {
   id           String     @id @default(cuid())
   studentId    String
-  ruleId       String
   periodRef    String
   triggerCount Int
   status       FlagStatus @default(PENDING)
@@ -354,10 +345,9 @@ model SanctionFlag {
   reviewedAt   DateTime?
   createdAt    DateTime   @default(now())
   student      Student    @relation(fields: [studentId], references: [id])
-  rule         SanctionRule @relation(fields: [ruleId], references: [id])
   reviewedBy   User?      @relation(fields: [reviewedById], references: [id])
 
-  @@index([studentId, ruleId, periodRef])
+  @@index([studentId, periodRef])
   @@index([status])
 }
 

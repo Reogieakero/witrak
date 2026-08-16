@@ -92,7 +92,9 @@ function summaryFor(action: string, details: Record<string, unknown>): string {
     case "SCOPE_CHANGED":
       return typeof details.to === "string" ? `→ ${String(details.to)}` : "scope changed";
     case "SANCTION_CREATED":
-      return typeof details.rule === "string" ? `auto-issued · ${String(details.rule)}` : "auto-issued";
+      return typeof details.absences === "number"
+        ? `auto-issued · ${details.absences} absences`
+        : "auto-issued";
     case "SANCTION_RESOLVED":
       return "cleared";
     case "FLAG_DISMISSED":
@@ -140,7 +142,7 @@ function targetDetailFor(
 
 export default async function AdminAuditLogPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
   if (!hasPermission(access, "audit_view")) redirect("/dashboard");

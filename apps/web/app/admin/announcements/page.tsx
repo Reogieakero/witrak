@@ -26,7 +26,7 @@ function formatDateTime(d: Date): string {
 
 export default async function AdminAnnouncementsPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
   if (!hasPermission(access, "announcements_view")) redirect("/dashboard");

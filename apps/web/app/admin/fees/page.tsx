@@ -36,7 +36,7 @@ function toInputDate(d: Date): string {
 
 export default async function AdminFeesPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
   if (!hasPermission(access, "fees_view")) redirect("/dashboard");
