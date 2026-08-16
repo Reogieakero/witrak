@@ -12,7 +12,6 @@ import { StudentSanctions } from "@/app/components/student/student-sanctions";
 import { StudentFees } from "@/app/components/student/student-fees";
 import { StudentQuickLinks } from "@/app/components/student/student-quick-links";
 import { StudentKpiOverview } from "@/app/components/student/student-kpi-overview";
-import { EventsModalProvider } from "@/app/components/student/events-modal-context";
 import type { StudentHomeData } from "@/app/components/student/types";
 import styles from "./student-home.module.css";
 
@@ -357,19 +356,26 @@ export default async function StudentHomeView({
         transparencyCount={data.transparencyCount}
       />
 
-      <EventsModalProvider>
-        <div className={styles.dashGrid}>
+      <div className={styles.dashGrid}>
           <div className={styles.leftCol}>
             <div className={styles.halfGrid}>
-              <StudentAnnouncements announcements={data.announcements} />
-              <StudentEvents events={data.events} />
+              <div id="section-announcements" className={styles.section}>
+                <StudentAnnouncements announcements={data.announcements} />
+              </div>
+              <div id="section-events" className={styles.section}>
+                <StudentEvents events={data.events} />
+              </div>
             </div>
-            <StudentAttendance attendance={data.attendance} />
-            <StudentTransparency
-              items={data.transparency}
-              allItems={data.transparencyAll}
-              count={data.transparencyCount}
-            />
+            <div id="section-attendance" className={styles.section}>
+              <StudentAttendance attendance={data.attendance} />
+            </div>
+            <div id="section-transparency" className={styles.section}>
+              <StudentTransparency
+                items={data.transparency}
+                allItems={data.transparencyAll}
+                count={data.transparencyCount}
+              />
+            </div>
           </div>
 
           <div className={styles.rightCol}>
@@ -381,7 +387,6 @@ export default async function StudentHomeView({
             <StudentQuickLinks />
           </div>
         </div>
-      </EventsModalProvider>
     </StudentShell>
   );
 }

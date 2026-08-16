@@ -4,8 +4,8 @@ import styles from "./faq.module.css";
 
 const ITEMS = [
   {
-    q: "Does FHUSOCOM replace our existing spreadsheets?",
-    a: "Yes. Events, attendance, fees, sanctions, and reports all live in FHUSOCOM — one source of truth instead of files scattered across group chats and folders.",
+    q: "Does Liberalis replace our existing spreadsheets?",
+    a: "Yes. Events, attendance, fees, sanctions, and reports all live in Liberalis — one source of truth instead of files scattered across group chats and folders.",
   },
   {
     q: "Who can see a student's sanction records?",
@@ -25,7 +25,7 @@ const ITEMS = [
   },
   {
     q: "How are officer accounts created?",
-    a: "The Super Admin provisions accounts with roles on day one. Students are linked to their records during setup, so there's no self-registration chaos.",
+    a: "The Supreme provisions accounts with roles on day one. Students are linked to their records during setup, so there's no self-registration chaos.",
   },
 ];
 

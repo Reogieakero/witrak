@@ -199,7 +199,7 @@ export default async function AdminEventsPage() {
 
   const userName = user?.name ?? "Officer";
   const isSuperAdmin = user?.roles.some((r) => r.role.name === "Super Admin") ?? false;
-  const roleLabel = isSuperAdmin ? "Super Admin" : (user?.roles[0]?.role.name ?? "Officer");
+  const roleLabel = isSuperAdmin ? "Supreme" : (user?.roles[0]?.role.name ?? "Officer");
 
   return (
     <AdminShell userName={userName} roleLabel={roleLabel}>

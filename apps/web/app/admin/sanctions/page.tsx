@@ -181,7 +181,7 @@ export default async function AdminSanctionsPage() {
   const isSuperAdmin =
     user?.roles.some((r) => r.role.name === "Super Admin") ?? false;
   const roleLabel = isSuperAdmin
-    ? "Super Admin"
+    ? "Supreme"
     : user?.roles[0]?.role.name ?? "Officer";
 
   return (

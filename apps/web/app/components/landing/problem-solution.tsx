@@ -20,7 +20,7 @@ const ITEMS = [
   },
   {
     icon: CheckCircle2,
-    title: "FHUSOCOM keeps it together",
+    title: "Liberalis keeps it together",
     text: "Every record digital, current, and visible to exactly the right role — in one place.",
   },
 ];

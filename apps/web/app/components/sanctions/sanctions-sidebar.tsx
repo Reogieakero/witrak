@@ -43,7 +43,7 @@ export function SanctionsSidebar({ fines }: { fines: SanctionFineRow[] }) {
         </div>
         <p className={styles.policyText}>
           When a student reaches an absence count, a sanction is issued automatically
-          and tied to the requirement for that count. The admin or president clears it
+          and tied to the requirement for that count. The supreme clears it
           once the student meets the requirement. Only the admin, the Discipline
           Officer, and the student involved can see these records.
         </p>

@@ -3,7 +3,7 @@
 import { isValidElement, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GraduationCap, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { MAIN_NAV, SYSTEM_NAV } from "@/lib/constants/dashboard";
 import { savePersistedView, saveViewSnapshot } from "@/lib/view-store";
 import {
@@ -14,16 +14,6 @@ import {
 import { fetchSidebarBadges, setSectionSeen } from "@/app/admin/badges/actions";
 import { UserMenu } from "./user-menu";
 import styles from "./admin-shell.module.css";
-
-function initials(name: string): string {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 type AdminShellProps = {
   userName: string;
@@ -87,7 +77,24 @@ export function AdminShell({
     }
   }, [pathname, children, userName, roleLabel, isSuperAdmin, snapshot]);
 
-  const canManagePrograms = isSuperAdmin || roleLabel === "Super Admin";
+  const canManagePrograms = isSuperAdmin || roleLabel === "Supreme";
+
+  const PAGE_TITLES: Record<string, string> = {
+    "/admin/dashboard": "Dashboard",
+    "/admin/events": "Events",
+    "/admin/attendance": "Attendance",
+    "/admin/transparency": "Transparency",
+    "/admin/sanctions": "Sanctions",
+    "/admin/fees": "Fees",
+    "/admin/announcements": "Announcements",
+    "/admin/members": "Members",
+    "/admin/students": "Students",
+    "/admin/audit-log": "Audit Log",
+  };
+  const currentPage =
+    Object.entries(PAGE_TITLES).find(
+      ([p]) => pathname === p || pathname.startsWith(`${p}/`),
+    )?.[1] ?? "Dashboard";
 
   const isActive = (href: string) =>
     href !== "#" && (pathname === href || pathname.startsWith(`${href}/`));
@@ -99,9 +106,9 @@ export function AdminShell({
       <aside className={`${styles.sidebar} ${open ? styles.sidebarOpen : ""}`}>
         <div className={styles.sidebarBrand}>
           <span className={styles.brandLogo}>
-            <GraduationCap size={14} />
+            <img src="/logo-favicon.png" alt="Liberalis" />
           </span>
-          <span className={styles.brandName}>FHUSOCOM</span>
+          <span className={styles.brandName}>Liberalis</span>
           <button
             type="button"
             className={styles.sidebarClose}
@@ -146,16 +153,6 @@ export function AdminShell({
             );
           })}
         </nav>
-
-        <div className={styles.sidebarFooter}>
-          <div className={styles.userChip}>
-            <span className={styles.userAvatar}>{initials(userName)}</span>
-            <span className={styles.userMeta}>
-              <span className={styles.userName}>{userName}</span>
-              <span className={styles.userRole}>{roleLabel}</span>
-            </span>
-          </div>
-        </div>
       </aside>
 
       <div className={styles.content}>
@@ -169,9 +166,9 @@ export function AdminShell({
             >
               <Menu size={20} />
             </button>
-            <span className={styles.crumbRoot}>FHUSOCOM Admin</span>
+            <span className={styles.crumbRoot}>Liberalis</span>
             <span className={styles.crumbSep}>/</span>
-            <span className={styles.crumbCurrent}>Dashboard</span>
+            <span className={styles.crumbCurrent}>{currentPage}</span>
           </div>
 
           <div className={styles.headerRight}>

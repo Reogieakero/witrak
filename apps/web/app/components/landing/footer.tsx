@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { GraduationCap } from "lucide-react";
 import styles from "./footer.module.css";
 
 const PRODUCT = [
@@ -22,9 +21,9 @@ export function Footer() {
         <div className={styles.brandCol}>
           <span className={styles.brand}>
             <span className={styles.logo}>
-              <GraduationCap size={16} />
+              <img src="/logo-favicon.png" alt="Liberalis" />
             </span>
-            FHUSOCOM
+            Liberalis
           </span>
           <p className={styles.desc}>
             Student Government Management System — built for transparency and
@@ -57,7 +56,7 @@ export function Footer() {
         </div>
       </div>
       <div className={styles.bottom}>
-        © {new Date().getFullYear()} FHUSOCOM. All rights reserved.
+        © {new Date().getFullYear()} Liberalis. All rights reserved.
       </div>
     </footer>
   );

@@ -70,7 +70,7 @@ export function AttendanceHeader({
                 assigned sections.
               </li>
               <li>
-                <strong>Correct</strong> — Only Super Admins and Secretaries can
+                <strong>Correct</strong> — Only the Supreme and Secretaries can
                 edit or correct records.
               </li>
             </ul>

@@ -312,7 +312,7 @@ export default async function AdminAttendancePage() {
         canEdit,
         userName: user?.name ?? "Officer",
         roleLabel: user?.roles.some((r) => r.role.name === "Super Admin")
-          ? "Super Admin"
+          ? "Supreme"
           : (user?.roles[0]?.role.name ?? "Officer"),
       };
     },

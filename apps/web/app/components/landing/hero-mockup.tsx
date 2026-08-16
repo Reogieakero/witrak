@@ -33,13 +33,13 @@ export function HeroMockup() {
           <span className={styles.dotRed} />
           <span className={styles.dotAmber} />
           <span className={styles.dotGreen} />
-          <div className={styles.url}>fhusocom.app/dashboard</div>
+          <div className={styles.url}>liberalis.app/dashboard</div>
         </div>
 
         <div className={styles.body}>
           <div className={styles.greeting}>
             <div>
-              <div className={styles.greetingTitle}>Good day, President</div>
+              <div className={styles.greetingTitle}>Good day, Supreme</div>
               <div className={styles.greetingSub}>
                 Wednesday, August 12 · SY 2026
               </div>

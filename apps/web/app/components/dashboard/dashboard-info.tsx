@@ -31,7 +31,7 @@ const SECTIONS: Section[] = [
   {
     icon: UserPlus,
     title: "Role Requests",
-    text: "Students applying to be Year/Program Reps that are waiting for the Super Admin to approve and assign their area.",
+    text: "Students applying to be Year/Program Reps that are waiting for the Supreme to approve and assign their area.",
   },
   {
     icon: Zap,
@@ -67,7 +67,7 @@ export function DashboardInfo() {
 
       <Modal open={open} onClose={() => setOpen(false)} title="About this dashboard">
         <p className={styles.intro}>
-          This dashboard gives officers and Super Admins a single view of the organization&apos;s
+          This dashboard gives officers and the Supreme a single view of the organization&apos;s
           operations. Here is what each section shows:
         </p>
         <ul className={styles.list}>

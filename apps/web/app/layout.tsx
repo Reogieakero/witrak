@@ -12,8 +12,11 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "FHUSOCOM",
+  title: "Liberalis",
   description: "Student Government Management System",
+  icons: {
+    icon: "/logo-favicon.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

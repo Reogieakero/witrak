@@ -9,6 +9,7 @@ const PUBLIC_PREFIXES = [
   "/login",
   "/auth",
   "/api/auth",
+  "/api/mobile",
   "/api/openapi",
   "/docs",
   "/_next",
@@ -67,5 +68,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api/auth|api/openapi|docs|_next/static|_next/image|favicon.ico|login).*)"],
+  matcher: ["/((?!api/auth|api/openapi|api/mobile|docs|_next/static|_next/image|favicon.ico|login).*)"],
 };

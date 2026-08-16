@@ -80,7 +80,7 @@ export function OfficerLoginForm() {
             type="email"
             autoComplete="email"
             required
-            placeholder="you@fhusocom.edu"
+            placeholder="you@liberalis.edu"
             className={styles.input}
           />
         </div>

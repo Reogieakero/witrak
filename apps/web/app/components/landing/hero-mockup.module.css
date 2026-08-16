@@ -5,7 +5,7 @@
 .frame {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface-card);
   box-shadow: 0 20px 50px -20px rgba(15, 23, 42, 0.25);
   overflow: hidden;
 }

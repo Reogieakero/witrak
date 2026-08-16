@@ -68,7 +68,7 @@ export function AuditLogSidebar({ entries, stats }: AuditLogSidebarProps) {
         </h3>
         <div className={styles.list}>
           <div className={styles.accessRow}>
-            <span className={styles.accessRole}>Super Admin</span>
+            <span className={styles.accessRole}>Supreme</span>
             <span className={styles.accessKey}>
               <ShieldCheck size={11} />
               Can view
@@ -82,7 +82,7 @@ export function AuditLogSidebar({ entries, stats }: AuditLogSidebarProps) {
           ))}
         </div>
         <p className={styles.accessNote}>
-          Only the Super Admin can view this log.
+          Only the Supreme can view this log.
         </p>
       </div>
 
@@ -104,7 +104,7 @@ export function AuditLogSidebar({ entries, stats }: AuditLogSidebarProps) {
           ))}
         </div>
         <p className={styles.accessNote}>
-          Every action by the Super Admin is recorded here automatically.
+          Every action by the Supreme is recorded here automatically.
         </p>
       </div>
     </aside>

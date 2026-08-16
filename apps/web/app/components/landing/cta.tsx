@@ -13,7 +13,7 @@ export function Cta() {
           </h2>
           <p className={styles.text}>
             Get started now, or sign in if your organization is already on
-            FHUSOCOM.
+            Liberalis.
           </p>
           <div className={styles.actions}>
             <Button href="/login/students" variant="white">

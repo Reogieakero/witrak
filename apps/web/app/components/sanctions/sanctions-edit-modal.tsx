@@ -55,7 +55,7 @@ export function EditModal({
           <p className={styles.note}>
             <Info size={12} className={styles.flexNone} />
             <span>
-              Edits are restricted to the admin / president. The absences, rule, evidence, and
+              Edits are restricted to the supreme. The absences, rule, evidence, and
               outcome are unchanged.
             </span>
           </p>

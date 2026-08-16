@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { BreathingLogo } from "./breathing-logo";
 import styles from "./loading-overlay.module.css";
 
 export function LoadingOverlay({
@@ -14,8 +14,8 @@ export function LoadingOverlay({
   return (
     <div className={styles.overlay} role="status" aria-live="polite">
       <div className={styles.card}>
-        <span className={styles.spinnerWrap}>
-          <Loader2 size={22} className={styles.spinner} />
+        <span className={styles.logoWrap}>
+          <BreathingLogo size={52} />
         </span>
         <span className={styles.label}>{label}</span>
       </div>

@@ -257,12 +257,10 @@ export default async function DashboardView() {
 
     const eventTrend = [...latestEvents].reverse().map((e) => {
       const rows = attendanceRows.filter((a) => a.eventId === e.id);
-      return {
-        name: e.title,
-        present: rows.filter((a) => a.status === "PRESENT").length,
-        absent: rows.filter((a) => a.status === "ABSENT").length,
-        late: rows.filter((a) => a.status === "LATE").length,
-      };
+      const present = rows.filter((a) => a.status === "PRESENT").length;
+      const late = rows.filter((a) => a.status === "LATE").length;
+      const absent = Math.max(0, expectedForEvent(e.id) - present - late);
+      return { name: e.title, present, absent, late };
     });
 
     const PROGRAM_ORDER: Record<string, number> = {
@@ -403,7 +401,7 @@ export default async function DashboardView() {
   const sectionById = new Map<string, ScopedSection>(Object.entries(sectionByIdRecord));
   const yearById = new Map<string, ScopedYearLevel>(Object.entries(yearByIdRecord));
   const roleLabel = isSuperAdmin
-    ? "Super Admin"
+    ? "Supreme"
     : (userWithRoles?.roles[0]?.role.name ?? "Officer");
   const userName = userWithRoles?.name ?? "Officer";
 

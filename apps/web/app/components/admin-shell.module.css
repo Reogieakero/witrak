@@ -49,14 +49,20 @@
 }
 
 .brandLogo {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 0.25rem;
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  color: #fff;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.35rem;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.brandLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .brandName {

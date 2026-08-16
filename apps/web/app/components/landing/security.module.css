@@ -46,7 +46,7 @@
 }
 
 .panel {
-  background: var(--brand-800);
+  background: var(--brand-gradient);
   color: #fff;
   border-radius: 8px;
   padding: 2rem;
@@ -84,7 +84,7 @@
 }
 
 .viewAccess {
-  color: var(--brand-200);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 700;
   text-align: right;
 }

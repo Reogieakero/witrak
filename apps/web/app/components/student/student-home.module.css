@@ -26,6 +26,10 @@
   align-items: start;
 }
 
+.section {
+  scroll-margin-top: 5rem;
+}
+
 .rightCol {
   min-width: 0;
   display: flex;

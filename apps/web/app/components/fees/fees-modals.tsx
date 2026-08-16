@@ -573,7 +573,7 @@ function PaymentMethodModal({
             name="accountName"
             value={accountName}
             onChange={(e) => setAccountName(e.target.value)}
-            placeholder="e.g. Fhusocom Org / Juan Dela Cruz"
+            placeholder="e.g. Liberalis Org / Juan Dela Cruz"
             className={styles.input}
           />
         </div>

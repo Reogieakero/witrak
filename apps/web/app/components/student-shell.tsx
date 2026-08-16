@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GraduationCap } from "lucide-react";
 import { UserMenu } from "./user-menu";
 import { StudentProfileModal } from "./student/student-profile-modal";
+import { StudentMobileNav } from "./student/student-mobile-nav";
+import { EventsModalProvider } from "./student/events-modal-context";
 import { getStudentAvatar } from "@/app/dashboard/profile/actions";
 import styles from "./student-shell.module.css";
 
@@ -29,15 +30,16 @@ export function StudentShell({ userName, roleLabel, crumb, children }: StudentSh
   }, []);
 
   return (
-    <div className={styles.shell}>
+    <EventsModalProvider>
+      <div className={styles.shell}>
       <div className={styles.content}>
         <header className={styles.header}>
           <div className={styles.headerLeft}>
             <span className={styles.brand}>
               <span className={styles.brandLogo}>
-                <GraduationCap size={14} />
+                <img src="/logo-favicon.png" alt="Liberalis" />
               </span>
-              <span className={styles.crumbRoot}>FHUSOCOM Student</span>
+              <span className={styles.crumbRoot}>Liberalis Student</span>
             </span>
             <span className={styles.crumbSep}>/</span>
             <span className={styles.crumbCurrent}>{crumb}</span>
@@ -62,6 +64,9 @@ export function StudentShell({ userName, roleLabel, crumb, children }: StudentSh
         onClose={() => setProfileOpen(false)}
         onAvatarChange={setAvatarUrl}
       />
+
+      <StudentMobileNav />
     </div>
+    </EventsModalProvider>
   );
 }

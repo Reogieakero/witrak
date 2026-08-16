@@ -18,7 +18,7 @@
   padding: 0.625rem 1.25rem;
   border-radius: 8px;
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface-card);
   color: var(--ink-600);
   font-weight: 600;
   font-size: 0.875rem;
@@ -104,7 +104,7 @@
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--brand-700);
-  background: #fff;
+  background: var(--surface-card);
   border: 1px solid var(--brand-200);
   padding: 0.25rem 0.5rem;
   border-radius: 8px;

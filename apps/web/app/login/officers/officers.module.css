@@ -59,15 +59,20 @@
 }
 
 .brandLogo {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+}
+
+.brandLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .brandName {
@@ -195,14 +200,20 @@
 }
 
 .mobileLogo {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--brand-gradient);
-  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.mobileLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .backLink {

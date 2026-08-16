@@ -5,7 +5,6 @@ import {
   CalendarDays,
   ChevronDown,
   FlaskConical,
-  GraduationCap,
   Landmark,
   ShieldAlert,
   Star,
@@ -29,7 +28,7 @@ const FEATURES = [
 ];
 
 const DEMO_ROLES = [
-  { role: "Super Admin", desc: "Faculty-wide access, manages roles" },
+  { role: "Supreme", desc: "Faculty-wide access, manages roles" },
   { role: "Secretary", desc: "Events, attendance, announcements" },
   { role: "Treasurer", desc: "Fees, payment verification, reports" },
   { role: "Discipline Officer", desc: "Private sanctions and appeals" },
@@ -45,9 +44,9 @@ export default function OfficersLoginPage() {
         <div className={styles.brandTop}>
           <Link href="/" className={styles.brand}>
             <span className={styles.brandLogo}>
-              <GraduationCap size={18} />
+              <img src="/logo-favicon.png" alt="Liberalis" />
             </span>
-            <span className={styles.brandName}>FHUSOCOM</span>
+            <span className={styles.brandName}>Liberalis</span>
           </Link>
 
           <h1 className={styles.brandHeadline}>
@@ -91,12 +90,12 @@ export default function OfficersLoginPage() {
       </aside>
 
       <div className={styles.formPanel}>
-        <Link href="/" className={styles.mobileBrand}>
-          <span className={styles.mobileLogo}>
-            <GraduationCap size={16} />
-          </span>
-          FHUSOCOM
-        </Link>
+          <Link href="/" className={styles.mobileBrand}>
+            <span className={styles.mobileLogo}>
+              <img src="/logo-favicon.png" alt="Liberalis" />
+            </span>
+            Liberalis
+          </Link>
 
         <Link href="/" className={styles.backLink}>
           <ArrowLeft size={14} />
@@ -106,7 +105,7 @@ export default function OfficersLoginPage() {
         <div className={styles.inner}>
           <h2 className={styles.title}>Welcome back</h2>
           <p className={styles.subtitle}>
-            Sign in to the FHUSOCOM Officer Portal to continue.
+            Sign in to the Liberalis Officer Portal to continue.
           </p>
 
           <Suspense fallback={null}>
@@ -114,7 +113,7 @@ export default function OfficersLoginPage() {
           </Suspense>
 
           <p className={styles.note}>
-            Super Admin, Secretary, Treasurer, Discipline Officer, or Year Rep
+            Supreme, Secretary, Treasurer, Discipline Officer, or Year Rep
             account? Contact your school administrator for access.
           </p>
 
@@ -136,7 +135,7 @@ export default function OfficersLoginPage() {
         </div>
 
         <p className={styles.copyright}>
-          &copy; {new Date().getFullYear()} FHUSOCOM. All rights reserved.
+          &copy; {new Date().getFullYear()} Liberalis. All rights reserved.
         </p>
       </div>
     </main>

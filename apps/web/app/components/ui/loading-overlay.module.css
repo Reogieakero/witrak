@@ -20,7 +20,7 @@
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
 }
 
-.spinnerWrap {
+.logoWrap {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -28,21 +28,10 @@
   border-radius: 0.625rem;
   background: var(--brand-50);
   border: 1px solid var(--brand-100);
-  color: var(--brand-600);
-}
-
-.spinner {
-  animation: spin 0.9s linear infinite;
 }
 
 .label {
   font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-strong);
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }

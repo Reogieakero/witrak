@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
-import { GraduationCap } from "lucide-react";
 import { prisma } from "@fhusocom/db";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { CompleteProfileForm } from "./complete-profile-form";
@@ -72,9 +71,9 @@ export default async function CompleteProfilePage() {
       <div className={styles.card}>
         <div className={styles.brandRow}>
           <span className={styles.logo}>
-            <GraduationCap size={20} />
+            <img src="/logo-favicon.png" alt="Liberalis" />
           </span>
-          <span className={styles.brandName}>FHUSOCOM</span>
+          <span className={styles.brandName}>Liberalis</span>
         </div>
 
         <h1 className={styles.title}>Complete your student profile</h1>

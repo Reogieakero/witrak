@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { GraduationCap, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import styles from "./navbar.module.css";
 
@@ -22,9 +22,9 @@ export function Navbar() {
       <div className={styles.container}>
         <Link href="/" className={styles.brand}>
           <span className={styles.logo}>
-            <GraduationCap size={16} />
+            <img src="/logo-favicon.png" alt="Liberalis" />
           </span>
-          FHUSOCOM
+          Liberalis
         </Link>
 
         <nav className={styles.links}>

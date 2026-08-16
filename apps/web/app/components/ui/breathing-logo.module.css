@@ -1,0 +1,26 @@
+.breathing {
+  display: block;
+  object-fit: contain;
+  animation: breathe 1.6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(0.86);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .breathing {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+}

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { GraduationCap } from "lucide-react";
 import { RegisterForm } from "@/app/components/register-form";
 import styles from "./register.module.css";
 
@@ -9,9 +8,9 @@ export default function RegisterPage() {
       <div className={styles.card}>
         <div className={styles.brandRow}>
           <span className={styles.logo}>
-            <GraduationCap size={20} />
+            <img src="/logo-favicon.png" alt="Liberalis" />
           </span>
-          <span className={styles.brandName}>FHUSOCOM</span>
+          <span className={styles.brandName}>Liberalis</span>
         </div>
 
         <h1 className={styles.title}>Create your student account</h1>

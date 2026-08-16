@@ -12,7 +12,7 @@ import styles from "./roles.module.css";
 const ROLES = [
   {
     icon: Crown,
-    title: "Super Admin",
+    title: "Supreme",
     text: "Full oversight of roles, permissions, and every record in the system.",
   },
   {

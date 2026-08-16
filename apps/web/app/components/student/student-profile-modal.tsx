@@ -60,7 +60,7 @@ export function StudentProfileModal({
 
   const qrValue = profile
     ? [
-        "FHUSOCOM Student ID",
+        "Liberalis Student ID",
         `Name: ${profile.firstName} ${profile.lastName}${profile.suffix ? ` ${profile.suffix}` : ""}`,
         `Student No: ${profile.studentNo}`,
         `Section: ${profile.sectionLabel}`,
@@ -284,7 +284,7 @@ export function StudentProfileModal({
             <span>{profile.sectionLabel}</span>
           </div>
           <p className={styles.qrHint}>
-            Present this code when attending FHUSOCOM activities for quick identity
+            Present this code when attending Liberalis activities for quick identity
             scanning.
           </p>
         </div>

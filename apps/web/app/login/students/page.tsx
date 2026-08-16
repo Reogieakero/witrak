@@ -36,9 +36,9 @@ export default function StudentsLoginPage() {
         <div className={styles.brandTop}>
           <Link href="/" className={styles.brand}>
             <span className={styles.brandLogo}>
-              <GraduationCap size={18} />
+              <img src="/logo-favicon.png" alt="Liberalis" />
             </span>
-            <span className={styles.brandName}>FHUSOCOM</span>
+            <span className={styles.brandName}>Liberalis</span>
           </Link>
 
           <h1 className={styles.brandHeadline}>
@@ -83,9 +83,9 @@ export default function StudentsLoginPage() {
       <div className={styles.formPanel}>
         <Link href="/" className={styles.mobileBrand}>
           <span className={styles.mobileLogo}>
-            <GraduationCap size={16} />
+            <img src="/logo-favicon.png" alt="Liberalis" />
           </span>
-          FHUSOCOM
+          Liberalis
         </Link>
 
         <Link href="/" className={styles.backLink}>
@@ -127,7 +127,7 @@ export default function StudentsLoginPage() {
         </div>
 
         <p className={styles.copyright}>
-          &copy; {new Date().getFullYear()} FHUSOCOM. All rights reserved.
+          &copy; {new Date().getFullYear()} Liberalis. All rights reserved.
         </p>
       </div>
     </main>
