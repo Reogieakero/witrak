@@ -5,6 +5,7 @@ import { money } from "@/lib/constants/dashboard";
 import { getTermContext } from "@/lib/terms";
 import { StudentShell } from "@/app/components/student-shell";
 import { StudentFeesPage } from "@/app/components/student/student-fees-page";
+import { StudentSuspended } from "@/app/components/student/student-suspended";
 
 function fmtDate(d: Date): string {
   return d.toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" });
@@ -16,9 +17,18 @@ export default async function StudentFeesRoute() {
 
   const student = await prisma.student.findUnique({
     where: { userId: session.user.id },
-    select: { id: true },
+    select: { id: true, suspended: true },
   });
   if (!student) redirect("/admin/dashboard");
+
+  // Suspended accounts get no access to the fees page.
+  if (student.suspended) {
+    return (
+      <StudentShell userName={session.user.name ?? "Student"} roleLabel="Student" crumb="My Fees">
+        <StudentSuspended />
+      </StudentShell>
+    );
+  }
 
   await getTermContext();
 

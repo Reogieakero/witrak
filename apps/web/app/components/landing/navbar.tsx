@@ -39,7 +39,7 @@ export function Navbar() {
           <Link href="/login/students" className={styles.signIn}>
             Sign in
           </Link>
-          <Button href="/login/students" size="sm">
+          <Button href="/login/students" size="sm" className={styles.headerCta}>
             Get started
           </Button>
           <button

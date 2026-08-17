@@ -46,7 +46,22 @@
 @media (max-width: 640px) {
   .banner {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+  }
+
+  .actions {
+    width: 100%;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .bannerBtn {
+    width: 100%;
+    justify-content: center;
+    white-space: normal;
   }
 }
 

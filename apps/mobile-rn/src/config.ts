@@ -1,0 +1,5 @@
+export const AppConfig = {
+  supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL as string,
+  supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY as string,
+  apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL as string,
+};

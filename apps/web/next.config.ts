@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  supportsImmutableAssets: false,
   transpilePackages: ["@fhusocom/db"],
   serverExternalPackages: ["@prisma/client"],
   experimental: {

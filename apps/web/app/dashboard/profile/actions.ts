@@ -30,6 +30,7 @@ async function getCurrentStudent() {
     select: {
       id: true,
       userId: true,
+      suspended: true,
       studentNo: true,
       firstName: true,
       lastName: true,
@@ -85,6 +86,7 @@ export async function updateStudentProfile(input: {
 }): Promise<ProfileActionResult> {
   const student = await getCurrentStudent();
   if (!student) return { ok: false, error: "Student record not found." };
+  if (student.suspended) return { ok: false, error: "Account suspended." };
 
   const firstName = input.firstName.trim();
   const lastName = input.lastName.trim();
@@ -108,6 +110,7 @@ export async function uploadStudentAvatar(
 ): Promise<ProfileActionResult & { imageUrl?: string }> {
   const student = await getCurrentStudent();
   if (!student) return { ok: false, error: "Student record not found." };
+  if (student.suspended) return { ok: false, error: "Account suspended." };
 
   const file = formData.get("file") as File | null;
   if (!file || file.size === 0) return { ok: false, error: "Please choose an image." };

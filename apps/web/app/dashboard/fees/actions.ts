@@ -25,10 +25,13 @@ export async function uploadFeeProofAction(
 
   const student = await prisma.student.findUnique({
     where: { userId: session.user.id },
-    select: { id: true },
+    select: { id: true, suspended: true },
   });
   if (!student) {
     return { ok: false, error: "Student record not found." };
+  }
+  if (student.suspended) {
+    return { ok: false, error: "Your account is suspended and cannot submit payments." };
   }
 
   const feeId = String(formData.get("feeId") ?? "").trim();

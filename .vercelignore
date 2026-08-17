@@ -1,0 +1,10 @@
+node_modules
+.next
+apps/web/.next
+apps/mobile/build
+apps/mobile/.dart_tool
+apps/mobile/.idea
+apps/mobile/.gradle
+apps/mobile/android/.gradle
+admin-ui
+student-ui

@@ -1,6 +1,6 @@
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
 }
 
@@ -621,6 +621,12 @@
   text-decoration: underline;
 }
 
+@media (max-width: 960px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 640px) {
   .pageHeader {
     align-items: flex-start;
@@ -632,6 +638,12 @@
   }
 
   .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 400px) {
+  .statsGrid {
     grid-template-columns: 1fr;
   }
 }

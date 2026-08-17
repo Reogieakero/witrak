@@ -71,17 +71,20 @@
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-strong);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .tileSub {
   font-size: 0.625rem;
   color: var(--text-faint);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+@media (max-width: 400px) {
+  .tileLabel,
+  .tileSub {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
 }
 
 :global([data-theme="dark"]) .tile:hover .tileIcon {

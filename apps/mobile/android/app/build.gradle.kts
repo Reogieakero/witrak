@@ -5,10 +5,16 @@ plugins {
 }
 
 val keystorePropertiesFile = rootProject.file("key.properties")
-val keystoreProperties = java.util.Properties().apply {
-    if (keystorePropertiesFile.exists()) load(keystorePropertiesFile.inputStream())
+val keystoreProps = mutableMapOf<String, String>()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.readLines()
+        .filter { it.contains("=") && !it.trimStart().startsWith("#") }
+        .forEach { line ->
+            val parts = line.split("=", limit = 2)
+            keystoreProps[parts[0].trim()] = parts[1].trim()
+        }
 }
-val useUploadKey = keystoreProperties.getProperty("storeFile") != null
+val useUploadKey = keystoreProps["storeFile"] != null
 
 android {
     namespace = "edu.fhusocom.fhusocom_mobile"
@@ -38,10 +44,10 @@ android {
     signingConfigs {
         if (useUploadKey) {
             create("release") {
-                storeFile = file(keystoreProperties.getProperty("storeFile")!!)
-                storePassword = keystoreProperties.getProperty("storePassword")
-                keyAlias = keystoreProperties.getProperty("keyAlias")
-                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = file(keystoreProps["storeFile"]!!)
+                storePassword = keystoreProps["storePassword"]
+                keyAlias = keystoreProps["keyAlias"]
+                keyPassword = keystoreProps["keyPassword"]
             }
         }
     }
@@ -49,6 +55,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
