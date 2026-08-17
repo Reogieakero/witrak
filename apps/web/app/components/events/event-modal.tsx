@@ -39,6 +39,12 @@ export function EventModal({
     event?.requiresAttendance ?? false,
   );
   const [scanPassword, setScanPassword] = useState(event?.scanPassword ?? "");
+  const [hasTimeInOut, setHasTimeInOut] = useState(
+    event?.hasTimeInOut ?? false,
+  );
+  const [lateGraceMinutes, setLateGraceMinutes] = useState(
+    event?.lateGraceMinutes ?? 15,
+  );
 
   useEffect(() => {
     const el = descRef.current;
@@ -229,7 +235,10 @@ export function EventModal({
             type="checkbox"
             name="requiresAttendance"
             checked={requiresAttendance}
-            onChange={(e) => setRequiresAttendance(e.target.checked)}
+            onChange={(e) => {
+              setRequiresAttendance(e.target.checked);
+              if (!e.target.checked) setHasTimeInOut(false);
+            }}
           />
           <span>Requires attendance (QR scan enabled)</span>
         </label>
@@ -265,6 +274,62 @@ export function EventModal({
               attendance for this event.
             </p>
           </div>
+        )}
+
+        {requiresAttendance && (
+          <label className={styles.check}>
+            <input
+              type="checkbox"
+              name="hasTimeInOut"
+              checked={hasTimeInOut}
+              onChange={(e) => setHasTimeInOut(e.target.checked)}
+            />
+            <span>Track time in and time out</span>
+          </label>
+        )}
+
+        {requiresAttendance && hasTimeInOut && (
+          <>
+            <div className={styles.fieldGrid}>
+              <div className={styles.field}>
+                <label className={styles.label}>Time in</label>
+                <TimePicker
+                  name="timeIn"
+                  value={event?.timeIn ?? event?.startsAt}
+                />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Time out</label>
+                <TimePicker
+                  name="timeOut"
+                  value={event?.timeOut ?? event?.endsAt}
+                />
+              </div>
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>
+                Allowed late time (minutes)
+              </label>
+              <input
+                type="number"
+                name="lateGraceMinutes"
+                min={0}
+                max={120}
+                value={lateGraceMinutes}
+                onChange={(e) =>
+                  setLateGraceMinutes(
+                    Math.max(0, Number.parseInt(e.target.value, 10) || 0),
+                  )
+                }
+                className={styles.input}
+              />
+              <p className={styles.hint}>
+                Minutes after time-in a student is still on time. Example:
+                time-in 10:00 with a 15-minute allowance means scans after
+                10:15 are marked LATE. Time out is when students scan out.
+              </p>
+            </div>
+          </>
         )}
 
         {isEdit && access.yearRep && (

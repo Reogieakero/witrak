@@ -43,6 +43,12 @@ export async function POST(request: Request) {
         scanPassword: true,
         startsAt: true,
         endsAt: true,
+        hasTimeInOut: true,
+        lateGraceMinutes: true,
+        timeIn: true,
+        timeOut: true,
+        programId: true,
+        program: { select: { name: true } },
       },
     });
 
@@ -85,7 +91,12 @@ export async function POST(request: Request) {
         lastName: true,
         suspended: true,
         sectionId: true,
-        section: { select: { name: true } },
+        section: {
+          select: {
+            name: true,
+            programYear: { select: { programId: true } },
+          },
+        },
         user: { select: { roles: { select: { id: true } } } },
       },
     });
@@ -95,6 +106,19 @@ export async function POST(request: Request) {
         { error: "Student not found or outside your scope." },
         { status: 404 },
       );
+    }
+
+    if (event.programId) {
+      const studentProgramId =
+        student.section?.programYear.programId ?? null;
+      if (studentProgramId !== event.programId) {
+        return NextResponse.json(
+          {
+            error: `This event is for ${event.program?.name ?? "a specific faculty"} only. This student is not part of that faculty.`,
+          },
+          { status: 403 },
+        );
+      }
     }
 
     if (student.suspended) {
@@ -120,6 +144,69 @@ export async function POST(request: Request) {
       }
     }
 
+    const now = new Date();
+    const mode = body?.mode === "checkout" ? "checkout" : "checkin";
+
+    const studentInfo = {
+      name: `${student.firstName} ${student.lastName}`.trim(),
+      studentNo: student.studentNo,
+      section: student.section?.name ?? null,
+    };
+
+    if (mode === "checkout") {
+      if (!event.hasTimeInOut) {
+        return NextResponse.json(
+          { error: "This event does not track check-out times." },
+          { status: 400 },
+        );
+      }
+      const existing = await prisma.attendance.findUnique({
+        where: {
+          eventId_studentId: { eventId, studentId: student.id },
+        },
+        select: { id: true, checkedOutAt: true },
+      });
+      if (!existing) {
+        return NextResponse.json(
+          { error: "This student has not checked in yet." },
+          { status: 400 },
+        );
+      }
+      if (existing.checkedOutAt) {
+        return NextResponse.json({
+          ok: true,
+          alreadyScanned: true,
+          mode,
+          message: "This student has already checked out.",
+          student: studentInfo,
+        });
+      }
+      await prisma.attendance.update({
+        where: { id: existing.id },
+        data: {
+          checkedOutAt: now,
+          scannedById: null,
+          scannedAt: now,
+        },
+      });
+      await recomputeSanctionTriggers(student.id);
+      await invalidateByPrefix("attendance:");
+      return NextResponse.json({
+        ok: true,
+        alreadyScanned: false,
+        mode,
+        message: "Check out recorded for this student.",
+        student: studentInfo,
+      });
+    }
+
+    const isLate =
+      event.hasTimeInOut &&
+      now.getTime() >
+        (event.timeIn ?? event.startsAt).getTime() +
+          (event.lateGraceMinutes ?? 0) * 60000;
+    const status = isLate ? "LATE" : "PRESENT";
+
     const existing = await prisma.attendance.findUnique({
       where: {
         eventId_studentId: { eventId, studentId: student.id },
@@ -127,15 +214,17 @@ export async function POST(request: Request) {
       select: { id: true, status: true },
     });
 
-    const alreadyScanned = existing?.status === "PRESENT";
+    const alreadyCheckedIn =
+      existing?.status === "PRESENT" || existing?.status === "LATE";
     if (existing) {
-      if (existing.status !== "PRESENT") {
+      if (!alreadyCheckedIn) {
         await prisma.attendance.update({
           where: { id: existing.id },
           data: {
-            status: "PRESENT",
+            status,
+            checkedInAt: now,
             scannedById: null,
-            scannedAt: new Date(),
+            scannedAt: now,
           },
         });
       }
@@ -144,9 +233,10 @@ export async function POST(request: Request) {
         data: {
           eventId,
           studentId: student.id,
-          status: "PRESENT",
+          status,
+          checkedInAt: now,
           scannedById: null,
-          scannedAt: new Date(),
+          scannedAt: now,
         },
       });
     }
@@ -156,17 +246,17 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       ok: true,
-      alreadyScanned,
-      message: alreadyScanned
+      alreadyScanned: alreadyCheckedIn,
+      mode,
+      status,
+      message: alreadyCheckedIn
         ? "This student is already checked in."
-        : existing
-          ? "Attendance recorded for this student."
-          : "Attendance recorded.",
-      student: {
-        name: `${student.firstName} ${student.lastName}`.trim(),
-        studentNo: student.studentNo,
-        section: student.section?.name ?? null,
-      },
+        : isLate
+          ? "Attendance recorded (late)."
+          : existing
+            ? "Attendance recorded for this student."
+            : "Attendance recorded.",
+      student: studentInfo,
     });
   } catch {
     return NextResponse.json(

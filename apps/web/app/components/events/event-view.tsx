@@ -19,6 +19,14 @@ export type EventViewProps = {
   onEdit?: () => void;
 };
 
+function formatTime(iso: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleTimeString("en-PH", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export function EventView({
   event,
   access,
@@ -101,6 +109,32 @@ export function EventView({
               <span className={styles.gridValue}>{event.scheduleTime}</span>
             </div>
           </div>
+          {event.hasTimeInOut && (
+            <>
+              <div className={styles.gridItem}>
+                <span className={styles.gridIcon}>
+                  <Clock3 size={15} />
+                </span>
+                <div>
+                  <span className={styles.gridLabel}>Time In</span>
+                  <span className={styles.gridValue}>
+                    {formatTime(event.timeIn)}
+                  </span>
+                </div>
+              </div>
+              <div className={styles.gridItem}>
+                <span className={styles.gridIcon}>
+                  <Clock3 size={15} />
+                </span>
+                <div>
+                  <span className={styles.gridLabel}>Time Out</span>
+                  <span className={styles.gridValue}>
+                    {formatTime(event.timeOut)}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
           <div className={styles.gridItem}>
             <span className={styles.gridIcon}>
               <MapPin size={15} />

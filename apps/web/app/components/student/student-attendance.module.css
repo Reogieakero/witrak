@@ -58,6 +58,12 @@
   color: var(--ink-500);
 }
 
+.timeCell {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-subtle);
+  white-space: nowrap;
+}
+
 .empty {
   margin-top: 0.75rem;
   padding: 2rem 1rem;

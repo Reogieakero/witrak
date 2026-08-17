@@ -171,8 +171,15 @@ export function EventCalendar({ items, onSelect }: EventCalendarProps) {
                     <span className={styles.eventTime}>{ev.scheduleTime}</span>
                     <span className={styles.eventName}>{ev.title}</span>
                     {ev.requiresAttendance && (
-                      <span className={styles.eventAtt} title="Requires attendance">
-                        QR
+                      <span
+                        className={styles.eventAtt}
+                        title={
+                          ev.hasTimeInOut
+                            ? "Time in and time out"
+                            : "Requires attendance"
+                        }
+                      >
+                        {ev.hasTimeInOut ? "In/Out" : "QR"}
                       </span>
                     )}
                   </span>

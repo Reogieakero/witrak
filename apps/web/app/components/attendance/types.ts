@@ -29,6 +29,7 @@ export type AttendanceStudentItem = {
   present: number;
   late: number;
   absent: number;
+  total: number;
   rate: number;
 };
 

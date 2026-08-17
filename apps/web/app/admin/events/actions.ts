@@ -55,6 +55,31 @@ export async function saveEvent(
   const programId = ((formData.get("programId") as string) ?? "").trim() || null;
   const requiresAttendance = formData.get("requiresAttendance") === "on";
   const scanPassword = ((formData.get("scanPassword") as string) ?? "").trim() || null;
+  const hasTimeInOut = requiresAttendance && formData.get("hasTimeInOut") === "on";
+  const lateGraceMinutes = hasTimeInOut
+    ? Math.max(
+        0,
+        Math.min(
+          120,
+          Number.parseInt(
+            String(formData.get("lateGraceMinutes") ?? "0"),
+            10,
+          ) || 0,
+        ),
+      )
+    : 0;
+  const timeIn = hasTimeInOut
+    ? combineDateTime(
+        (formData.get("eventDate") as string) ?? "",
+        (formData.get("timeIn") as string) ?? "",
+      )
+    : null;
+  const timeOut = hasTimeInOut
+    ? combineDateTime(
+        (formData.get("eventDate") as string) ?? "",
+        (formData.get("timeOut") as string) ?? "",
+      )
+    : null;
 
   if (!title || !startsAt || !endsAt) {
     return { ok: false, error: "Title, start, and end are required." };
@@ -69,6 +94,9 @@ export async function saveEvent(
   }
   if (endDate <= startDate) {
     return { ok: false, error: "End must be after start." };
+  }
+  if (timeIn && timeOut && timeOut <= timeIn) {
+    return { ok: false, error: "Time out must be after time in." };
   }
 
   if (id) {
@@ -91,6 +119,10 @@ export async function saveEvent(
         programId,
         requiresAttendance,
         scanPassword,
+        hasTimeInOut,
+        lateGraceMinutes,
+        timeIn,
+        timeOut,
       },
     });
   } else {
@@ -107,6 +139,10 @@ export async function saveEvent(
         programId,
         requiresAttendance,
         scanPassword,
+        hasTimeInOut,
+        lateGraceMinutes,
+        timeIn,
+        timeOut,
         createdById: session.user.id,
       },
     });

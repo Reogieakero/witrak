@@ -1,3 +1,5 @@
+export type ScanMode = 'checkin' | 'checkout';
+
 export interface ScanEvent {
   id: string;
   title: string;
@@ -5,6 +7,7 @@ export interface ScanEvent {
   status: string;
   startsAt: Date;
   endsAt: Date;
+  hasTimeInOut: boolean;
 }
 
 export function canScanEvent(event: ScanEvent): boolean {
@@ -19,6 +22,7 @@ export function scanEventFromJson(json: any): ScanEvent {
     status: json.status as string,
     startsAt: new Date(json.startsAt as string),
     endsAt: new Date(json.endsAt as string),
+    hasTimeInOut: (json.hasTimeInOut as boolean) ?? false,
   };
 }
 

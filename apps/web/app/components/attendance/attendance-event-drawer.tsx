@@ -46,6 +46,7 @@ type Row = {
   scannedAt: string | null;
   checkedInAt: string | null;
   checkedOutAt: string | null;
+  checkedOutOnly: boolean;
 };
 
 function formatTime(iso: string | null): string {
@@ -119,6 +120,7 @@ export function AttendanceEventDrawer({
           scannedAt: optimistic?.scannedAt ?? r?.scannedAt ?? null,
           checkedInAt: r?.checkedInAt ?? null,
           checkedOutAt: r?.checkedOutAt ?? null,
+          checkedOutOnly: !!(r?.checkedOutAt && !r?.checkedInAt),
         };
       }),
     [roster, recordByStudent, defaultStatus, optimisticStatus],
@@ -129,6 +131,8 @@ export function AttendanceEventDrawer({
   const absent = rows.filter(
     (r) => r.status === "ABSENT" || r.status === "EXCUSED",
   ).length;
+  const allPresent =
+    rows.length > 0 && rows.every((r) => r.status === "PRESENT");
 
   const searchQuery = query.trim().toLowerCase();
   const filtered = useMemo(
@@ -274,6 +278,14 @@ export function AttendanceEventDrawer({
         <div className={styles.rateBar}>
           <span style={{ width: `${event.rate}%` }} />
         </div>
+        {rows.length > 0 && (
+          <div className={styles.rateRow}>
+            <span>Attendance status</span>
+            <Badge tone={allPresent ? "green" : "amber"}>
+              {allPresent ? "All present" : "Partial present"}
+            </Badge>
+          </div>
+        )}
 
         <div className={styles.schedule}>
           <span className={styles.scheduleItem}>{event.scheduleDate}</span>
@@ -338,20 +350,16 @@ export function AttendanceEventDrawer({
                       </span>
                     </td>
                     <td className={styles.thRight}>
-                      {r.status ? (
-                        <Badge
-                          tone={
-                            r.status === "PRESENT"
-                              ? "green"
-                              : r.status === "LATE"
-                                ? "amber"
-                                : "red"
-                          }
-                        >
-                          {statusLabel(r.status)}
-                        </Badge>
+                      {r.checkedOutOnly ? (
+                        <Badge tone="red">Checked out only</Badge>
+                      ) : r.status === "PRESENT" ? (
+                        <Badge tone="green">Present</Badge>
+                      ) : r.status === "LATE" ? (
+                        <Badge tone="amber">Late</Badge>
+                      ) : r.status ? (
+                        <Badge tone="red">{statusLabel(r.status)}</Badge>
                       ) : (
-                        <Badge tone="gray">Not recorded</Badge>
+                        <Badge tone="red">Not scanned</Badge>
                       )}
                     </td>
                     <td className={styles.right}>
