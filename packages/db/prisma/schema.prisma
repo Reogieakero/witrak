@@ -1,0 +1,459 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ScopeType {
+  FACULTY
+  PROGRAM
+  PROGRAM_YEAR
+  SECTION
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+  LATE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REJECTED
+}
+
+enum SanctionStatus {
+  OPEN
+  RESOLVED
+}
+
+enum FlagStatus {
+  PENDING
+  DISMISSED
+  RESOLVED
+}
+
+enum SanctionAction {
+  FLAG_FOR_REVIEW
+}
+
+enum PeriodType {
+  SEMESTER
+  EVENT_SERIES
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AuditAction {
+  ROLE_ASSIGNED
+  ROLE_REVOKED
+  SCOPE_CHANGED
+  ROLE_REQUEST_REJECTED
+  SANCTION_CREATED
+  SANCTION_RESOLVED
+  FLAG_DISMISSED
+  FLAG_AUTO_DISMISSED
+  PAYMENT_VERIFIED
+  PAYMENT_REJECTED
+  MEMBER_SUSPENDED
+  MEMBER_REINSTATED
+  MEMBER_AUTHORIZATION_REMOVED
+}
+
+enum PermissionKey {
+  events_create
+  events_edit
+  events_delete
+  events_view
+  attendance_scan
+  attendance_view
+  attendance_edit
+  transparency_upload
+  transparency_delete
+  transparency_view
+  sanctions_create
+  sanctions_view
+  sanctions_view_own
+  sanctions_resolve
+  sanctions_appeal_respond
+  fees_create
+  fees_verify_payment
+  fees_view
+  announcements_create
+  announcements_edit
+  announcements_delete
+  announcements_view
+  members_view
+  users_manage_roles
+  audit_view
+}
+
+model Program {
+  id              String          @id @default(cuid())
+  code            String          @unique
+  name            String
+  enrollmentTarget Int?
+  yearLevels      YearLevel[]
+  sections        Section[]
+   userRoles       UserRole[]
+   events          Event[]
+  announcements   Announcement[]
+}
+
+model YearLevel {
+  id            String          @id @default(cuid())
+  programId     String
+  level         Int
+  program       Program         @relation(fields: [programId], references: [id])
+  sections      Section[]
+   userRoles     UserRole[]
+
+   @@unique([programId, level])
+}
+
+model Section {
+  id            String          @id @default(cuid())
+  programId     String?
+  programYearId String
+  name          String
+  program       Program?        @relation(fields: [programId], references: [id])
+  programYear   YearLevel       @relation(fields: [programYearId], references: [id])
+  students      Student[]
+   userRoles     UserRole[]
+
+   @@unique([programYearId, name])
+}
+
+model Student {
+  id          String     @id @default(cuid())
+  userId      String     @unique
+  studentNo   String     @unique
+  firstName   String
+  lastName    String
+  suffix      String?
+  sectionId   String?
+  suspended   Boolean    @default(false)
+  imageUrl    String?
+  imagePath   String?
+  section     Section?   @relation(fields: [sectionId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+  attendances Attendance[]
+  sanctions   Sanction[]
+  flags       SanctionFlag[]
+  feeProofs   FeeProof[]
+
+  @@index([sectionId])
+  @@index([lastName, firstName])
+}
+
+model User {
+  id                String          @id @default(cuid())
+  email             String          @unique
+  name              String
+  supabaseId        String?         @unique
+  deletedAt         DateTime?
+  student           Student?
+  roles             UserRole[]
+  roleRequests      RoleRequest[]
+  auditLogs         AuditLog[]
+  createdEvents     Event[]         @relation("EventCreatedBy")
+  createdFees       Fee[]           @relation("FeeCreatedBy")
+  scannedAttendance Attendance[]    @relation("AttendanceScannedBy")
+  verifiedProofs    FeeProof[]      @relation("ProofVerifiedBy")
+  reviewedFlags     SanctionFlag[]
+  issuedSanctions   Sanction[]      @relation("SanctionIssuedBy")
+  resolvedSanctions Sanction[]      @relation("SanctionResolvedBy")
+  transparencyFiles TransparencyFile[]
+  announcements     Announcement[]
+  seenStates        SeenState[]
+}
+
+model SeenState {
+  id      String   @id @default(cuid())
+  userId  String
+  section String
+  seenAt  DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, section])
+  @@index([userId])
+}
+
+model Role {
+  id           String           @id @default(cuid())
+  name         String           @unique
+  description  String?
+  permissions  RolePermission[]
+  userRoles    UserRole[]
+  roleRequests RoleRequest[]
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  key         PermissionKey    @unique
+  description String?
+  roles       RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  id            String    @id @default(cuid())
+  userId        String
+  roleId        String
+  scopeType     ScopeType
+  programId     String?
+  programYearId String?
+  sectionId     String?
+  assignedAt    DateTime  @default(now())
+  assignedBy    String
+  user          User      @relation(fields: [userId], references: [id])
+  role          Role      @relation(fields: [roleId], references: [id])
+  program       Program?  @relation(fields: [programId], references: [id])
+  programYear   YearLevel? @relation(fields: [programYearId], references: [id])
+  section       Section?  @relation(fields: [sectionId], references: [id])
+
+  @@index([userId])
+  @@index([roleId])
+}
+
+model RoleRequest {
+  id                     String        @id @default(cuid())
+  userId                 String
+  requestedRoleId        String
+  requestedScopeType     ScopeType
+  requestedProgramYearId String?
+  requestedSectionId     String?
+  status                 RequestStatus @default(PENDING)
+  reviewedById           String?
+  reviewedAt             DateTime?
+  user                   User          @relation(fields: [userId], references: [id])
+  requestedRole          Role          @relation(fields: [requestedRoleId], references: [id])
+
+  @@index([status])
+  @@index([userId])
+}
+
+model AcademicTerm {
+  id         String     @id @default(cuid())
+  name       String     @unique
+  periodType PeriodType @default(SEMESTER)
+  startsOn   DateTime
+  endsOn     DateTime
+  isActive   Boolean    @default(false)
+}
+
+model Event {
+  id                 String       @id @default(cuid())
+  title              String
+  description        String?
+  startsAt           DateTime
+  endsAt             DateTime
+  location           String?
+  requiresAttendance Boolean      @default(false)
+  scanPassword       String?
+  programId          String?
+  program            Program?     @relation(fields: [programId], references: [id])
+  createdAt          DateTime     @default(now())
+  createdById        String
+  createdBy          User         @relation("EventCreatedBy", fields: [createdById], references: [id])
+  attendances        Attendance[]
+
+  @@index([startsAt])
+  @@index([createdById])
+}
+
+model Attendance {
+  id                String           @id @default(cuid())
+  eventId           String
+  studentId         String
+  status            AttendanceStatus @default(PRESENT)
+  scannedById       String?
+  scannedAt         DateTime         @default(now())
+  checkedInAt       DateTime?
+  checkedOutAt      DateTime?
+  event             Event            @relation(fields: [eventId], references: [id])
+  student           Student          @relation(fields: [studentId], references: [id])
+  scannedBy         User?            @relation("AttendanceScannedBy", fields: [scannedById], references: [id])
+  sanctionEvidences SanctionEvidence[]
+
+  @@unique([eventId, studentId])
+  @@index([studentId])
+  @@index([status])
+  @@index([scannedAt])
+}
+
+model Sanction {
+  id           String           @id @default(cuid())
+  studentId    String
+  title        String
+  reason       String
+  status       SanctionStatus   @default(OPEN)
+  issuedById   String?
+  issuedAt     DateTime         @default(now())
+  resolvedById String?
+  resolvedAt   DateTime?
+  resolvedNote String?
+  fineId       String?
+  fine         SanctionFine?    @relation(fields: [fineId], references: [id])
+  student      Student          @relation(fields: [studentId], references: [id])
+  issuedBy     User?            @relation("SanctionIssuedBy", fields: [issuedById], references: [id])
+  resolvedBy   User?            @relation("SanctionResolvedBy", fields: [resolvedById], references: [id])
+  evidences    SanctionEvidence[]
+
+  @@index([studentId])
+  @@index([status])
+  @@index([issuedAt])
+  @@index([fineId])
+}
+
+model SanctionFine {
+  id           String   @id @default(cuid())
+  absenceCount Int      @unique
+  title        String
+  description   String
+  updatedAt     DateTime @updatedAt
+
+  sanctions    Sanction[]
+
+  @@index([absenceCount])
+}
+
+model SanctionEvidence {
+  id           String     @id @default(cuid())
+  sanctionId   String
+  attendanceId String
+  sanction     Sanction   @relation(fields: [sanctionId], references: [id])
+  attendance   Attendance @relation(fields: [attendanceId], references: [id])
+
+  @@unique([sanctionId, attendanceId])
+  @@index([attendanceId])
+}
+
+model SanctionFlag {
+  id           String     @id @default(cuid())
+  studentId    String
+  periodRef    String
+  triggerCount Int
+  status       FlagStatus @default(PENDING)
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime   @default(now())
+  student      Student    @relation(fields: [studentId], references: [id])
+  reviewedBy   User?      @relation(fields: [reviewedById], references: [id])
+
+  @@index([studentId, periodRef])
+  @@index([status])
+}
+
+model Fee {
+  id          String     @id @default(cuid())
+  title       String
+  amount      Decimal    @db.Decimal(10, 2)
+  dueDate     DateTime
+  createdAt   DateTime   @default(now())
+  createdById String
+  createdBy   User       @relation("FeeCreatedBy", fields: [createdById], references: [id])
+  proofs      FeeProof[]
+
+  @@index([dueDate])
+  @@index([createdAt])
+  @@index([createdById])
+}
+
+model FeeProof {
+  id              String        @id @default(cuid())
+  feeId           String
+  studentId       String
+  fileUrl         String
+  status          PaymentStatus @default(PENDING)
+  rejectionReason String?
+  method          String?
+  reference       String?
+  accountName     String?
+  verifiedById    String?
+  verifiedAt      DateTime?
+  fee             Fee           @relation(fields: [feeId], references: [id])
+  student         Student       @relation(fields: [studentId], references: [id])
+  verifiedBy      User?         @relation("ProofVerifiedBy", fields: [verifiedById], references: [id])
+  createdAt       DateTime      @default(now())
+
+  @@index([studentId])
+  @@index([feeId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model PaymentMethod {
+  id            String   @id @default(cuid())
+  type          String
+  accountName   String
+  accountNumber String?
+  instructions  String?
+  active        Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+}
+
+model TransparencyFile {
+  id           String   @id @default(cuid())
+  title        String
+  fileUrl      String
+  category     String?
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+  uploadedAt   DateTime @default(now())
+
+  @@index([uploadedAt])
+  @@index([uploadedById])
+}
+
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String
+  body        String
+  imageUrl    String?
+  imagePath   String?
+  scopeType   ScopeType @default(FACULTY)
+  programId   String?
+  program     Program?   @relation(fields: [programId], references: [id])
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+
+  @@index([createdAt])
+  @@index([createdById])
+  @@index([scopeType])
+}
+
+model AuditLog {
+  id        Int         @id @default(autoincrement())
+  actorId   String?
+  action    AuditAction
+  targetId  String?
+  details   Json
+  timestamp DateTime    @default(now())
+  actor     User?       @relation(fields: [actorId], references: [id])
+
+  @@index([actorId])
+  @@index([action])
+  @@index([action, timestamp])
+  @@index([timestamp])
+}
