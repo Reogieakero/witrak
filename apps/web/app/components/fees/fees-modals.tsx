@@ -504,6 +504,18 @@ function PaymentMethodModal({
     { value: "OTHER", label: "Other" },
   ];
 
+  const isCash = type === "CASH";
+
+  function handleTypeChange(v: string) {
+    setType(v);
+    if (v === "CASH") {
+      setAccountName("Go to treasurer");
+      setAccountNumber("");
+    } else {
+      setAccountName("");
+    }
+  }
+
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
@@ -560,35 +572,53 @@ function PaymentMethodModal({
             value={type}
             placeholder="Select method"
             options={typeOptions}
-            onChange={setType}
+            onChange={handleTypeChange}
           />
         </div>
 
-        <div className={styles.field}>
-          <label className={styles.label}>
-            Account name <span className={styles.required}>*</span>
-          </label>
-          <input
-            type="text"
-            name="accountName"
-            value={accountName}
-            onChange={(e) => setAccountName(e.target.value)}
-            placeholder="e.g. Liberalis Org / Juan Dela Cruz"
-            className={styles.input}
-          />
-        </div>
+        {isCash ? (
+          <div className={styles.field}>
+            <label className={styles.label}>Account name</label>
+            <input
+              type="text"
+              value="Go to treasurer"
+              readOnly
+              className={styles.input}
+            />
+            <p className={styles.note}>
+              Students will pay in cash directly to the treasurer and only
+              upload their receipt — no reference number is needed.
+            </p>
+          </div>
+        ) : (
+          <div className={styles.field}>
+            <label className={styles.label}>
+              Account name <span className={styles.required}>*</span>
+            </label>
+            <input
+              type="text"
+              name="accountName"
+              value={accountName}
+              onChange={(e) => setAccountName(e.target.value)}
+              placeholder="e.g. Liberalis Org / Juan Dela Cruz"
+              className={styles.input}
+            />
+          </div>
+        )}
 
-        <div className={styles.field}>
-          <label className={styles.label}>Account number / reference</label>
-          <input
-            type="text"
-            name="accountNumber"
-            value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value)}
-            placeholder="0917xxxxxxx / bank account"
-            className={styles.input}
-          />
-        </div>
+        {!isCash && (
+          <div className={styles.field}>
+            <label className={styles.label}>Account number / reference</label>
+            <input
+              type="text"
+              name="accountNumber"
+              value={accountNumber}
+              onChange={(e) => setAccountNumber(e.target.value)}
+              placeholder="0917xxxxxxx / bank account"
+              className={styles.input}
+            />
+          </div>
+        )}
 
         <div className={styles.field}>
           <label className={styles.label}>Instructions (optional)</label>

@@ -55,7 +55,7 @@ export default async function AdminMembersPage() {
     const [students, programs, sections, rawRemovedAuth, rawRequests] =
       await Promise.all([
         prisma.student.findMany({
-          where: scopeWhere,
+          where: { ...scopeWhere, user: { deletedAt: null } },
           orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
           include: {
             section: {

@@ -27,8 +27,9 @@ function attendanceStatusTone(
   status: StudentAttendanceItem["attendanceStatus"],
 ): "green" | "amber" | "red" | "gray" {
   if (status === "PRESENT" || status === "EXCUSED") return "green";
-  if (status === "LATE" || status === "NOT_SCANNED") return "amber";
+  if (status === "LATE") return "amber";
   if (status === "ABSENT") return "red";
+  if (status === "NOT_SCANNED" || status === "CHECKED_OUT_ONLY") return "red";
   return "gray";
 }
 
@@ -48,6 +49,8 @@ function attendanceStatusLabel(
       return "Not scanned";
     case "NOT_YET":
       return "Not yet";
+    case "CHECKED_OUT_ONLY":
+      return "Checked out only";
     default:
       return "Not recorded";
   }
@@ -58,6 +61,14 @@ function formatDate(iso: string): string {
     month: "short",
     day: "numeric",
     year: "numeric",
+  });
+}
+
+function formatTime(iso: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleTimeString("en-PH", {
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -146,6 +157,8 @@ function AttendanceTable({ attendance }: { attendance: StudentAttendanceItem[] }
         <tr>
           <th>Event</th>
           <th className={styles.thCenter}>Event Status</th>
+          <th className={styles.thCenter}>Time In</th>
+          <th className={styles.thCenter}>Time Out</th>
           <th className={styles.thCenter}>Attendance</th>
         </tr>
       </thead>
@@ -163,6 +176,12 @@ function AttendanceTable({ attendance }: { attendance: StudentAttendanceItem[] }
               <Badge tone={eventStatusTone(a.eventStatus)}>
                 {eventStatusLabel(a.eventStatus)}
               </Badge>
+            </td>
+            <td className={styles.thCenter}>
+              <span className={styles.timeCell}>{formatTime(a.checkedInAt)}</span>
+            </td>
+            <td className={styles.thCenter}>
+              <span className={styles.timeCell}>{formatTime(a.checkedOutAt)}</span>
             </td>
             <td className={styles.thCenter}>
               <Badge tone={attendanceStatusTone(a.attendanceStatus)}>

@@ -269,6 +269,10 @@ model Event {
   location           String?
   requiresAttendance Boolean      @default(false)
   scanPassword       String?
+  hasTimeInOut       Boolean      @default(false)
+  lateGraceMinutes   Int          @default(0)
+  timeIn             DateTime?
+  timeOut            DateTime?
   programId          String?
   program            Program?     @relation(fields: [programId], references: [id])
   createdAt          DateTime     @default(now())

@@ -277,6 +277,7 @@ export default async function AdminAttendancePage() {
           present,
           late,
           absent,
+          total,
           rate,
         };
       });

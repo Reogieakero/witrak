@@ -166,21 +166,25 @@ export function AttendanceStudentDrawer({
                       <span className={styles.timeCell}>{formatTime(r.checkedOutAt)}</span>
                     </td>
                     <td className={styles.thRight}>
-                      <Badge
-                        tone={
-                          r.status === "PRESENT"
-                            ? "green"
+                      {r.checkedOutAt && !r.checkedInAt ? (
+                        <Badge tone="red">Checked out only</Badge>
+                      ) : (
+                        <Badge
+                          tone={
+                            r.status === "PRESENT"
+                              ? "green"
+                              : r.status === "LATE"
+                                ? "amber"
+                                : "red"
+                          }
+                        >
+                          {r.status === "PRESENT"
+                            ? "Present"
                             : r.status === "LATE"
-                              ? "amber"
-                              : "red"
-                        }
-                      >
-                        {r.status === "PRESENT"
-                          ? "Present"
-                          : r.status === "LATE"
-                            ? "Late"
-                            : "Absent"}
-                      </Badge>
+                              ? "Late"
+                              : "Absent"}
+                        </Badge>
+                      )}
                     </td>
                   </tr>
                 ))}

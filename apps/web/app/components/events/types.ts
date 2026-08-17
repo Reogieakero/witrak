@@ -7,6 +7,10 @@ export type EventItem = {
   location: string | null;
   requiresAttendance: boolean;
   scanPassword: string | null;
+  hasTimeInOut: boolean;
+  lateGraceMinutes: number;
+  timeIn: string | null;
+  timeOut: string | null;
   programId: string | null;
   programName: string | null;
   createdByName: string;

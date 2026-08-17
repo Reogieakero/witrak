@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { ScanMode } from './models';
 
 export interface QueuedScan {
   id: string;
@@ -9,6 +10,7 @@ export interface QueuedScan {
   studentName: string;
   studentNo?: string | null;
   section?: string | null;
+  mode: ScanMode;
   scannedAt: string;
 }
 
@@ -24,6 +26,7 @@ function toQueued(json: any): QueuedScan {
     studentName: json.studentName as string,
     studentNo: (json.studentNo as string) ?? null,
     section: (json.section as string) ?? null,
+    mode: ((json.mode as ScanMode) ?? 'checkin') as ScanMode,
     scannedAt: json.scannedAt as string,
   };
 }

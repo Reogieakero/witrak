@@ -20,8 +20,11 @@ export type StudentAttendanceItem = {
     | "ABSENT"
     | "NOT_SCANNED"
     | "NOT_YET"
-    | "NOT_RECORDED";
+    | "NOT_RECORDED"
+    | "CHECKED_OUT_ONLY";
   scannedAt: string | null;
+  checkedInAt: string | null;
+  checkedOutAt: string | null;
 };
 
 export type StudentEventItem = {

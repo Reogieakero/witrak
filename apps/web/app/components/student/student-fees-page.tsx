@@ -98,6 +98,15 @@ export function StudentFeesPage({
       label: `${f.title} · ${f.amount}`,
     }));
 
+  const methodOptions: SelectOption[] = paymentMethods.map((m) => {
+    const typeLabel = m.type.charAt(0) + m.type.slice(1).toLowerCase();
+    const suffix = m.accountNumber ? ` · ${m.accountNumber}` : "";
+    return { value: m.id, label: `${typeLabel}${suffix}` };
+  });
+
+  const selectedMethod = paymentMethods.find((m) => m.id === method) ?? null;
+  const isCash = selectedMethod?.type === "CASH";
+
   const referenceValue = reference.trim();
   const referenceDuplicate = Boolean(
     referenceValue &&
@@ -106,9 +115,24 @@ export function StudentFeesPage({
       ),
   );
 
+  function handleMethodChange(v: string) {
+    setMethod(v);
+    const m = paymentMethods.find((x) => x.id === v);
+    if (m?.type === "CASH") setReference("");
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const methodId = String(formData.get("methodId") ?? "").trim();
+    const chosen = paymentMethods.find((m) => m.id === methodId);
+    if (chosen) {
+      formData.set(
+        "method",
+        chosen.type.charAt(0) + chosen.type.slice(1).toLowerCase(),
+      );
+    }
+    formData.delete("methodId");
     setSubmitting(true);
     startTransition(async () => {
       try {
@@ -278,20 +302,30 @@ export function StudentFeesPage({
               )}
             </div>
 
-            <div className={styles.fieldGrid}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="studentMethod">
-                  Method
-                </label>
-                <input
-                  id="studentMethod"
-                  name="method"
-                  value={method}
-                  onChange={(e) => setMethod(e.target.value)}
-                  className={styles.input}
-                  placeholder="e.g. GCash"
-                />
-              </div>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="studentMethod">
+                Method
+              </label>
+              <Select
+                name="methodId"
+                value={method}
+                placeholder={
+                  methodOptions.length === 0
+                    ? "No payment methods yet"
+                    : "Choose a method…"
+                }
+                options={methodOptions}
+                onChange={handleMethodChange}
+              />
+              {isCash && (
+                <p className={styles.fieldHint}>
+                  Pay in cash directly to the treasurer and attach your receipt.
+                  No reference number needed.
+                </p>
+              )}
+            </div>
+
+            {!isCash && (
               <div className={styles.field}>
                 <label className={styles.label} htmlFor="studentReference">
                   Reference No.
@@ -311,7 +345,7 @@ export function StudentFeesPage({
                   </p>
                 )}
               </div>
-            </div>
+            )}
 
             <div className={styles.field}>
               <label className={styles.label}>Proof File</label>

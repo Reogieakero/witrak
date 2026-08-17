@@ -26,6 +26,7 @@ export async function GET() {
         location: true,
         startsAt: true,
         endsAt: true,
+        hasTimeInOut: true,
       },
     });
 
@@ -36,6 +37,7 @@ export async function GET() {
         location: e.location,
         startsAt: e.startsAt.toISOString(),
         endsAt: e.endsAt.toISOString(),
+        hasTimeInOut: e.hasTimeInOut,
         status: eventStatus(e.startsAt, e.endsAt, now),
       })),
     });

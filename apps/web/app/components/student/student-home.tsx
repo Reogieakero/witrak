@@ -157,7 +157,13 @@ export default async function StudentHomeView({
       }),
       prisma.attendance.findMany({
         where: { studentId, eventId: { in: attendanceEvents.map((e) => e.id) } },
-        select: { eventId: true, status: true, scannedAt: true },
+        select: {
+          eventId: true,
+          status: true,
+          scannedAt: true,
+          checkedInAt: true,
+          checkedOutAt: true,
+        },
       }),
     ]);
 
@@ -214,7 +220,10 @@ export default async function StudentHomeView({
     const isCompleted = e.endsAt <= now;
     let attendanceStatus: StudentHomeData["attendance"][number]["attendanceStatus"];
     if (rec) {
-      attendanceStatus = rec.status;
+      attendanceStatus =
+        rec.checkedOutAt && !rec.checkedInAt
+          ? "CHECKED_OUT_ONLY"
+          : rec.status;
     } else if (e.requiresAttendance && isCompleted) {
       attendanceStatus = "ABSENT";
     } else if (isLive) {
@@ -235,6 +244,8 @@ export default async function StudentHomeView({
       requiresAttendance: e.requiresAttendance,
       attendanceStatus,
       scannedAt: rec?.scannedAt.toISOString() ?? null,
+      checkedInAt: rec?.checkedInAt?.toISOString() ?? null,
+      checkedOutAt: rec?.checkedOutAt?.toISOString() ?? null,
     };
   });
 

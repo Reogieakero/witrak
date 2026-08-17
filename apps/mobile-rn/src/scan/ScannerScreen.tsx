@@ -20,6 +20,7 @@ import {
   parseStudentQr,
   ScanEvent,
   ScanLogEntry,
+  ScanMode,
   ScanResult,
 } from './models';
 import {
@@ -60,6 +61,7 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
   const [pending, setPending] = useState(0);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [scannerError, setScannerError] = useState<string | null>(null);
+  const [mode, setMode] = useState<ScanMode>('checkin');
   const autoReset = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resultRef = useRef<ScanResult | null>(null);
   const historyRef = useRef<ScanLogEntry[]>([]);
@@ -132,7 +134,10 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
 
     const queue = await loadQueue();
     const duplicate = queue.some(
-      (s) => s.eventId === event.id && s.studentNo === qr.studentNo,
+      (s) =>
+        s.eventId === event.id &&
+        s.studentNo === qr.studentNo &&
+        s.mode === mode,
     );
 
     if (duplicate) {
@@ -151,7 +156,10 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
       setResultSafe({
         ok: true,
         alreadyScanned: true,
-        message: 'Already checked in.',
+        message:
+          mode === 'checkin'
+            ? 'Already checked in.'
+            : 'Already checked out.',
         studentName: qr.name,
         studentNo: qr.studentNo,
         section: qr.section,
@@ -176,6 +184,7 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
       studentName: qr.name,
       studentNo: qr.studentNo,
       section: qr.section,
+      mode,
       scannedAt: now.toISOString(),
     };
     await addScan(scan);
@@ -220,16 +229,23 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
     }
 
     const syncedIds: string[] = [];
+    let firstError: string | null = null;
     for (const scan of queue) {
       try {
         await api.post('/api/mobile/scan', {
           eventId: scan.eventId,
           scanPassword: scan.scanPassword,
           qrText: scan.qrText,
+          mode: scan.mode,
         });
         syncedIds.push(scan.id);
-      } catch {
-        // Keep this entry; retry on the next sync.
+      } catch (e) {
+        if (firstError == null) {
+          firstError =
+            e instanceof ApiException
+              ? e.message
+              : 'Could not sync. Check your connection and try again.';
+        }
       }
     }
 
@@ -245,10 +261,12 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
     setSyncing(false);
     alert(
       syncedIds.length === 0
-        ? 'Could not sync. Check your connection and try again.'
+        ? firstError ?? 'Could not sync. Check your connection and try again.'
         : remaining === 0
           ? `Synced ${syncedIds.length} scan${syncedIds.length === 1 ? '' : 's'}.`
-          : `Synced ${syncedIds.length}. ${remaining} still waiting.`,
+          : `Synced ${syncedIds.length}. ${remaining} could not sync${
+              firstError ? `: ${firstError}` : '.'
+            }`,
     );
   }
 
@@ -306,6 +324,43 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
           <Text style={styles.topSubtitle}>Point at a member's QR code</Text>
         </View>
 
+        {event.hasTimeInOut && (
+          <View style={styles.modeToggle}>
+            <Pressable
+              onPress={() => {
+                setMode('checkin');
+                setResultSafe(null);
+              }}
+              style={[styles.modeBtn, mode === 'checkin' && styles.modeBtnActive]}
+            >
+              <Text
+                style={[
+                  styles.modeLabel,
+                  mode === 'checkin' && styles.modeLabelActive,
+                ]}
+              >
+                Time In
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setMode('checkout');
+                setResultSafe(null);
+              }}
+              style={[styles.modeBtn, mode === 'checkout' && styles.modeBtnActive]}
+            >
+              <Text
+                style={[
+                  styles.modeLabel,
+                  mode === 'checkout' && styles.modeLabelActive,
+                ]}
+              >
+                Time Out
+              </Text>
+            </Pressable>
+          </View>
+        )}
+
         <View style={styles.scanFrame} pointerEvents="none" />
 
         {processing && (
@@ -326,7 +381,12 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
         )}
 
         {result != null && (
-          <ResultPanel result={result} themeMode="dark" onDismiss={() => setResultSafe(null)} />
+          <ResultPanel
+            result={result}
+            mode={mode}
+            themeMode="dark"
+            onDismiss={() => setResultSafe(null)}
+          />
         )}
 
         <View style={styles.bottomBar} pointerEvents="box-none">
@@ -392,9 +452,11 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
 
 function ResultPanel({
   result,
+  mode,
   onDismiss,
 }: {
   result: ScanResult;
+  mode: ScanMode;
   themeMode: ThemeMode;
   onDismiss: () => void;
 }) {
@@ -418,9 +480,13 @@ function ResultPanel({
           <Text style={[styles.resultTitle, { color }]}>
             {ok
               ? result.alreadyScanned
-                ? 'Already checked in'
+                ? mode === 'checkin'
+                  ? 'Already checked in'
+                  : 'Already checked out'
                 : 'Saved'
-              : 'Check-in failed'}
+              : mode === 'checkin'
+                ? 'Check-in failed'
+                : 'Check-out failed'}
           </Text>
           {result.message.length > 0 && (
             <Text style={styles.resultMessage}>{result.message}</Text>
@@ -578,6 +644,26 @@ const styles = StyleSheet.create({
   topBar: { alignItems: 'center', marginTop: 4 },
   topTitle: { color: '#fff', fontSize: 16, fontFamily: FhusoFonts.bold },
   topSubtitle: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  modeToggle: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginTop: 12,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 10,
+    padding: 3,
+  },
+  modeBtn: {
+    paddingHorizontal: 18,
+    paddingVertical: 7,
+    borderRadius: 8,
+  },
+  modeBtnActive: { backgroundColor: FhusoColors.brand },
+  modeLabel: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 13,
+    fontFamily: FhusoFonts.bold,
+  },
+  modeLabelActive: { color: '#fff' },
   scanFrame: {
     flex: 1,
     marginVertical: 24,
