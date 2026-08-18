@@ -241,11 +241,13 @@ export function EventsScreen({ themeMode, onToggleTheme }: EventsScreenProps) {
       )}
 
       {scannerSession != null && (
-        <ScannerScreen
-          event={scannerSession.event}
-          passcode={scannerSession.passcode}
-          onClose={() => setScannerSession(null)}
-        />
+        <View style={StyleSheet.absoluteFill}>
+          <ScannerScreen
+            event={scannerSession.event}
+            passcode={scannerSession.passcode}
+            onClose={() => setScannerSession(null)}
+          />
+        </View>
       )}
     </View>
   );

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   BackHandler,
+  Image,
   Modal,
   Pressable,
   ScrollView,
@@ -349,6 +350,14 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
         />
       )}
 
+      <View style={styles.bgLogoWrap} pointerEvents="none">
+        <Image
+          source={require('../../assets/logo.png')}
+          style={styles.bgLogo}
+          resizeMode="contain"
+        />
+      </View>
+
       <SafeAreaView style={styles.overlay} pointerEvents="box-none">
         <View style={styles.topRow}>
           <Pressable
@@ -512,16 +521,17 @@ function ResultPanel({
       ? FhusoColors.brand
       : FhusoColors.success
     : FhusoColors.danger;
-  const icon = ok
-    ? result.alreadyScanned
-      ? 'reload'
-      : 'checkmark-circle'
-    : 'close-circle';
 
   return (
     <Pressable style={styles.resultWrap} onPress={onDismiss}>
       <View style={styles.resultCard}>
-        <Ionicons name={icon} size={40} color={color} />
+        <View style={styles.resultLogoWrap}>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={styles.resultLogo}
+            resizeMode="contain"
+          />
+        </View>
         <View style={styles.resultBody}>
           <Text style={[styles.resultTitle, { color }]}>
             {ok
@@ -537,19 +547,19 @@ function ResultPanel({
           {result.message.length > 0 && (
             <Text style={styles.resultMessage}>{result.message}</Text>
           )}
+          {result.studentName != null && (
+            <View style={styles.resultDetails}>
+              <Row icon="person-outline" text={result.studentName} />
+              {result.studentNo != null && (
+                <Row icon="card-outline" text={result.studentNo} />
+              )}
+              {result.section != null && (
+                <Row icon="people-outline" text={result.section} />
+              )}
+            </View>
+          )}
         </View>
       </View>
-      {result.studentName != null && (
-        <View style={styles.resultDetails}>
-          <Row icon="person-outline" text={result.studentName} />
-          {result.studentNo != null && (
-            <Row icon="card-outline" text={result.studentNo} />
-          )}
-          {result.section != null && (
-            <Row icon="people-outline" text={result.section} />
-          )}
-        </View>
-      )}
     </Pressable>
   );
 }
@@ -686,6 +696,17 @@ function HistoryEntry({ entry }: { entry: ScanLogEntry }) {
 
 const styles = StyleSheet.create({
   scannerRoot: { flex: 1, backgroundColor: '#0B1220' },
+  bgLogoWrap: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.16,
+  },
+  bgLogo: { width: '60%', aspectRatio: 1 },
   overlay: { flex: 1, padding: 16 },
   topRow: { position: 'relative', marginTop: 4 },
   topBar: { alignItems: 'center' },
@@ -779,20 +800,23 @@ const styles = StyleSheet.create({
   },
   resultCard: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     backgroundColor: FhusoColors.surfaceDark,
     borderRadius: 20,
     padding: 20,
   },
-  resultBody: { flex: 1, marginLeft: 12 },
+  resultLogoWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginRight: 14,
+  },
+  resultLogo: { width: 48, height: 48 },
+  resultBody: { flex: 1 },
   resultTitle: { fontSize: 17, fontFamily: FhusoFonts.extraBold },
   resultMessage: { fontSize: 13, color: FhusoColors.mutedDark, marginTop: 2 },
-  resultDetails: {
-    backgroundColor: FhusoColors.surfaceDark,
-    borderRadius: 20,
-    padding: 20,
-    marginTop: 8,
-  },
+  resultDetails: { marginTop: 14 },
   row: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
   rowText: { color: FhusoColors.inkDark, fontSize: 14, marginLeft: 10, flex: 1 },
   bottomBar: {

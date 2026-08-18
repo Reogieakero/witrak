@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Image, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
@@ -48,8 +48,13 @@ export default function App() {
 
   if (!fontsLoaded || !onboardingChecked) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#111113', alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color="#3B82F6" />
+      <View style={{ flex: 1, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center' }}>
+        <Image
+          source={require('./assets/logo.png')}
+          style={{ width: 140, height: 140 }}
+          resizeMode="contain"
+        />
+        <ActivityIndicator color="#fff" style={{ marginTop: 24 }} />
       </View>
     );
   }
