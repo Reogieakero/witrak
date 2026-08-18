@@ -28,8 +28,7 @@ function attendanceStatusTone(
 ): "green" | "amber" | "red" | "gray" {
   if (status === "PRESENT" || status === "EXCUSED") return "green";
   if (status === "LATE") return "amber";
-  if (status === "ABSENT") return "red";
-  if (status === "NOT_SCANNED" || status === "CHECKED_OUT_ONLY") return "red";
+  if (status === "ABSENT" || status === "NOT_SCANNED") return "red";
   return "gray";
 }
 
@@ -49,11 +48,39 @@ function attendanceStatusLabel(
       return "Not scanned";
     case "NOT_YET":
       return "Not yet";
-    case "CHECKED_OUT_ONLY":
-      return "Checked out only";
     default:
       return "Not recorded";
   }
+}
+
+function AttendanceBadges({ item }: { item: StudentAttendanceItem }) {
+  if (item.attendanceStatus === "LATE") {
+    return (
+      <span className={styles.badgeGroup}>
+        <Badge tone="amber">Late</Badge>
+        <Badge tone="green">Present</Badge>
+      </span>
+    );
+  }
+  if (item.attendanceStatus === "ABSENT") {
+    const hasIn = !!item.checkedInAt;
+    const hasOut = !!item.checkedOutAt;
+    return (
+      <span className={styles.badgeGroup}>
+        <Badge tone="red">Absent</Badge>
+        {hasIn !== hasOut && (
+          <Badge tone="red">
+            {hasIn ? "Time out not scanned" : "Time in not scanned"}
+          </Badge>
+        )}
+      </span>
+    );
+  }
+  return (
+    <Badge tone={attendanceStatusTone(item.attendanceStatus)}>
+      {attendanceStatusLabel(item.attendanceStatus)}
+    </Badge>
+  );
 }
 
 function formatDate(iso: string): string {
@@ -61,6 +88,7 @@ function formatDate(iso: string): string {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "Asia/Manila",
   });
 }
 
@@ -69,6 +97,7 @@ function formatTime(iso: string | null): string {
   return new Date(iso).toLocaleTimeString("en-PH", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Manila",
   });
 }
 
@@ -184,9 +213,7 @@ function AttendanceTable({ attendance }: { attendance: StudentAttendanceItem[] }
               <span className={styles.timeCell}>{formatTime(a.checkedOutAt)}</span>
             </td>
             <td className={styles.thCenter}>
-              <Badge tone={attendanceStatusTone(a.attendanceStatus)}>
-                {attendanceStatusLabel(a.attendanceStatus)}
-              </Badge>
+              <AttendanceBadges item={a} />
             </td>
           </tr>
         ))}

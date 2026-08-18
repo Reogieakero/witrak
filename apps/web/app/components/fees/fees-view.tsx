@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { HandCoins, Loader2, PlusCircle, PencilLine, Trash2 } from "lucide-react";
+import { Download, HandCoins, Loader2, PlusCircle, PencilLine, Trash2 } from "lucide-react";
 import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
 import { LoadingOverlay } from "@/app/components/ui/loading-overlay";
@@ -285,8 +285,17 @@ export function FeesView({
               approve or reject.
             </p>
           </div>
-          {canCreate && (
-            <div className={styles.actions}>
+          <div className={styles.actions}>
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => window.location.assign("/api/fees/export")}
+              disabled={isMutating}
+            >
+              <Download size={15} />
+              Export Excel
+            </Button>
+            {canCreate && (
               <Button
                 variant="primary"
                 size="md"
@@ -295,8 +304,8 @@ export function FeesView({
               >
                 New Fee
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <FeesStatsGrid stats={stats} />

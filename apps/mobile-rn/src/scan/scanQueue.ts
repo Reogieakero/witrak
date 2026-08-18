@@ -12,6 +12,8 @@ export interface QueuedScan {
   section?: string | null;
   mode: ScanMode;
   scannedAt: string;
+  synced?: boolean;
+  duplicate?: boolean;
 }
 
 const KEY = 'scan_queue_v1';
@@ -28,6 +30,8 @@ function toQueued(json: any): QueuedScan {
     section: (json.section as string) ?? null,
     mode: ((json.mode as ScanMode) ?? 'checkin') as ScanMode,
     scannedAt: json.scannedAt as string,
+    synced: json.synced === true,
+    duplicate: json.duplicate === true,
   };
 }
 
@@ -50,6 +54,13 @@ export async function addScan(scan: QueuedScan): Promise<void> {
   const queue = await loadQueue();
   queue.push(scan);
   await saveQueue(queue);
+}
+
+export async function markScansSynced(ids: string[]): Promise<void> {
+  const idSet = new Set(ids);
+  const queue = await loadQueue();
+  const next = queue.map((e) => (idSet.has(e.id) ? { ...e, synced: true } : e));
+  await saveQueue(next);
 }
 
 export async function removeScansByIds(ids: string[]): Promise<void> {

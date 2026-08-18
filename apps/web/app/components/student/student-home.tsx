@@ -115,9 +115,18 @@ export default async function StudentHomeView({
     ]);
 
   const fmtDate = (d: Date) =>
-    d.toLocaleDateString("en-PH", { month: "short", day: "numeric", year: "numeric" });
+    d.toLocaleDateString("en-PH", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "Asia/Manila",
+    });
   const fmtTime = (d: Date) =>
-    d.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" });
+    d.toLocaleTimeString("en-PH", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Asia/Manila",
+    });
 
   const totalEvents = eventRows.length;
   const upcomingEvents = eventRows.filter((e) => e.startsAt > now).length;
@@ -136,20 +145,33 @@ export default async function StudentHomeView({
     ...[...eventRows.filter((e) => e.endsAt <= now)].reverse(),
   ].slice(0, 6);
 
-  const [totalRecords, presentCount, pastAttendanceRows, otherAbsent, attendanceForEvents] =
+  const [totalRecords, presentRows, pastAttendanceRows, otherAbsent, attendanceForEvents] =
     await Promise.all([
       prisma.attendance.count({ where: { studentId } }),
-      prisma.attendance.count({
+      prisma.attendance.findMany({
         where: { studentId, status: { in: ["PRESENT", "LATE"] } },
+        select: { checkedInAt: true, checkedOutAt: true },
       }),
       prisma.attendance.findMany({
         where: { studentId, eventId: { in: [...pastRequiredEventIds] } },
-        select: { status: true },
+        select: { status: true, checkedInAt: true, checkedOutAt: true },
       }),
       prisma.attendance.count({
         where: {
           studentId,
-          status: { in: ["ABSENT", "EXCUSED"] },
+          OR: [
+            { status: { in: ["ABSENT", "EXCUSED"] } },
+            {
+              status: { in: ["PRESENT", "LATE"] },
+              checkedInAt: { not: null },
+              checkedOutAt: null,
+            },
+            {
+              status: { in: ["PRESENT", "LATE"] },
+              checkedInAt: null,
+              checkedOutAt: { not: null },
+            },
+          ],
           ...(pastRequiredEventIds.size > 0
             ? { eventId: { notIn: [...pastRequiredEventIds] } }
             : {}),
@@ -167,9 +189,14 @@ export default async function StudentHomeView({
       }),
     ]);
 
+  const presentCount = presentRows.filter(
+    (r) => !!r.checkedInAt && !!r.checkedOutAt,
+  ).length;
+
   let pastPresent = 0;
   let pastLate = 0;
   for (const r of pastAttendanceRows) {
+    if (!!r.checkedInAt !== !!r.checkedOutAt) continue;
     if (r.status === "PRESENT") pastPresent += 1;
     else if (r.status === "LATE") pastLate += 1;
   }
@@ -220,10 +247,9 @@ export default async function StudentHomeView({
     const isCompleted = e.endsAt <= now;
     let attendanceStatus: StudentHomeData["attendance"][number]["attendanceStatus"];
     if (rec) {
-      attendanceStatus =
-        rec.checkedOutAt && !rec.checkedInAt
-          ? "CHECKED_OUT_ONLY"
-          : rec.status;
+      const hasIn = !!rec.checkedInAt;
+      const hasOut = !!rec.checkedOutAt;
+      attendanceStatus = hasIn !== hasOut ? "ABSENT" : rec.status;
     } else if (e.requiresAttendance && isCompleted) {
       attendanceStatus = "ABSENT";
     } else if (isLive) {
@@ -301,8 +327,16 @@ export default async function StudentHomeView({
       location: e.location,
       startsAt: e.startsAt.toISOString(),
       endsAt: e.endsAt.toISOString(),
-      day: e.startsAt.getDate(),
-      month: e.startsAt.toLocaleDateString("en-PH", { month: "short" }),
+      day: Number(
+        e.startsAt.toLocaleDateString("en-PH", {
+          day: "numeric",
+          timeZone: "Asia/Manila",
+        }),
+      ),
+      month: e.startsAt.toLocaleDateString("en-PH", {
+        month: "short",
+        timeZone: "Asia/Manila",
+      }),
       scheduleTime: fmtTime(e.startsAt),
       requiresAttendance: e.requiresAttendance,
       isLive: e.startsAt <= now && now < e.endsAt,

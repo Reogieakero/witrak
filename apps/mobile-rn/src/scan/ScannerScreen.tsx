@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  BackHandler,
   Modal,
   Pressable,
   ScrollView,
@@ -26,8 +27,8 @@ import {
 import {
   addScan,
   loadQueue,
+  markScansSynced,
   QueuedScan,
-  removeScansByIds,
 } from './scanQueue';
 
 function pad2(n: number): string {
@@ -42,7 +43,8 @@ function initialsOf(name: string): string {
 }
 
 function formatTime(d: Date): string {
-  return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  const ph = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+  return `${pad2(ph.getUTCHours())}:${pad2(ph.getUTCMinutes())}`;
 }
 
 interface ScannerScreenProps {
@@ -73,6 +75,18 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
     };
   }, []);
 
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (historyOpen) {
+        setHistoryOpen(false);
+        return true;
+      }
+      onClose();
+      return true;
+    });
+    return () => sub.remove();
+  }, [historyOpen, onClose]);
+
   function setResultSafe(r: ScanResult | null) {
     resultRef.current = r;
     setResult(r);
@@ -93,12 +107,12 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
           studentNo: s.studentNo,
           section: s.section,
           scannedAt: new Date(s.scannedAt),
-          synced: false,
-          duplicate: false,
+          synced: s.synced === true,
+          duplicate: s.duplicate === true,
         }),
       )
       .sort((a, b) => b.scannedAt.getTime() - a.scannedAt.getTime());
-    setPending(queue.length);
+    setPending(queue.filter((s) => !s.synced && !s.duplicate).length);
     setHistorySafe(entries);
   }
 
@@ -141,14 +155,30 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
     );
 
     if (duplicate) {
+      const dupId = String(Date.now());
+      const dupTime = new Date();
+      await addScan({
+        id: dupId,
+        eventId: event.id,
+        eventTitle: event.title,
+        scanPassword: passcode,
+        qrText,
+        studentName: qr.name,
+        studentNo: qr.studentNo,
+        section: qr.section,
+        mode,
+        scannedAt: dupTime.toISOString(),
+        duplicate: true,
+        synced: true,
+      });
       setHistorySafe([
         {
-          id: String(Date.now()),
+          id: dupId,
           studentName: qr.name,
           studentNo: qr.studentNo,
           section: qr.section,
-          scannedAt: new Date(),
-          synced: false,
+          scannedAt: dupTime,
+          synced: true,
           duplicate: true,
         },
         ...historyRef.current,
@@ -222,7 +252,8 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
     if (syncing) return;
     setSyncing(true);
     const queue = await loadQueue();
-    if (queue.length === 0) {
+    const toSync = queue.filter((s) => !s.synced && !s.duplicate);
+    if (toSync.length === 0) {
       setSyncing(false);
       alert('Nothing to sync.');
       return;
@@ -230,7 +261,7 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
 
     const syncedIds: string[] = [];
     let firstError: string | null = null;
-    for (const scan of queue) {
+    for (const scan of toSync) {
       try {
         await api.post('/api/mobile/scan', {
           eventId: scan.eventId,
@@ -249,9 +280,9 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
       }
     }
 
-    await removeScansByIds(syncedIds);
+    await markScansSynced(syncedIds);
     const idSet = new Set(syncedIds);
-    const remaining = queue.length - syncedIds.length;
+    const remaining = toSync.length - syncedIds.length;
     setPending(remaining);
     setHistorySafe(
       historyRef.current.map((e) =>
@@ -319,9 +350,19 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
       )}
 
       <SafeAreaView style={styles.overlay} pointerEvents="box-none">
-        <View style={styles.topBar} pointerEvents="none">
-          <Text style={styles.topTitle}>{event.title}</Text>
-          <Text style={styles.topSubtitle}>Point at a member's QR code</Text>
+        <View style={styles.topRow}>
+          <Pressable
+            onPress={onClose}
+            hitSlop={8}
+            style={styles.closeBtn}
+            accessibilityLabel="Close scanner"
+          >
+            <Ionicons name="close" size={22} color="#fff" />
+          </Pressable>
+          <View style={styles.topBar} pointerEvents="none">
+            <Text style={styles.topTitle}>{event.title}</Text>
+            <Text style={styles.topSubtitle}>Point at a member's QR code</Text>
+          </View>
         </View>
 
         {event.hasTimeInOut && (
@@ -362,6 +403,11 @@ export function ScannerScreen({ event, passcode, onClose }: ScannerScreenProps) 
         )}
 
         <View style={styles.scanFrame} pointerEvents="none" />
+        <Text style={styles.scanHint} pointerEvents="none">
+          Keep the QR code inside the square
+        </Text>
+
+        <View style={styles.flexSpacer} />
 
         {processing && (
           <View style={styles.processingOverlay}>
@@ -530,7 +576,7 @@ function HistoryPanel({
 }) {
   const [tab, setTab] = useState(0);
   const ready = history.filter((e) => !e.synced && !e.duplicate);
-  const synced = history.filter((e) => e.synced);
+  const synced = history.filter((e) => e.synced && !e.duplicate);
   const duplicates = history.filter((e) => e.duplicate);
   const tabs = ['Ready to sync', 'Synced', 'Already checked in'];
   const items = [ready, synced, duplicates];
@@ -641,9 +687,22 @@ function HistoryEntry({ entry }: { entry: ScanLogEntry }) {
 const styles = StyleSheet.create({
   scannerRoot: { flex: 1, backgroundColor: '#0B1220' },
   overlay: { flex: 1, padding: 16 },
-  topBar: { alignItems: 'center', marginTop: 4 },
+  topRow: { position: 'relative', marginTop: 4 },
+  topBar: { alignItems: 'center' },
   topTitle: { color: '#fff', fontSize: 16, fontFamily: FhusoFonts.bold },
   topSubtitle: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  closeBtn: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 2,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   modeToggle: {
     flexDirection: 'row',
     alignSelf: 'center',
@@ -665,12 +724,23 @@ const styles = StyleSheet.create({
   },
   modeLabelActive: { color: '#fff' },
   scanFrame: {
-    flex: 1,
-    marginVertical: 24,
+    width: '76%',
+    aspectRatio: 1,
+    alignSelf: 'center',
+    marginTop: 20,
+    marginBottom: 12,
     borderWidth: 3,
     borderColor: FhusoColors.brand,
     borderRadius: 24,
     backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  flexSpacer: { flex: 1 },
+  scanHint: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    fontFamily: FhusoFonts.semiBold,
+    textAlign: 'center',
+    marginBottom: 8,
   },
   processingOverlay: {
     position: 'absolute',

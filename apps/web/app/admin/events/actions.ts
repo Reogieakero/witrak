@@ -11,7 +11,7 @@ export type SaveEventState = { ok: boolean; error?: string };
 
 function combineDateTime(date: string, time: string): Date | null {
   if (!date || !time) return null;
-  const d = new Date(`${date}T${time}`);
+  const d = new Date(`${date}T${time}:00+08:00`);
   return Number.isNaN(d.getTime()) ? null : d;
 }
 

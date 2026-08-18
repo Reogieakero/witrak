@@ -15,6 +15,13 @@ import type {
 const PRESENT_STATUSES = ["PRESENT", "LATE"];
 const ABSENT_STATUSES = ["ABSENT", "EXCUSED"];
 
+function isPartial(r: {
+  checkedInAt: Date | null;
+  checkedOutAt: Date | null;
+}): boolean {
+  return !!r.checkedInAt !== !!r.checkedOutAt;
+}
+
 function eventStatus(
   startsAt: Date,
   endsAt: Date,
@@ -87,6 +94,8 @@ export default async function AdminAttendancePage() {
               scannedAt: true,
               eventId: true,
               studentId: true,
+              checkedInAt: true,
+              checkedOutAt: true,
               student: {
                 select: {
                   id: true,
@@ -178,15 +187,18 @@ export default async function AdminAttendancePage() {
           total: 0,
         };
         evAgg.total += 1;
-        if (row.status === "PRESENT") evAgg.present += 1;
+        if (isPartial(row)) evAgg.absent += 1;
+        else if (row.status === "PRESENT") evAgg.present += 1;
         else if (row.status === "LATE") evAgg.late += 1;
         else evAgg.absent += 1;
         attByEvent.set(row.eventId, evAgg);
 
         if (pastAttendanceEventIds.has(row.eventId)) {
           const p = studentPast.get(row.studentId) ?? { present: 0, late: 0 };
-          if (row.status === "PRESENT") p.present += 1;
-          else if (row.status === "LATE") p.late += 1;
+          if (!isPartial(row)) {
+            if (row.status === "PRESENT") p.present += 1;
+            else if (row.status === "LATE") p.late += 1;
+          }
           studentPast.set(row.studentId, p);
         } else {
           const o = studentOther.get(row.studentId) ?? {
@@ -194,17 +206,19 @@ export default async function AdminAttendancePage() {
             late: 0,
             absent: 0,
           };
-          if (row.status === "PRESENT") o.present += 1;
+          if (isPartial(row)) o.absent += 1;
+          else if (row.status === "PRESENT") o.present += 1;
           else if (row.status === "LATE") o.late += 1;
           else o.absent += 1;
           studentOther.set(row.studentId, o);
         }
 
-        if (PRESENT_STATUSES.includes(row.status)) {
+        const effective = isPartial(row) ? "ABSENT" : row.status;
+        if (PRESENT_STATUSES.includes(effective)) {
           presentTotal += 1;
           attendedTotal += 1;
         }
-        if (ABSENT_STATUSES.includes(row.status)) attendedTotal += 1;
+        if (ABSENT_STATUSES.includes(effective)) attendedTotal += 1;
         if (isSameDay(row.scannedAt, now)) scannedToday += 1;
       }
 
@@ -233,20 +247,32 @@ export default async function AdminAttendancePage() {
           title: e.title,
           location: e.location,
           programId: e.programId,
-          month: e.startsAt.toLocaleDateString("en-PH", { month: "short" }),
-          day: e.startsAt.getDate(),
+          month: e.startsAt.toLocaleDateString("en-PH", {
+            month: "short",
+            timeZone: "Asia/Manila",
+          }),
+          day: Number(
+            e.startsAt.toLocaleDateString("en-PH", {
+              day: "numeric",
+              timeZone: "Asia/Manila",
+            }),
+          ),
           scheduleDate: e.startsAt.toLocaleDateString("en-PH", {
             month: "short",
             day: "numeric",
+            timeZone: "Asia/Manila",
           }),
           scheduleTime: `${e.startsAt.toLocaleTimeString("en-PH", {
             hour: "2-digit",
             minute: "2-digit",
+            timeZone: "Asia/Manila",
           })} – ${e.endsAt.toLocaleTimeString("en-PH", {
             hour: "2-digit",
             minute: "2-digit",
+            timeZone: "Asia/Manila",
           })}`,
           status,
+          requiresAttendance: e.requiresAttendance,
           present,
           late,
           absent,

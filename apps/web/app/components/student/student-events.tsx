@@ -42,14 +42,17 @@ function scheduleRange(e: StudentEventItem): string {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "Asia/Manila",
   });
   const startTime = start.toLocaleTimeString("en-PH", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Manila",
   });
   const endTime = end.toLocaleTimeString("en-PH", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Manila",
   });
   return `${date} · ${startTime} – ${endTime}`;
 }

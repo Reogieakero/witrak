@@ -379,7 +379,7 @@ export async function exportStudentData(): Promise<ExportDataResult> {
     rows: attendances.map((a) => [
       a.event.title,
       fmtDate(a.event.startsAt),
-      a.status,
+      !!a.checkedInAt !== !!a.checkedOutAt ? "ABSENT" : a.status,
       fmtDate(a.checkedInAt),
       fmtDate(a.checkedOutAt),
       fmtDate(a.scannedAt),

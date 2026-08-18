@@ -305,8 +305,6 @@ export function AttendanceList({
                       <th className={styles.center}>Present</th>
                       <th className={styles.center}>Late</th>
                       <th className={styles.center}>Absent</th>
-                      <th className={styles.center}>Rate</th>
-                      <th className={styles.center}>Overall</th>
                       <th className={styles.center}>Actions</th>
                     </tr>
                   </thead>
@@ -346,20 +344,6 @@ export function AttendanceList({
                         </td>
                         <td className={styles.center}>
                           <span className={styles.absent}>{s.absent}</span>
-                        </td>
-                        <td className={styles.center}>
-                          <Badge tone={s.rate >= 90 ? "green" : s.rate >= 75 ? "amber" : "red"}>
-                            {s.rate}%
-                          </Badge>
-                        </td>
-                        <td className={styles.center}>
-                          {s.total > 0 ? (
-                            <Badge tone={s.absent === 0 ? "green" : "amber"}>
-                              {s.absent === 0 ? "All present" : "Partial present"}
-                            </Badge>
-                          ) : (
-                            <span className={styles.cellMuted}>—</span>
-                          )}
                         </td>
                         <td className={styles.center}>
                           <button

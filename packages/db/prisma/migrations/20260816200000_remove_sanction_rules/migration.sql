@@ -3,13 +3,13 @@
 
 -- AlterTable Sanction: drop ruleId
 ALTER TABLE "Sanction" DROP CONSTRAINT "Sanction_ruleId_fkey";
-ALTER TABLE "Sanction" DROP COLUMN "ruleId";
 DROP INDEX "Sanction_ruleId_idx";
+ALTER TABLE "Sanction" DROP COLUMN "ruleId";
 
 -- AlterTable SanctionFlag: drop ruleId
 ALTER TABLE "SanctionFlag" DROP CONSTRAINT "SanctionFlag_ruleId_fkey";
-ALTER TABLE "SanctionFlag" DROP COLUMN "ruleId";
 DROP INDEX "SanctionFlag_studentId_ruleId_periodRef_idx";
+ALTER TABLE "SanctionFlag" DROP COLUMN "ruleId";
 CREATE INDEX "SanctionFlag_studentId_periodRef_idx" ON "SanctionFlag"("studentId", "periodRef");
 
 -- DropTable SanctionRule

@@ -1,4 +1,5 @@
 import { prisma, FlagStatus, AuditAction } from "./index";
+import type { Prisma } from "@prisma/client";
 
 export type RecomputeResult = "none" | "created" | "updated";
 
@@ -80,6 +81,8 @@ export async function recomputeSanctionTriggers(
             studentId,
             status: { in: ["PRESENT", "LATE"] },
             eventId: { in: pastEventIds },
+            checkedInAt: { not: null },
+            checkedOutAt: { not: null },
             ...(range ? { scannedAt: range } : {}),
           },
         })
@@ -97,10 +100,6 @@ export async function recomputeSanctionTriggers(
 
   const count =
     Math.max(0, pastEventIds.length - presentLateCount) + otherAbsentCount;
-  if (count === 0) return "none";
-
-  const fine = await resolveFineForCount(count);
-  if (!fine) return "none";
 
   const [existingSanction, existingFlag] = await Promise.all([
     prisma.sanction.findFirst({
@@ -108,7 +107,7 @@ export async function recomputeSanctionTriggers(
         studentId,
         ...(range ? { issuedAt: range } : {}),
       },
-      select: { id: true, status: true, fineId: true },
+      select: { id: true, status: true, fineId: true, reason: true },
     }),
     prisma.sanctionFlag.findFirst({
       where: { studentId, periodRef },
@@ -119,10 +118,67 @@ export async function recomputeSanctionTriggers(
   // A cleared sanction stays cleared — never reopen it.
   if (existingSanction?.status === "RESOLVED") return "none";
 
+  if (count === 0) {
+    // Attendance was later confirmed, so an auto-issued open sanction is now
+    // stale — clear it instead of leaving a fine the student no longer owes.
+    if (
+      existingSanction &&
+      existingFlag &&
+      existingSanction.reason?.startsWith("Automatically issued")
+    ) {
+      await prisma.$transaction(async (tx) => {
+        await tx.sanction.update({
+          where: { id: existingSanction.id },
+          data: {
+            status: "RESOLVED",
+            resolvedAt: new Date(),
+            resolvedNote: "Auto-cleared: absence count is now zero.",
+          },
+        });
+        await tx.sanctionEvidence.deleteMany({
+          where: { sanctionId: existingSanction.id },
+        });
+        await tx.auditLog.create({
+          data: {
+            action: AuditAction.SANCTION_RESOLVED,
+            targetId: existingSanction.id,
+            details: {
+              auto: true,
+              absences: 0,
+              reason: "absence count cleared",
+            },
+          },
+        });
+      });
+      return "updated";
+    }
+    return "none";
+  }
+
+  const fine = await resolveFineForCount(count);
+  if (!fine) return "none";
+
+  const partialEvidenceWhere: Prisma.AttendanceWhereInput[] = pastEventIds.length
+    ? [
+        {
+          status: { in: ["PRESENT", "LATE"] },
+          checkedInAt: { not: null },
+          checkedOutAt: null,
+          eventId: { in: pastEventIds },
+        },
+        {
+          status: { in: ["PRESENT", "LATE"] },
+          checkedInAt: null,
+          checkedOutAt: { not: null },
+          eventId: { in: pastEventIds },
+        },
+      ]
+    : [];
+
   const absentRows = await prisma.attendance.findMany({
     where: {
       studentId,
-      status: { in: ["ABSENT", "EXCUSED"] },
+      OR: [{ status: { in: ["ABSENT", "EXCUSED"] } }, ...partialEvidenceWhere],
       ...(range ? { scannedAt: range } : {}),
     },
     select: { id: true },

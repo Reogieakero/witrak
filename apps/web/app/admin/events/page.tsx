@@ -10,6 +10,13 @@ import type { EventItem, EventsStats } from "@/app/components/events/types";
 
 const PRESENT_STATUSES = ["PRESENT", "LATE"];
 
+function isPartial(r: {
+  checkedInAt: Date | null;
+  checkedOutAt: Date | null;
+}): boolean {
+  return !!r.checkedInAt !== !!r.checkedOutAt;
+}
+
 function eventStatus(startsAt: Date, endsAt: Date, now: Date): "live" | "upcoming" | "past" {
   if (startsAt <= now && now < endsAt) return "live";
   if (startsAt > now) return "upcoming";
@@ -18,8 +25,10 @@ function eventStatus(startsAt: Date, endsAt: Date, now: Date): "live" | "upcomin
 
 function formatDayMonth(d: Date) {
   return {
-    month: d.toLocaleDateString("en-PH", { month: "short" }),
-    day: d.getDate(),
+    month: d.toLocaleDateString("en-PH", { month: "short", timeZone: "Asia/Manila" }),
+    day: Number(
+      d.toLocaleDateString("en-PH", { day: "numeric", timeZone: "Asia/Manila" }),
+    ),
   };
 }
 
@@ -29,9 +38,18 @@ function formatSchedule(startsAt: Date, endsAt: Date) {
     month: "short",
     day: "numeric",
     year: "numeric",
+    timeZone: "Asia/Manila",
   });
-  const start = startsAt.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" });
-  const end = endsAt.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" });
+  const start = startsAt.toLocaleTimeString("en-PH", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Manila",
+  });
+  const end = endsAt.toLocaleTimeString("en-PH", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Manila",
+  });
   return { date, time: `${start} – ${end}` };
 }
 
@@ -106,7 +124,12 @@ export default async function AdminEventsPage() {
       const attendanceRows = events.length
         ? await prisma.attendance.findMany({
             where: { eventId: { in: events.map((e) => e.id) } },
-            select: { eventId: true, status: true },
+            select: {
+              eventId: true,
+              status: true,
+              checkedInAt: true,
+              checkedOutAt: true,
+            },
           })
         : [];
 
@@ -140,7 +163,7 @@ export default async function AdminEventsPage() {
       for (const row of attendanceRows) {
         if (!termEventIds.has(row.eventId)) continue;
         rowCountByEvent.set(row.eventId, (rowCountByEvent.get(row.eventId) ?? 0) + 1);
-        if (PRESENT_STATUSES.includes(row.status)) {
+        if (PRESENT_STATUSES.includes(row.status) && !isPartial(row)) {
           presentByEvent.set(row.eventId, (presentByEvent.get(row.eventId) ?? 0) + 1);
           presentTotal += 1;
         }

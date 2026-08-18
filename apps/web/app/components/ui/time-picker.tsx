@@ -20,8 +20,9 @@ function toTime(value?: string): string {
   if (!value) return "";
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return "";
+  const ph = new Date(d.getTime() + 8 * 60 * 60 * 1000);
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${pad(ph.getUTCHours())}:${pad(ph.getUTCMinutes())}`;
 }
 
 function formatTime(time: string): string {

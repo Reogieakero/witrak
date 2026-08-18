@@ -10,6 +10,7 @@ export type AttendanceEventItem = {
   scheduleDate: string;
   scheduleTime: string;
   status: "live" | "upcoming" | "past";
+  requiresAttendance: boolean;
   present: number;
   late: number;
   absent: number;

@@ -24,6 +24,7 @@ function formatTime(iso: string | null): string {
   return new Date(iso).toLocaleTimeString("en-PH", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Manila",
   });
 }
 
@@ -73,7 +74,7 @@ export function EventView({
                 </span>
               )}
               {upcoming && <span className={styles.statusUpcoming}>UPCOMING</span>}
-              {past && <span className={styles.statusPast}>COMPLETED</span>}
+              {past && <span className={styles.statusPast}>Completed</span>}
               {event.programName && (
                 <span className={styles.programChip}>
                   <Target size={12} />

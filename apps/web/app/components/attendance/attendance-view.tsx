@@ -44,6 +44,7 @@ function formatScheduleDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-PH", {
     month: "short",
     day: "numeric",
+    timeZone: "Asia/Manila",
   });
 }
 
@@ -150,6 +151,7 @@ export function AttendanceView({
       {selectedStudent && (
         <AttendanceStudentDrawer
           student={selectedStudent}
+          events={events}
           records={records.filter((r) => r.studentId === selectedStudent.id)}
           loading={loadingRecords}
           onClose={() => setSelectedStudent(null)}

@@ -46,7 +46,6 @@ type Row = {
   scannedAt: string | null;
   checkedInAt: string | null;
   checkedOutAt: string | null;
-  checkedOutOnly: boolean;
 };
 
 function formatTime(iso: string | null): string {
@@ -54,20 +53,67 @@ function formatTime(iso: string | null): string {
   return new Date(iso).toLocaleTimeString("en-PH", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Manila",
   });
 }
 
-function statusLabel(status: AttendanceStatus): string {
-  switch (status) {
-    case "PRESENT":
-      return "Present";
-    case "LATE":
-      return "Late";
-    case "ABSENT":
-      return "Absent";
-    case "EXCUSED":
-      return "Excused";
+function effectiveStatus(r: Row): AttendanceStatus | null {
+  if (r.status === "PRESENT" || r.status === "LATE") {
+    const hasIn = !!r.checkedInAt;
+    const hasOut = !!r.checkedOutAt;
+    if (hasIn !== hasOut) return "ABSENT";
   }
+  return r.status;
+}
+
+function rowBadges(r: Row): React.ReactNode[] {
+  const s = effectiveStatus(r);
+  if (s === "LATE") {
+    return [
+      <Badge key="late" tone="amber">
+        Late
+      </Badge>,
+      <Badge key="present" tone="green">
+        Present
+      </Badge>,
+    ];
+  }
+  if (s === "PRESENT") {
+    return [
+      <Badge key="present" tone="green">
+        Present
+      </Badge>,
+    ];
+  }
+  if (s === "ABSENT") {
+    const hasIn = !!r.checkedInAt;
+    const hasOut = !!r.checkedOutAt;
+    const badges = [
+      <Badge key="absent" tone="red">
+        Absent
+      </Badge>,
+    ];
+    if (hasIn !== hasOut) {
+      badges.push(
+        <Badge key="missing" tone="red">
+          {hasIn ? "Time out not scanned" : "Time in not scanned"}
+        </Badge>,
+      );
+    }
+    return badges;
+  }
+  if (s === "EXCUSED") {
+    return [
+      <Badge key="excused" tone="green">
+        Excused
+      </Badge>,
+    ];
+  }
+  return [
+    <Badge key="noscanned" tone="red">
+      Not scanned
+    </Badge>,
+  ];
 }
 
 export function AttendanceEventDrawer({
@@ -120,19 +166,20 @@ export function AttendanceEventDrawer({
           scannedAt: optimistic?.scannedAt ?? r?.scannedAt ?? null,
           checkedInAt: r?.checkedInAt ?? null,
           checkedOutAt: r?.checkedOutAt ?? null,
-          checkedOutOnly: !!(r?.checkedOutAt && !r?.checkedInAt),
         };
       }),
     [roster, recordByStudent, defaultStatus, optimisticStatus],
   );
 
-  const present = rows.filter((r) => r.status === "PRESENT").length;
-  const late = rows.filter((r) => r.status === "LATE").length;
-  const absent = rows.filter(
-    (r) => r.status === "ABSENT" || r.status === "EXCUSED",
-  ).length;
+  const present = rows.filter((r) => effectiveStatus(r) === "PRESENT").length;
+  const late = rows.filter((r) => effectiveStatus(r) === "LATE").length;
+  const absent = rows.filter((r) => {
+    const s = effectiveStatus(r);
+    return s === "ABSENT" || s === "EXCUSED";
+  }).length;
   const allPresent =
-    rows.length > 0 && rows.every((r) => r.status === "PRESENT");
+    rows.length > 0 &&
+    rows.every((r) => effectiveStatus(r) === "PRESENT");
 
   const searchQuery = query.trim().toLowerCase();
   const filtered = useMemo(
@@ -282,7 +329,7 @@ export function AttendanceEventDrawer({
           <div className={styles.rateRow}>
             <span>Attendance status</span>
             <Badge tone={allPresent ? "green" : "amber"}>
-              {allPresent ? "All present" : "Partial present"}
+              {allPresent ? "All present" : "Not all present"}
             </Badge>
           </div>
         )}
@@ -350,17 +397,9 @@ export function AttendanceEventDrawer({
                       </span>
                     </td>
                     <td className={styles.thRight}>
-                      {r.checkedOutOnly ? (
-                        <Badge tone="red">Checked out only</Badge>
-                      ) : r.status === "PRESENT" ? (
-                        <Badge tone="green">Present</Badge>
-                      ) : r.status === "LATE" ? (
-                        <Badge tone="amber">Late</Badge>
-                      ) : r.status ? (
-                        <Badge tone="red">{statusLabel(r.status)}</Badge>
-                      ) : (
-                        <Badge tone="red">Not scanned</Badge>
-                      )}
+                      <span className={styles.badgeGroup}>
+                        {rowBadges(r)}
+                      </span>
                     </td>
                     <td className={styles.right}>
                       {canEdit && (

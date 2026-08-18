@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { UserRound } from "lucide-react";
-import type { AttendanceStudentItem, AttendanceStatus } from "./types";
+import type {
+  AttendanceEventItem,
+  AttendanceStudentItem,
+  AttendanceStatus,
+} from "./types";
 import { Drawer } from "@/app/components/ui/drawer";
 import { Button } from "@/app/components/ui/button";
 import { Badge } from "@/app/components/ui/badge";
@@ -12,8 +16,10 @@ import styles from "./attendance-student-drawer.module.css";
 
 export type AttendanceStudentDrawerProps = {
   student: AttendanceStudentItem;
+  events: AttendanceEventItem[];
   records: {
     id: string;
+    eventId: string;
     eventTitle: string;
     scheduleDate: string;
     status: AttendanceStatus;
@@ -30,11 +36,82 @@ function formatTime(iso: string | null): string {
   return new Date(iso).toLocaleTimeString("en-PH", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Asia/Manila",
   });
+}
+
+function statusBadges(rec?: {
+  status: AttendanceStatus;
+  checkedInAt: string | null;
+  checkedOutAt: string | null;
+}, eventStatus?: "live" | "upcoming" | "past"): React.ReactNode[] {
+  if (!rec) {
+    if (eventStatus === "upcoming") {
+      return [
+        <Badge key="notyet" tone="gray">
+          Not yet
+        </Badge>,
+      ];
+    }
+    if (eventStatus === "past") {
+      return [
+        <Badge key="absent" tone="red">
+          Absent
+        </Badge>,
+      ];
+    }
+    return [
+      <Badge key="noscanned" tone="red">
+        Not scanned
+      </Badge>,
+    ];
+  }
+  const hasIn = !!rec.checkedInAt;
+  const hasOut = !!rec.checkedOutAt;
+  if (rec.status === "PRESENT" || rec.status === "LATE") {
+    if (hasIn !== hasOut) {
+      return [
+        <Badge key="absent" tone="red">
+          Absent
+        </Badge>,
+        <Badge key="missing" tone="red">
+          {hasIn ? "Time out not scanned" : "Time in not scanned"}
+        </Badge>,
+      ];
+    }
+    if (rec.status === "LATE") {
+      return [
+        <Badge key="late" tone="amber">
+          Late
+        </Badge>,
+        <Badge key="present" tone="green">
+          Present
+        </Badge>,
+      ];
+    }
+    return [
+      <Badge key="present" tone="green">
+        Present
+      </Badge>,
+    ];
+  }
+  if (rec.status === "EXCUSED") {
+    return [
+      <Badge key="excused" tone="green">
+        Excused
+      </Badge>,
+    ];
+  }
+  return [
+    <Badge key="absent" tone="red">
+      Absent
+    </Badge>,
+  ];
 }
 
 export function AttendanceStudentDrawer({
   student,
+  events,
   records,
   loading = false,
   onClose,
@@ -49,14 +126,40 @@ export function AttendanceStudentDrawer({
     .join("")
     .toUpperCase();
 
+  const recordByEvent = useMemo(
+    () => new Map(records.map((r) => [r.eventId, r])),
+    [records],
+  );
+
+  const rows = useMemo(
+    () =>
+      events
+        .filter((e) => e.requiresAttendance)
+        .map((e) => {
+          const rec = recordByEvent.get(e.id);
+          return {
+            eventId: e.id,
+            eventTitle: e.title,
+            scheduleDate: e.scheduleDate,
+            scheduleTime: e.scheduleTime,
+            scannedAt: rec?.scannedAt ?? null,
+            checkedInAt: rec?.checkedInAt ?? null,
+            checkedOutAt: rec?.checkedOutAt ?? null,
+            badges: statusBadges(rec, e.status),
+          };
+        })
+        .sort((a, b) => b.eventId.localeCompare(a.eventId)),
+    [events, recordByEvent],
+  );
+
   const searchQuery = query.trim().toLowerCase();
   const filtered = useMemo(
     () =>
-      records.filter((r) => {
+      rows.filter((r) => {
         if (!searchQuery) return true;
         return r.eventTitle.toLowerCase().includes(searchQuery);
       }),
-    [records, searchQuery],
+    [rows, searchQuery],
   );
 
   return (
@@ -125,10 +228,10 @@ export function AttendanceStudentDrawer({
         <div className={styles.records}>
           {loading ? (
             <SkeletonRows rows={8} columns={6} />
-          ) : records.length === 0 ? (
+          ) : rows.length === 0 ? (
             <div className={styles.empty}>
               <UserRound size={20} />
-              <span>No attendance records for this student yet.</span>
+              <span>No attendance events for this student yet.</span>
             </div>
           ) : filtered.length === 0 ? (
             <div className={styles.empty}>
@@ -142,19 +245,20 @@ export function AttendanceStudentDrawer({
                   <th>Event</th>
                   <th>Date</th>
                   <th className={styles.thRight}>Scanned At</th>
-                  <th className={styles.thRight}>Check In</th>
-                  <th className={styles.thRight}>Check Out</th>
+                  <th className={styles.thRight}>Time In</th>
+                  <th className={styles.thRight}>Time Out</th>
                   <th className={styles.thRight}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((r) => (
-                  <tr key={r.id}>
+                  <tr key={r.eventId}>
                     <td>
                       <span className={styles.eventTitle}>{r.eventTitle}</span>
                     </td>
                     <td>
                       <span className={styles.cellMuted}>{r.scheduleDate}</span>
+                      <span className={styles.cellMuted}>{r.scheduleTime}</span>
                     </td>
                     <td className={styles.thRight}>
                       <span className={styles.timeCell}>{formatTime(r.scannedAt)}</span>
@@ -166,25 +270,7 @@ export function AttendanceStudentDrawer({
                       <span className={styles.timeCell}>{formatTime(r.checkedOutAt)}</span>
                     </td>
                     <td className={styles.thRight}>
-                      {r.checkedOutAt && !r.checkedInAt ? (
-                        <Badge tone="red">Checked out only</Badge>
-                      ) : (
-                        <Badge
-                          tone={
-                            r.status === "PRESENT"
-                              ? "green"
-                              : r.status === "LATE"
-                                ? "amber"
-                                : "red"
-                          }
-                        >
-                          {r.status === "PRESENT"
-                            ? "Present"
-                            : r.status === "LATE"
-                              ? "Late"
-                              : "Absent"}
-                        </Badge>
-                      )}
+                      <span className={styles.badgeGroup}>{r.badges}</span>
                     </td>
                   </tr>
                 ))}

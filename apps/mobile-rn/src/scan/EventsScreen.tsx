@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   Modal,
   Pressable,
   RefreshControl,
@@ -31,7 +32,10 @@ function scheduleLabel(event: ScanEvent): string {
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
   ];
-  const time = (d: Date) => `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  const time = (d: Date) => {
+    const ph = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+    return `${pad2(ph.getUTCHours())}:${pad2(ph.getUTCMinutes())}`;
+  };
   return `${months[event.startsAt.getMonth()]} ${event.startsAt.getDate()} · ${time(
     event.startsAt,
   )} – ${time(event.endsAt)}`;
@@ -115,9 +119,18 @@ export function EventsScreen({ themeMode, onToggleTheme }: EventsScreenProps) {
     <View style={[styles.root, { backgroundColor: colors.canvas }]}>
       <SafeAreaView edges={['top']} style={styles.safe}>
         <View style={styles.appBar}>
-          <Text style={[styles.appBarTitle, { color: colors.ink }]}>
-            Liberal Scanner
-          </Text>
+          <View style={styles.appBarBrand}>
+            <View style={styles.appBarLogoWrap}>
+              <Image
+                source={require('../../assets/logo.png')}
+                style={styles.appBarLogo}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={[styles.appBarTitle, { color: colors.ink }]}>
+              Liberal Scanner
+            </Text>
+          </View>
           <Pressable onPress={onToggleTheme} hitSlop={8}>
             <Ionicons
               name={isDark ? 'sunny-outline' : 'moon-outline'}
@@ -463,6 +476,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  appBarBrand: { flexDirection: 'row', alignItems: 'center' },
+  appBarLogoWrap: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    marginRight: 10,
+    overflow: 'hidden',
+  },
+  appBarLogo: { width: 30, height: 30 },
   appBarTitle: { fontSize: 20, fontFamily: FhusoFonts.bold, letterSpacing: -0.3 },
   center: {
     flexGrow: 1,
