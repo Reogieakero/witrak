@@ -67,36 +67,40 @@ export async function recomputeSanctionTriggers(
 
   const pastEvents = await prisma.event.findMany({
     where: pastEventWhere,
-    select: { id: true },
+    select: { id: true, hasTimeInOut: true },
   });
   const pastEventIds = pastEvents.map((e) => e.id);
   const range = activeTerm
     ? { gte: activeTerm.startsOn, lte: activeTerm.endsOn }
     : null;
 
-  const [presentLateCount, otherAbsentCount] = await Promise.all([
-    pastEventIds.length
-      ? prisma.attendance.count({
-          where: {
-            studentId,
-            status: { in: ["PRESENT", "LATE"] },
-            eventId: { in: pastEventIds },
-            checkedInAt: { not: null },
-            checkedOutAt: { not: null },
-            ...(range ? { scannedAt: range } : {}),
-          },
-        })
-      : Promise.resolve(0),
-    prisma.attendance.count({
-      where: {
-        studentId,
-        status: { in: ["ABSENT", "EXCUSED"] },
-        ...(pastEventIds.length ? { eventId: { notIn: pastEventIds } } : {}),
-        ...(range ? { scannedAt: range } : {}),
-        ...(range ? { event: { startsAt: range } } : {}),
-      },
-    }),
-  ]);
+  // A student "attended" an event if they have a PRESENT/LATE record with a
+  // check-in. For events that track time-out, a matching check-out is also
+  // required; otherwise a single check-in is enough.
+  const attendedEventIds = new Set<string>();
+  for (const e of pastEvents) {
+    const where: Prisma.AttendanceWhereInput = {
+      studentId,
+      eventId: e.id,
+      status: { in: ["PRESENT", "LATE"] },
+      checkedInAt: { not: null },
+      ...(e.hasTimeInOut ? { checkedOutAt: { not: null } } : {}),
+      ...(range ? { scannedAt: range } : {}),
+    };
+    const found = await prisma.attendance.findFirst({ where, select: { id: true } });
+    if (found) attendedEventIds.add(e.id);
+  }
+  const presentLateCount = attendedEventIds.size;
+
+  const otherAbsentCount = await prisma.attendance.count({
+    where: {
+      studentId,
+      status: { in: ["ABSENT", "EXCUSED"] },
+      ...(pastEventIds.length ? { eventId: { notIn: pastEventIds } } : {}),
+      ...(range ? { scannedAt: range } : {}),
+      ...(range ? { event: { startsAt: range } } : {}),
+    },
+  });
 
   const count =
     Math.max(0, pastEventIds.length - presentLateCount) + otherAbsentCount;
@@ -158,22 +162,27 @@ export async function recomputeSanctionTriggers(
   const fine = await resolveFineForCount(count);
   if (!fine) return "none";
 
-  const partialEvidenceWhere: Prisma.AttendanceWhereInput[] = pastEventIds.length
-    ? [
-        {
-          status: { in: ["PRESENT", "LATE"] },
-          checkedInAt: { not: null },
-          checkedOutAt: null,
-          eventId: { in: pastEventIds },
-        },
-        {
-          status: { in: ["PRESENT", "LATE"] },
-          checkedInAt: null,
-          checkedOutAt: { not: null },
-          eventId: { in: pastEventIds },
-        },
-      ]
-    : [];
+  const timeInOutEventIds = pastEvents
+    .filter((e) => e.hasTimeInOut)
+    .map((e) => e.id);
+
+  const partialEvidenceWhere: Prisma.AttendanceWhereInput[] =
+    timeInOutEventIds.length
+      ? [
+          {
+            status: { in: ["PRESENT", "LATE"] },
+            checkedInAt: { not: null },
+            checkedOutAt: null,
+            eventId: { in: timeInOutEventIds },
+          },
+          {
+            status: { in: ["PRESENT", "LATE"] },
+            checkedInAt: null,
+            checkedOutAt: { not: null },
+            eventId: { in: timeInOutEventIds },
+          },
+        ]
+      : [];
 
   const absentRows = await prisma.attendance.findMany({
     where: {

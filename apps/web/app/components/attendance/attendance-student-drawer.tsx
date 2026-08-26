@@ -40,11 +40,15 @@ function formatTime(iso: string | null): string {
   });
 }
 
-function statusBadges(rec?: {
-  status: AttendanceStatus;
-  checkedInAt: string | null;
-  checkedOutAt: string | null;
-}, eventStatus?: "live" | "upcoming" | "past"): React.ReactNode[] {
+function statusBadges(
+  rec?: {
+    status: AttendanceStatus;
+    checkedInAt: string | null;
+    checkedOutAt: string | null;
+  },
+  eventStatus?: "live" | "upcoming" | "past",
+  hasTimeInOut: boolean = false,
+): React.ReactNode[] {
   if (!rec) {
     if (eventStatus === "upcoming") {
       return [
@@ -69,7 +73,7 @@ function statusBadges(rec?: {
   const hasIn = !!rec.checkedInAt;
   const hasOut = !!rec.checkedOutAt;
   if (rec.status === "PRESENT" || rec.status === "LATE") {
-    if (hasIn !== hasOut) {
+    if (hasTimeInOut && hasIn !== hasOut) {
       return [
         <Badge key="absent" tone="red">
           Absent
@@ -145,7 +149,7 @@ export function AttendanceStudentDrawer({
             scannedAt: rec?.scannedAt ?? null,
             checkedInAt: rec?.checkedInAt ?? null,
             checkedOutAt: rec?.checkedOutAt ?? null,
-            badges: statusBadges(rec, e.status),
+            badges: statusBadges(rec, e.status, e.hasTimeInOut),
           };
         })
         .sort((a, b) => b.eventId.localeCompare(a.eventId)),

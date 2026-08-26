@@ -57,17 +57,22 @@ function formatTime(iso: string | null): string {
   });
 }
 
-function effectiveStatus(r: Row): AttendanceStatus | null {
+function effectiveStatus(
+  r: Row,
+  hasTimeInOut: boolean,
+): AttendanceStatus | null {
   if (r.status === "PRESENT" || r.status === "LATE") {
-    const hasIn = !!r.checkedInAt;
-    const hasOut = !!r.checkedOutAt;
-    if (hasIn !== hasOut) return "ABSENT";
+    if (hasTimeInOut) {
+      const hasIn = !!r.checkedInAt;
+      const hasOut = !!r.checkedOutAt;
+      if (hasIn !== hasOut) return "ABSENT";
+    }
   }
   return r.status;
 }
 
-function rowBadges(r: Row): React.ReactNode[] {
-  const s = effectiveStatus(r);
+function rowBadges(r: Row, hasTimeInOut: boolean): React.ReactNode[] {
+  const s = effectiveStatus(r, hasTimeInOut);
   if (s === "LATE") {
     return [
       <Badge key="late" tone="amber">
@@ -140,6 +145,8 @@ export function AttendanceEventDrawer({
   const defaultStatus: AttendanceStatus | null =
     event.status === "past" ? "ABSENT" : null;
 
+  const hasTimeInOut = event.hasTimeInOut;
+
   const roster = useMemo(
     () =>
       students.filter(
@@ -171,15 +178,19 @@ export function AttendanceEventDrawer({
     [roster, recordByStudent, defaultStatus, optimisticStatus],
   );
 
-  const present = rows.filter((r) => effectiveStatus(r) === "PRESENT").length;
-  const late = rows.filter((r) => effectiveStatus(r) === "LATE").length;
+  const present = rows.filter(
+    (r) => effectiveStatus(r, hasTimeInOut) === "PRESENT",
+  ).length;
+  const late = rows.filter(
+    (r) => effectiveStatus(r, hasTimeInOut) === "LATE",
+  ).length;
   const absent = rows.filter((r) => {
-    const s = effectiveStatus(r);
+    const s = effectiveStatus(r, hasTimeInOut);
     return s === "ABSENT" || s === "EXCUSED";
   }).length;
   const allPresent =
     rows.length > 0 &&
-    rows.every((r) => effectiveStatus(r) === "PRESENT");
+    rows.every((r) => effectiveStatus(r, hasTimeInOut) === "PRESENT");
 
   const searchQuery = query.trim().toLowerCase();
   const filtered = useMemo(
@@ -398,7 +409,7 @@ export function AttendanceEventDrawer({
                     </td>
                     <td className={styles.thRight}>
                       <span className={styles.badgeGroup}>
-                        {rowBadges(r)}
+                        {rowBadges(r, hasTimeInOut)}
                       </span>
                     </td>
                     <td className={styles.right}>

@@ -15,10 +15,11 @@ import type {
 const PRESENT_STATUSES = ["PRESENT", "LATE"];
 const ABSENT_STATUSES = ["ABSENT", "EXCUSED"];
 
-function isPartial(r: {
-  checkedInAt: Date | null;
-  checkedOutAt: Date | null;
-}): boolean {
+function isPartial(
+  r: { checkedInAt: Date | null; checkedOutAt: Date | null },
+  hasTimeInOut: boolean,
+): boolean {
+  if (!hasTimeInOut) return false;
   return !!r.checkedInAt !== !!r.checkedOutAt;
 }
 
@@ -77,6 +78,7 @@ export default async function AdminAttendancePage() {
               title: true,
               location: true,
               requiresAttendance: true,
+              hasTimeInOut: true,
               programId: true,
               startsAt: true,
               endsAt: true,
@@ -169,6 +171,10 @@ export default async function AdminAttendancePage() {
       );
       const pastAttendanceCount = pastAttendanceEventIds.size;
 
+      const eventHasTimeInOut = new Map(
+        events.map((e) => [e.id, e.hasTimeInOut]),
+      );
+
       const studentPast = new Map<string, { present: number; late: number }>();
       const studentOther = new Map<
         string,
@@ -187,7 +193,8 @@ export default async function AdminAttendancePage() {
           total: 0,
         };
         evAgg.total += 1;
-        if (isPartial(row)) evAgg.absent += 1;
+        if (isPartial(row, eventHasTimeInOut.get(row.eventId) ?? false))
+          evAgg.absent += 1;
         else if (row.status === "PRESENT") evAgg.present += 1;
         else if (row.status === "LATE") evAgg.late += 1;
         else evAgg.absent += 1;
@@ -195,7 +202,7 @@ export default async function AdminAttendancePage() {
 
         if (pastAttendanceEventIds.has(row.eventId)) {
           const p = studentPast.get(row.studentId) ?? { present: 0, late: 0 };
-          if (!isPartial(row)) {
+          if (!isPartial(row, eventHasTimeInOut.get(row.eventId) ?? false)) {
             if (row.status === "PRESENT") p.present += 1;
             else if (row.status === "LATE") p.late += 1;
           }
@@ -206,14 +213,17 @@ export default async function AdminAttendancePage() {
             late: 0,
             absent: 0,
           };
-          if (isPartial(row)) o.absent += 1;
+          if (isPartial(row, eventHasTimeInOut.get(row.eventId) ?? false))
+            o.absent += 1;
           else if (row.status === "PRESENT") o.present += 1;
           else if (row.status === "LATE") o.late += 1;
           else o.absent += 1;
           studentOther.set(row.studentId, o);
         }
 
-        const effective = isPartial(row) ? "ABSENT" : row.status;
+        const effective = isPartial(row, eventHasTimeInOut.get(row.eventId) ?? false)
+          ? "ABSENT"
+          : row.status;
         if (PRESENT_STATUSES.includes(effective)) {
           presentTotal += 1;
           attendedTotal += 1;
@@ -273,6 +283,7 @@ export default async function AdminAttendancePage() {
           })}`,
           status,
           requiresAttendance: e.requiresAttendance,
+          hasTimeInOut: e.hasTimeInOut,
           present,
           late,
           absent,
