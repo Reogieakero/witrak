@@ -75,6 +75,7 @@ export default async function StudentHomeView({
           startsAt: true,
           endsAt: true,
           requiresAttendance: true,
+          hasTimeInOut: true,
         },
       }),
       prisma.announcement.findMany({
@@ -138,6 +139,9 @@ export default async function StudentHomeView({
       .filter((e) => e.requiresAttendance && e.endsAt <= now)
       .map((e) => e.id),
   );
+  const hasTimeInOutByEvent = new Map(
+    eventRows.map((e) => [e.id, e.hasTimeInOut]),
+  );
 
   const attendanceEvents = [
     ...eventRows.filter((e) => e.startsAt <= now && now < e.endsAt),
@@ -150,11 +154,11 @@ export default async function StudentHomeView({
       prisma.attendance.count({ where: { studentId } }),
       prisma.attendance.findMany({
         where: { studentId, status: { in: ["PRESENT", "LATE"] } },
-        select: { checkedInAt: true, checkedOutAt: true },
+        select: { eventId: true, checkedInAt: true, checkedOutAt: true },
       }),
       prisma.attendance.findMany({
         where: { studentId, eventId: { in: [...pastRequiredEventIds] } },
-        select: { status: true, checkedInAt: true, checkedOutAt: true },
+        select: { eventId: true, status: true, checkedInAt: true, checkedOutAt: true },
       }),
       prisma.attendance.count({
         where: {
@@ -190,13 +194,14 @@ export default async function StudentHomeView({
     ]);
 
   const presentCount = presentRows.filter(
-    (r) => !!r.checkedInAt && !!r.checkedOutAt,
+    (r) => !!r.checkedInAt && (hasTimeInOutByEvent.get(r.eventId) ?? false ? !!r.checkedOutAt : true),
   ).length;
 
   let pastPresent = 0;
   let pastLate = 0;
   for (const r of pastAttendanceRows) {
-    if (!!r.checkedInAt !== !!r.checkedOutAt) continue;
+    const hasTIO = hasTimeInOutByEvent.get(r.eventId) ?? false;
+    if (hasTIO && !!r.checkedInAt !== !!r.checkedOutAt) continue;
     if (r.status === "PRESENT") pastPresent += 1;
     else if (r.status === "LATE") pastLate += 1;
   }
@@ -240,6 +245,7 @@ export default async function StudentHomeView({
   const pendingFees = feeItems.filter((f) => f.status === "PENDING").length;
 
   const attendanceByEventId = new Map(attendanceForEvents.map((a) => [a.eventId, a]));
+  const eventTIOById = new Map(eventRows.map((e) => [e.id, e.hasTimeInOut]));
 
   const attendanceItems = attendanceEvents.map((e) => {
     const rec = attendanceByEventId.get(e.id);
@@ -249,7 +255,9 @@ export default async function StudentHomeView({
     if (rec) {
       const hasIn = !!rec.checkedInAt;
       const hasOut = !!rec.checkedOutAt;
-      attendanceStatus = hasIn !== hasOut ? "ABSENT" : rec.status;
+      const hasTIO = eventTIOById.get(e.id) ?? false;
+      attendanceStatus =
+        hasTIO && hasIn !== hasOut ? "ABSENT" : rec.status;
     } else if (e.requiresAttendance && isCompleted) {
       attendanceStatus = "ABSENT";
     } else if (isLive) {

@@ -10,10 +10,11 @@ import type { EventItem, EventsStats } from "@/app/components/events/types";
 
 const PRESENT_STATUSES = ["PRESENT", "LATE"];
 
-function isPartial(r: {
-  checkedInAt: Date | null;
-  checkedOutAt: Date | null;
-}): boolean {
+function isPartial(
+  r: { checkedInAt: Date | null; checkedOutAt: Date | null },
+  hasTimeInOut: boolean,
+): boolean {
+  if (!hasTimeInOut) return false;
   return !!r.checkedInAt !== !!r.checkedOutAt;
 }
 
@@ -134,6 +135,9 @@ export default async function AdminEventsPage() {
         : [];
 
       const termEventIds = new Set(events.map((e) => e.id));
+      const hasTimeInOutByEvent = new Map(
+        events.map((e) => [e.id, e.hasTimeInOut]),
+      );
 
       const programStudentCount = new Map<string, number>();
       for (const s of sectionProgramRows) {
@@ -163,7 +167,7 @@ export default async function AdminEventsPage() {
       for (const row of attendanceRows) {
         if (!termEventIds.has(row.eventId)) continue;
         rowCountByEvent.set(row.eventId, (rowCountByEvent.get(row.eventId) ?? 0) + 1);
-        if (PRESENT_STATUSES.includes(row.status) && !isPartial(row)) {
+        if (PRESENT_STATUSES.includes(row.status) && !isPartial(row, hasTimeInOutByEvent.get(row.eventId) ?? false)) {
           presentByEvent.set(row.eventId, (presentByEvent.get(row.eventId) ?? 0) + 1);
           presentTotal += 1;
         }
