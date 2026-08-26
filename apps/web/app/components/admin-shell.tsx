@@ -106,9 +106,9 @@ export function AdminShell({
       <aside className={`${styles.sidebar} ${open ? styles.sidebarOpen : ""}`}>
         <div className={styles.sidebarBrand}>
           <span className={styles.brandLogo}>
-            <img src="/logo-favicon.png" alt="Liberalis" />
+            <img src="/logo-favicon.png" alt="Liberalis-Tracker" />
           </span>
-          <span className={styles.brandName}>Liberalis</span>
+          <span className={styles.brandName}>Liberalis-Tracker</span>
           <button
             type="button"
             className={styles.sidebarClose}
@@ -166,7 +166,7 @@ export function AdminShell({
             >
               <Menu size={20} />
             </button>
-            <span className={styles.crumbRoot}>Liberalis</span>
+            <span className={styles.crumbRoot}>Liberalis-Tracker</span>
             <span className={styles.crumbSep}>/</span>
             <span className={styles.crumbCurrent}>{currentPage}</span>
           </div>

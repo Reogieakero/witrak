@@ -28,9 +28,11 @@ const CATEGORY_META: Record<
 export default async function StudentHomeView({
   studentId,
   userName,
+  forceWalkthrough,
 }: {
   studentId: string;
   userName: string;
+  forceWalkthrough?: boolean;
 }) {
   const student = await prisma.student.findUnique({
     where: { id: studentId },
@@ -364,7 +366,7 @@ export default async function StudentHomeView({
   };
 
   return (
-    <StudentShell userName={userName} roleLabel="Student" crumb="Home">
+    <StudentShell userName={userName} roleLabel="Student" crumb="Home" forceWalkthrough={forceWalkthrough}>
       <WelcomeBanner
         firstName={data.firstName}
         sectionLabel={data.sectionLabel}

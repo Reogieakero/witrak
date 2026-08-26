@@ -71,9 +71,9 @@ export default async function CompleteProfilePage() {
       <div className={styles.card}>
         <div className={styles.brandRow}>
           <span className={styles.logo}>
-            <img src="/logo-favicon.png" alt="Liberalis" />
+            <img src="/logo-favicon.png" alt="Liberalis-Tracker" />
           </span>
-          <span className={styles.brandName}>Liberalis</span>
+          <span className={styles.brandName}>Liberalis-Tracker</span>
         </div>
 
         <h1 className={styles.title}>Complete your student profile</h1>

@@ -5,7 +5,11 @@ import StudentHomeView from "@/app/components/student/student-home";
 import { StudentSuspended } from "@/app/components/student/student-suspended";
 import { StudentShell } from "@/app/components/student-shell";
 
-export default async function StudentDashboardPage() {
+export default async function StudentDashboardPage({
+  searchParams,
+}: {
+  searchParams: { walkthrough?: string };
+}) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login/students");
 
@@ -27,5 +31,13 @@ export default async function StudentDashboardPage() {
     );
   }
 
-  return <StudentHomeView studentId={student.id} userName={session.user.name ?? "Student"} />;
+  const forceWalkthrough = searchParams.walkthrough === "1";
+
+  return (
+    <StudentHomeView
+      studentId={student.id}
+      userName={session.user.name ?? "Student"}
+      forceWalkthrough={forceWalkthrough}
+    />
+  );
 }

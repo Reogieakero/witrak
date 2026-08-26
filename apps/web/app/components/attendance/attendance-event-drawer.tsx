@@ -6,6 +6,8 @@ import {
   AlertTriangle,
   CalendarCheck,
   CheckCircle2,
+  FileSpreadsheet,
+  FileText,
   Loader2,
   Pencil,
   QrCode,
@@ -296,6 +298,24 @@ export function AttendanceEventDrawer({
           <Button variant="secondary" size="md" onClick={onClose}>
             Close
           </Button>
+          <a
+            className={styles.exportLink}
+            href={`/api/attendance/export?eventId=${encodeURIComponent(event.id)}&format=xlsx`}
+            download
+            title="Export this event as Excel"
+          >
+            <FileSpreadsheet size={13} />
+            Excel
+          </a>
+          <a
+            className={styles.exportLink}
+            href={`/api/attendance/export?eventId=${encodeURIComponent(event.id)}&format=pdf`}
+            download
+            title="Export this event as PDF"
+          >
+            <FileText size={13} />
+            PDF
+          </a>
           {canScan && event.canScan && (
             <Button variant="primary" size="md" onClick={() => onScan(event)}>
               <QrCode size={13} />

@@ -54,6 +54,7 @@ type StudentProfileModalProps = {
   open: boolean;
   onClose: () => void;
   onAvatarChange?: (url: string) => void;
+  initialTab?: Tab;
 };
 
 type Tab = "profile" | "qr";
@@ -62,8 +63,9 @@ export function StudentProfileModal({
   open,
   onClose,
   onAvatarChange,
+  initialTab,
 }: StudentProfileModalProps) {
-  const [tab, setTab] = useState<Tab>("profile");
+  const [tab, setTab] = useState<Tab>(initialTab ?? "profile");
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [options, setOptions] = useState<StudentPlacementOptions | null>(null);
   const [loading, setLoading] = useState(false);
@@ -86,7 +88,7 @@ export function StudentProfileModal({
     if (!open) return;
     let cancelled = false;
     (async () => {
-      setTab("profile");
+      setTab(initialTab ?? "profile");
       setEditing(false);
       setDeleteView("closed");
       setLoading(true);
@@ -111,7 +113,7 @@ export function StudentProfileModal({
     return () => {
       cancelled = true;
     };
-  }, [open]);
+  }, [open, initialTab]);
 
   const filteredYears = options?.years.filter((y) => y.programId === programId) ?? [];
   const filteredSections =
@@ -119,7 +121,7 @@ export function StudentProfileModal({
 
   const qrValue = profile
     ? [
-        "Liberalis Student ID",
+        "Liberalis-Tracker Student ID",
         `Name: ${profile.firstName} ${profile.lastName}${profile.suffix ? ` ${profile.suffix}` : ""}`,
         `Student No: ${profile.studentNo}`,
         `Section: ${profile.sectionLabel}`,
@@ -510,7 +512,7 @@ export function StudentProfileModal({
             <span>{profile.sectionLabel}</span>
           </div>
           <p className={styles.qrHint}>
-            Present this code when attending Liberalis activities for quick identity
+            Present this code when attending Liberalis-Tracker activities for quick identity
             scanning.
           </p>
         </div>

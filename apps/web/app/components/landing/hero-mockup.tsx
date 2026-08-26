@@ -33,7 +33,7 @@ export function HeroMockup() {
           <span className={styles.dotRed} />
           <span className={styles.dotAmber} />
           <span className={styles.dotGreen} />
-          <div className={styles.url}>liberalis.app/dashboard</div>
+          <div className={styles.url}>Liberalis-Tracker.app/dashboard</div>
         </div>
 
         <div className={styles.body}>

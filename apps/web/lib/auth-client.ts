@@ -43,3 +43,22 @@ export async function signInWithOAuth(
 export async function signOut(): Promise<void> {
   await supabaseBrowser.auth.signOut();
 }
+
+export type UpdatePasswordResult = {
+  ok: boolean;
+  error?: string;
+};
+
+/** Update the current user's password. Requires current session. */
+export async function updatePassword(
+  newPassword: string,
+): Promise<UpdatePasswordResult> {
+  const { error } = await supabaseBrowser.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+  return { ok: true };
+}

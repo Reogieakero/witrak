@@ -21,9 +21,9 @@ export function Footer() {
         <div className={styles.brandCol}>
           <span className={styles.brand}>
             <span className={styles.logo}>
-              <img src="/logo-favicon.png" alt="Liberalis" />
+              <img src="/logo-favicon.png" alt="Liberalis-Tracker" />
             </span>
-            Liberalis
+            Liberalis-Tracker
           </span>
           <p className={styles.desc}>
             Student Government Management System — built for transparency and
@@ -56,7 +56,7 @@ export function Footer() {
         </div>
       </div>
       <div className={styles.bottom}>
-        © {new Date().getFullYear()} Liberalis. All rights reserved.
+        © {new Date().getFullYear()} Liberalis-Tracker. All rights reserved.
       </div>
     </footer>
   );

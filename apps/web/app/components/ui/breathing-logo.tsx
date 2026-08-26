@@ -2,7 +2,7 @@ import styles from "./breathing-logo.module.css";
 
 export function BreathingLogo({
   size = 56,
-  alt = "Liberalis",
+  alt = "Liberalis-Tracker",
   className,
 }: {
   size?: number;

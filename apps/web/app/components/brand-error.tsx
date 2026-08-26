@@ -62,9 +62,9 @@ export function BrandError({
       <div className={styles.card}>
         <Link href="/" className={styles.brand}>
           <span className={styles.brandLogo}>
-            <img src="/logo-favicon.png" alt="Liberalis" />
+            <img src="/logo-favicon.png" alt="Liberalis-Tracker" />
           </span>
-          <span className={styles.brandName}>Liberalis</span>
+          <span className={styles.brandName}>Liberalis-Tracker</span>
         </Link>
 
         <div className={styles.code}>{code}</div>
@@ -79,7 +79,7 @@ export function BrandError({
       </div>
 
       <p className={styles.footer}>
-        &copy; {new Date().getFullYear()} Liberalis. Student Government
+        &copy; {new Date().getFullYear()} Liberalis-Tracker. Student Government
         Management System.
       </p>
     </main>

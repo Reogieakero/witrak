@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import {
   ArrowLeft,
   CalendarDays,
-  ChevronDown,
   GraduationCap,
   Landmark,
   Star,
@@ -36,9 +35,9 @@ export default function StudentsLoginPage() {
         <div className={styles.brandTop}>
           <Link href="/" className={styles.brand}>
             <span className={styles.brandLogo}>
-              <img src="/logo-favicon.png" alt="Liberalis" />
+              <img src="/logo-favicon.png" alt="Liberalis-Tracker" />
             </span>
-            <span className={styles.brandName}>Liberalis</span>
+            <span className={styles.brandName}>Liberalis-Tracker</span>
           </Link>
 
           <h1 className={styles.brandHeadline}>
@@ -83,9 +82,9 @@ export default function StudentsLoginPage() {
       <div className={styles.formPanel}>
         <Link href="/" className={styles.mobileBrand}>
           <span className={styles.mobileLogo}>
-            <img src="/logo-favicon.png" alt="Liberalis" />
+            <img src="/logo-favicon.png" alt="Liberalis-Tracker" />
           </span>
-          Liberalis
+          Liberalis-Tracker
         </Link>
 
         <Link href="/" className={styles.backLink}>
@@ -104,30 +103,12 @@ export default function StudentsLoginPage() {
           </Suspense>
 
           <p className={styles.note}>
-            Students sign in with Google using their school email. Are you an
-            officer? Use the officer sign in instead.
+            Students sign in with Google using their school email.
           </p>
-
-          <details className={styles.details}>
-            <summary className={styles.summary}>
-              Office of the student government
-              <ChevronDown size={12} className={styles.chevron} />
-            </summary>
-            <div className={styles.credentialBox}>
-              <div className={styles.credentialRow}>
-                <span>Officer portal</span>
-                <span className={styles.credentialDesc}>
-                  <Link href="/login/officers" className={styles.forgot}>
-                    Sign in here
-                  </Link>
-                </span>
-              </div>
-            </div>
-          </details>
         </div>
 
         <p className={styles.copyright}>
-          &copy; {new Date().getFullYear()} Liberalis. All rights reserved.
+          &copy; {new Date().getFullYear()} Liberalis-Tracker. All rights reserved.
         </p>
       </div>
     </main>

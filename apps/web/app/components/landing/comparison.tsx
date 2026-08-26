@@ -42,9 +42,9 @@ export function Comparison() {
         <div className={styles.table}>
           <div className={styles.headerRow}>
             <div className={styles.headerCell}>Task</div>
-            <div className={styles.headerCell}>Before Liberalis</div>
+            <div className={styles.headerCell}>Before Liberalis-Tracker</div>
             <div className={`${styles.headerCell} ${styles.headerAfter}`}>
-              With Liberalis
+              With Liberalis-Tracker
             </div>
           </div>
           {ROWS.map((r) => (

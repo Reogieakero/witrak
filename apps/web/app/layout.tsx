@@ -12,7 +12,7 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Liberalis",
+  title: "Liberalis-Tracker",
   description: "Student Government Management System",
   icons: {
     icon: "/logo-favicon.png",

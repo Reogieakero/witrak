@@ -143,5 +143,5 @@ export async function completeStudentProfile(
   }
 
   const next = String(formData.get("next") ?? "/dashboard");
-  redirect(next);
+  redirect(next.includes("?") ? `${next}&walkthrough=1` : `${next}?walkthrough=1`);
 }

@@ -26,7 +26,7 @@ export function Hero() {
               spreadsheet.
             </h1>
             <p className={styles.subtitle}>
-              Liberalis brings events, attendance, fees, sanctions, and
+              Liberalis-Tracker brings events, attendance, fees, sanctions, and
               transparency into one secure portal — so every officer and member
               always sees the current story of the organization.
             </p>

@@ -22,9 +22,9 @@ export function Navbar() {
       <div className={styles.container}>
         <Link href="/" className={styles.brand}>
           <span className={styles.logo}>
-            <img src="/logo-favicon.png" alt="Liberalis" />
+            <img src="/logo-favicon.png" alt="Liberalis-Tracker" />
           </span>
-          Liberalis
+          Liberalis-Tracker
         </Link>
 
         <nav className={styles.links}>

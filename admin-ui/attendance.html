@@ -12,6 +12,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Export libraries: SheetJS (Excel) + jsPDF (PDF) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -701,9 +706,13 @@
                                 <i data-lucide="pencil-line" class="w-3.5 h-3.5"></i>
                                 Correct Record
                             </button>
-                            <button data-action="export" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
-                                <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                                Export Report
+                            <button data-action="export" onclick="exportAllExcel()" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-colors">
+                                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+                                Export Excel (All Events)
+                            </button>
+                            <button data-action="export" onclick="exportAllPDF()" class="w-full flex items-center justify-center gap-1.5 px-3 py-2 text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-100 rounded-lg hover:bg-rose-100 transition-colors">
+                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                Export PDF (All Events)
                             </button>
                         </div>
                     </div>
@@ -886,6 +895,12 @@
             </div>
             <div class="flex items-center justify-end gap-2 px-5 py-4 border-t border-gray-100">
                 <button onclick="closeDrawer()" class="px-3.5 py-2 text-xs font-bold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">Close</button>
+                <button data-action="export" onclick="exportEventExcel()" class="px-3 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-colors">
+                    <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 inline"></i> Excel
+                </button>
+                <button data-action="export" onclick="exportEventPDF()" class="px-3 py-2 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-100 rounded-lg hover:bg-rose-100 transition-colors">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5 inline"></i> PDF
+                </button>
                 <button data-action="scan" onclick="openScanModal(); closeDrawer();" class="px-3.5 py-2 text-xs font-bold text-white bg-brand-gradient rounded-lg shadow-soft hover:shadow-md transition-all">Scan More</button>
             </div>
         </div>
@@ -988,6 +1003,7 @@
             document.querySelectorAll('[data-action="scan"]').forEach(el => el.classList.toggle('hidden', !perms.scan));
             document.querySelectorAll('[data-action="correct"]').forEach(el => el.classList.toggle('hidden', !perms.correct));
             document.querySelectorAll('[data-action="view"]').forEach(el => el.classList.toggle('hidden', !perms.view));
+            document.querySelectorAll('[data-action="export"]').forEach(el => el.classList.toggle('hidden', !perms.view));
         }
 
         document.getElementById('roleSelect').addEventListener('change', (e) => applyRole(e.target.value));
@@ -1078,6 +1094,148 @@
             document.getElementById('eventDrawer').classList.add('hidden');
             document.getElementById('studentDrawer').classList.add('hidden');
             document.body.style.overflow = '';
+        }
+
+        // ───────────────────────── Export (Excel + PDF) ─────────────────────────
+
+        function getEventRows() {
+            return Array.from(document.querySelectorAll('#eventDrawer tbody tr')).map(tr => {
+                const cells = tr.querySelectorAll('td');
+                return {
+                    student: cells[0].textContent.trim(),
+                    section: cells[1].textContent.trim(),
+                    status: cells[2].textContent.trim(),
+                };
+            });
+        }
+
+        function currentEventName() {
+            return (document.getElementById('drawerEventName').textContent || 'event').trim();
+        }
+
+        function downloadBlob(blob, filename) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        function safeName(name) {
+            return name.replace(/[^\w\-]+/g, '_');
+        }
+
+        function buildEventSummary(name) {
+            const present = document.querySelector('#eventDrawer .grid .text-emerald-600')?.textContent.trim() || '0';
+            const late = document.querySelector('#eventDrawer .grid .text-amber-600')?.textContent.trim() || '0';
+            const absent = document.querySelector('#eventDrawer .grid .text-red-500')?.textContent.trim() || '0';
+            const rate = document.querySelector('#eventDrawer .font-bold.text-gray-600')?.textContent.trim() || '0%';
+            return { present, late, absent, rate };
+        }
+
+        function exportEventExcel() {
+            const name = currentEventName();
+            const rows = getEventRows();
+            const summary = buildEventSummary(name);
+            const wsData = [
+                ['Attendance Report — ' + name],
+                ['Term 1 · 2025–2026'],
+                [],
+                ['Present', summary.present],
+                ['Late', summary.late],
+                ['Absent', summary.absent],
+                ['Present Rate', summary.rate],
+                [],
+                ['Student', 'Section', 'Status'],
+            ];
+            rows.forEach(r => wsData.push([r.student, r.section, r.status]));
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!cols'] = [{ wch: 28 }, { wch: 14 }, { wch: 12 }];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
+            XLSX.writeFile(wb, 'attendance_' + safeName(name) + '.xlsx');
+        }
+
+        function exportEventPDF() {
+            const name = currentEventName();
+            const rows = getEventRows();
+            const summary = buildEventSummary(name);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+            const pageW = doc.internal.pageSize.getWidth();
+            doc.setFontSize(16);
+            doc.text('FHUSOCOM — Attendance Report', 40, 48);
+            doc.setFontSize(12);
+            doc.text(name, 40, 70);
+            doc.setFontSize(9);
+            doc.setTextColor(120);
+            doc.text('Term 1 · 2025–2026  |  Generated ' + new Date().toLocaleString(), 40, 86);
+            doc.setTextColor(0);
+            doc.setFontSize(10);
+            doc.text('Present: ' + summary.present + '   Late: ' + summary.late + '   Absent: ' + summary.absent + '   Rate: ' + summary.rate, 40, 108);
+            doc.autoTable({
+                startY: 124,
+                head: [['Student', 'Section', 'Status']],
+                body: rows.map(r => [r.student, r.section, r.status]),
+                styles: { fontSize: 9, cellPadding: 5 },
+                headStyles: { fillColor: [37, 99, 235] },
+                alternateRowStyles: { fillColor: [248, 250, 252] },
+            });
+            doc.save('attendance_' + safeName(name) + '.pdf');
+        }
+
+        function getAllEventData() {
+            const events = [];
+            document.querySelectorAll('#eventView tbody tr').forEach(tr => {
+                if (tr.classList.contains('hidden')) return;
+                const name = tr.querySelector('.block.text-\\[11px\\].font-bold')?.textContent.trim();
+                events.push({
+                    name,
+                    present: tr.querySelector('.text-emerald-600')?.textContent.trim(),
+                    late: tr.querySelector('.text-amber-600')?.textContent.trim(),
+                    absent: tr.querySelector('.text-red-500')?.textContent.trim(),
+                    rate: tr.querySelector('td:nth-child(6)')?.textContent.replace(/\s+/g, ' ').trim(),
+                });
+            });
+            return events;
+        }
+
+        function exportAllExcel() {
+            const events = getAllEventData();
+            const wsData = [
+                ['Attendance Report — All Events'],
+                ['Term 1 · 2025–2026'],
+                [],
+                ['Event', 'Present', 'Late', 'Absent', 'Rate'],
+            ];
+            events.forEach(e => wsData.push([e.name, e.present, e.late, e.absent, e.rate]));
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!cols'] = [{ wch: 28 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 10 }];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'All Events');
+            XLSX.writeFile(wb, 'attendance_all_events.xlsx');
+        }
+
+        function exportAllPDF() {
+            const events = getAllEventData();
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+            const pageW = doc.internal.pageSize.getWidth();
+            doc.setFontSize(16);
+            doc.text('FHUSOCOM — Attendance Report (All Events)', 40, 48);
+            doc.setFontSize(9);
+            doc.setTextColor(120);
+            doc.text('Term 1 · 2025–2026  |  Generated ' + new Date().toLocaleString(), 40, 66);
+            doc.setTextColor(0);
+            doc.autoTable({
+                startY: 84,
+                head: [['Event', 'Present', 'Late', 'Absent', 'Rate']],
+                body: events.map(e => [e.name, e.present, e.late, e.absent, e.rate]),
+                styles: { fontSize: 9, cellPadding: 5 },
+                headStyles: { fillColor: [37, 99, 235] },
+                alternateRowStyles: { fillColor: [248, 250, 252] },
+            });
+            doc.save('attendance_all_events.pdf');
         }
 
         document.getElementById('globalSearch').addEventListener('input', (e) => {

@@ -9,12 +9,11 @@ type TimePickerProps = {
   value?: string;
 };
 
-const HOURS = Array.from({ length: 24 }, (_, i) =>
-  String(i).padStart(2, "0"),
-);
+const HOURS = Array.from({ length: 12 }, (_, i) => (i === 0 ? 12 : i));
 const MINUTES = Array.from({ length: 12 }, (_, i) =>
   String(i * 5).padStart(2, "0"),
 );
+const PERIODS = ["AM", "PM"] as const;
 
 function toTime(value?: string): string {
   if (!value) return "";
@@ -25,17 +24,30 @@ function toTime(value?: string): string {
   return `${pad(ph.getUTCHours())}:${pad(ph.getUTCMinutes())}`;
 }
 
-function formatTime(time: string): string {
-  const [h, m] = time.split(":").map(Number);
-  const period = h >= 12 ? "PM" : "AM";
+function from24to12(time: string): { hour: number; minute: string; period: "AM" | "PM" } {
+  if (!time) return { hour: 12, minute: "00", period: "AM" };
+  let [h, m] = time.split(":").map(Number);
+  const period: "AM" | "PM" = h >= 12 ? "PM" : "AM";
   const hour = h % 12 === 0 ? 12 : h % 12;
-  return `${String(hour).padStart(2, "0")}:${String(m).padStart(2, "0")} ${period}`;
+  return { hour, minute: String(m).padStart(2, "0"), period };
+}
+
+function to24(hour: number, minute: string, period: "AM" | "PM"): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  let h = hour % 12;
+  if (period === "PM") h += 12;
+  return `${pad(h)}:${minute}`;
+}
+
+function formatTime(time: string): string {
+  const { hour, minute, period } = from24to12(time);
+  return `${String(hour).padStart(2, "0")}:${minute} ${period}`;
 }
 
 export function TimePicker({ name, value }: TimePickerProps) {
   const [time, setTime] = useState(() => toTime(value));
   const [open, setOpen] = useState(false);
-  const [field, setField] = useState<"hour" | "minute" | null>(null);
+  const [field, setField] = useState<"hour" | "minute" | "period" | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -50,6 +62,7 @@ export function TimePicker({ name, value }: TimePickerProps) {
     return () => document.removeEventListener("mousedown", onDoc);
   }, [open]);
 
+  const { hour, minute, period } = from24to12(time);
   const displayValue = time ? formatTime(time) : "Select time";
 
   return (
@@ -79,7 +92,7 @@ export function TimePicker({ name, value }: TimePickerProps) {
                 onClick={() => setField(field === "hour" ? null : "hour")}
                 data-active={field === "hour" || undefined}
               >
-                {time ? time.slice(0, 2) : "--"}
+                {time ? String(hour).padStart(2, "0") : "--"}
                 <ChevronDown size={12} />
               </button>
               {field === "hour" && (
@@ -89,13 +102,14 @@ export function TimePicker({ name, value }: TimePickerProps) {
                       key={h}
                       type="button"
                       className={styles.menuItem}
-                      data-selected={time.slice(0, 2) === h || undefined}
+                      data-selected={hour === h || undefined}
                       onClick={() => {
-                        setTime((prev) => `${h}:${prev ? prev.slice(3) : "00"}`);
+                        const next = to24(h, minute, period);
+                        setTime(next);
                         setField("minute");
                       }}
                     >
-                      {h}
+                      {String(h).padStart(2, "0")}
                     </button>
                   ))}
                 </div>
@@ -110,7 +124,7 @@ export function TimePicker({ name, value }: TimePickerProps) {
                 onClick={() => setField(field === "minute" ? null : "minute")}
                 data-active={field === "minute" || undefined}
               >
-                {time ? time.slice(3) : "--"}
+                {time ? minute : "--"}
                 <ChevronDown size={12} />
               </button>
               {field === "minute" && (
@@ -120,14 +134,44 @@ export function TimePicker({ name, value }: TimePickerProps) {
                       key={m}
                       type="button"
                       className={styles.menuItem}
-                      data-selected={time.slice(3) === m || undefined}
+                      data-selected={minute === m || undefined}
                       onClick={() => {
-                        setTime((prev) => `${prev.slice(0, 2)}:${m}`);
+                        setTime(to24(hour, m, period));
+                        setField("period");
+                      }}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className={styles.timeField}>
+              <span className={styles.timeLabel}>AM / PM</span>
+              <button
+                type="button"
+                className={styles.timeBtn}
+                onClick={() => setField(field === "period" ? null : "period")}
+                data-active={field === "period" || undefined}
+              >
+                {time ? period : "--"}
+                <ChevronDown size={12} />
+              </button>
+              {field === "period" && (
+                <div className={styles.timeMenu}>
+                  {PERIODS.map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      className={styles.menuItem}
+                      data-selected={period === p || undefined}
+                      onClick={() => {
+                        setTime(to24(hour, minute, p));
                         setField(null);
                         setOpen(false);
                       }}
                     >
-                      {m}
+                      {p}
                     </button>
                   ))}
                 </div>

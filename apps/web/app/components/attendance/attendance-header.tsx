@@ -1,21 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Info } from "lucide-react";
+import { Info, FileSpreadsheet, FileText } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { InfoModal } from "@/app/components/ui/info-modal";
+import type { AttendanceAccess } from "./types";
 import styles from "./attendance-header.module.css";
 
 export type AttendanceHeaderProps = {
   canScan: boolean;
   onScan?: () => void;
+  access?: AttendanceAccess;
 };
 
 export function AttendanceHeader({
   canScan,
   onScan,
+  access,
 }: AttendanceHeaderProps) {
   const [infoOpen, setInfoOpen] = useState(false);
+  const canExport = !!access?.view;
 
   return (
     <div className={styles.headRow}>
@@ -29,6 +33,28 @@ export function AttendanceHeader({
         </p>
       </div>
       <div className={styles.actions}>
+        {canExport && (
+          <>
+            <a
+              className={styles.exportLink}
+              href="/api/attendance/export?all=1&format=xlsx"
+              download
+              title="Export all events as Excel"
+            >
+              <FileSpreadsheet size={14} />
+              Export Excel
+            </a>
+            <a
+              className={styles.exportLink}
+              href="/api/attendance/export?all=1&format=pdf"
+              download
+              title="Export all events as PDF"
+            >
+              <FileText size={14} />
+              Export PDF
+            </a>
+          </>
+        )}
         {canScan && onScan && (
           <Button variant="primary" size="md" onClick={onScan}>
             Scan Attendance

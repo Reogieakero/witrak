@@ -116,7 +116,7 @@ export function AttendanceView({
 
   return (
     <div className={styles.page}>
-        <AttendanceHeader canScan={false} />
+        <AttendanceHeader canScan={false} access={access} />
 
       <StatsGrid stats={stats} />
 

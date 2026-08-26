@@ -44,9 +44,9 @@ export default function OfficersLoginPage() {
         <div className={styles.brandTop}>
           <Link href="/" className={styles.brand}>
             <span className={styles.brandLogo}>
-              <img src="/logo-favicon.png" alt="Liberalis" />
+              <img src="/logo-favicon.png" alt="Liberalis-Tracker" />
             </span>
-            <span className={styles.brandName}>Liberalis</span>
+            <span className={styles.brandName}>Liberalis-Tracker</span>
           </Link>
 
           <h1 className={styles.brandHeadline}>
@@ -92,9 +92,9 @@ export default function OfficersLoginPage() {
       <div className={styles.formPanel}>
           <Link href="/" className={styles.mobileBrand}>
             <span className={styles.mobileLogo}>
-              <img src="/logo-favicon.png" alt="Liberalis" />
+              <img src="/logo-favicon.png" alt="Liberalis-Tracker" />
             </span>
-            Liberalis
+            Liberalis-Tracker
           </Link>
 
         <Link href="/" className={styles.backLink}>
@@ -105,7 +105,7 @@ export default function OfficersLoginPage() {
         <div className={styles.inner}>
           <h2 className={styles.title}>Welcome back</h2>
           <p className={styles.subtitle}>
-            Sign in to the Liberalis Officer Portal to continue.
+            Sign in to the Liberalis-Tracker Officer Portal to continue.
           </p>
 
           <Suspense fallback={null}>
@@ -135,7 +135,7 @@ export default function OfficersLoginPage() {
         </div>
 
         <p className={styles.copyright}>
-          &copy; {new Date().getFullYear()} Liberalis. All rights reserved.
+          &copy; {new Date().getFullYear()} Liberalis-Tracker. All rights reserved.
         </p>
       </div>
     </main>
