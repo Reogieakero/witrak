@@ -15,6 +15,7 @@
     "db:validate": "npm run validate -w @fhusocom/db",
     "db:migrate": "npm run migrate -w @fhusocom/db",
     "db:deploy": "npm run deploy -w @fhusocom/db",
+    "db:push": "npm run db:push -w @fhusocom/db",
     "db:seed": "npm run seed -w @fhusocom/db",
     "test": "npm run test -w @fhusocom/web"
   },
