@@ -1,8 +1,15 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { isMaintenanceMode } from "@/lib/maintenance";
 import { RegisterForm } from "@/app/components/register-form";
 import styles from "./register.module.css";
 
+export const dynamic = "force-dynamic";
+
 export default function RegisterPage() {
+  // System is down for data recovery — registration is disabled.
+  if (isMaintenanceMode()) redirect("/maintenance");
+
   return (
     <main className={styles.main}>
       <div className={styles.card}>

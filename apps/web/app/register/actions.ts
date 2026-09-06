@@ -4,10 +4,16 @@ import { redirect } from "next/navigation";
 import { ScopeType } from "@fhusocom/db";
 import { prisma } from "@fhusocom/db";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { MAINTENANCE_MESSAGE, isMaintenanceMode } from "@/lib/maintenance";
 
 export async function registerStudent(
   formData: FormData,
 ): Promise<{ ok: boolean; error?: string }> {
+  // System is down for data recovery — no new accounts may be created.
+  if (isMaintenanceMode()) {
+    return { ok: false, error: MAINTENANCE_MESSAGE };
+  }
+
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const firstName = String(formData.get("firstName") ?? "").trim();

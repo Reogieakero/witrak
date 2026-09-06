@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { isMaintenanceMode } from "@/lib/maintenance";
 import {
   ArrowLeft,
   CalendarDays,
@@ -29,12 +31,17 @@ const FEATURES = [
 
 const DEMO_ROLES = [
   { role: "Supreme", desc: "Faculty-wide access, manages roles" },
-  { role: "Secretary", desc: "Events, attendance, announcements" },
+  { role: "Secretary", desc: "Attendance, announcements" },
   { role: "Treasurer", desc: "Fees, payment verification, reports" },
   { role: "Discipline Officer", desc: "Private sanctions and appeals" },
 ];
 
+export const dynamic = "force-dynamic";
+
 export default function OfficersLoginPage() {
+  // System is down for data recovery — admin login is disabled.
+  if (isMaintenanceMode()) redirect("/maintenance");
+
   return (
     <main className={styles.main}>
       <aside className={styles.brandPanel}>

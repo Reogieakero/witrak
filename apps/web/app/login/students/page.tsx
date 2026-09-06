@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { isMaintenanceMode } from "@/lib/maintenance";
 import {
   ArrowLeft,
   CalendarDays,
@@ -25,7 +27,12 @@ const FEATURES = [
   },
 ];
 
+export const dynamic = "force-dynamic";
+
 export default function StudentsLoginPage() {
+  // System is down for data recovery — student login is disabled.
+  if (isMaintenanceMode()) redirect("/maintenance");
+
   return (
     <main className={styles.main}>
       <aside className={styles.brandPanel}>

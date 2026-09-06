@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@fhusocom/db";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { isMaintenanceMode } from "@/lib/maintenance";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
+
+  // System is down for data recovery — no OAuth sign-in may complete.
+  if (isMaintenanceMode()) {
+    return NextResponse.redirect(`${origin}/maintenance`);
+  }
+
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/dashboard";
 
