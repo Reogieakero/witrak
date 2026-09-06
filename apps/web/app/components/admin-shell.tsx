@@ -79,6 +79,13 @@ export function AdminShell({
 
   const canManagePrograms = isSuperAdmin || roleLabel === "Supreme";
 
+  const visibleMainNav = MAIN_NAV.filter(
+    (item) => !item.visibleRoles || item.visibleRoles.includes(roleLabel) || canManagePrograms,
+  );
+  const visibleSystemNav = SYSTEM_NAV.filter(
+    (item) => !item.visibleRoles || item.visibleRoles.includes(roleLabel) || canManagePrograms,
+  );
+
   const PAGE_TITLES: Record<string, string> = {
     "/admin/dashboard": "Dashboard",
     "/admin/events": "Events",
@@ -121,37 +128,37 @@ export function AdminShell({
 
         <nav className={styles.sidebarNav}>
           <div className={styles.navSection}>Main</div>
-          {MAIN_NAV.map((item) => {
-            const Icon = item.icon;
-            const active = item.active ?? isActive(item.href);
-            const count = badgeFor(item.href);
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={active ? styles.navLinkActive : styles.navLink}
-              >
-                <Icon size={16} />
-                <span className={styles.navLabel}>{item.label}</span>
-                {count > 0 && (
-                  <span className={styles.navBadge}>
-                    {count > 99 ? "99+" : count}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
+           {visibleMainNav.map((item) => {
+             const Icon = item.icon;
+             const active = item.active ?? isActive(item.href);
+             const count = badgeFor(item.href);
+             return (
+               <Link
+                 key={item.label}
+                 href={item.href}
+                 className={active ? styles.navLinkActive : styles.navLink}
+               >
+                 <Icon size={16} />
+                 <span className={styles.navLabel}>{item.label}</span>
+                 {count > 0 && (
+                   <span className={styles.navBadge}>
+                     {count > 99 ? "99+" : count}
+                   </span>
+                 )}
+               </Link>
+             );
+           })}
 
-          <div className={styles.navSection}>System</div>
-          {SYSTEM_NAV.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.label} href={item.href} className={styles.navLink}>
-                <Icon size={16} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+           <div className={styles.navSection}>System</div>
+           {visibleSystemNav.map((item) => {
+             const Icon = item.icon;
+             return (
+               <Link key={item.label} href={item.href} className={styles.navLink}>
+                 <Icon size={16} />
+                 <span>{item.label}</span>
+               </Link>
+             );
+           })}
         </nav>
       </aside>
 

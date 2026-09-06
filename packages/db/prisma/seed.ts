@@ -676,7 +676,7 @@ async function main(): Promise<void> {
   for (const model of [
     "program", "yearLevel", "section", "student", "user", "role", "permission",
     "rolePermission", "userRole", "roleRequest", "academicTerm", "event", "attendance",
-    "sanctionRule", "sanction", "sanctionEvidence", "sanctionFlag", "fee", "feeProof",
+    "sanctionFine", "sanction", "sanctionEvidence", "sanctionFlag", "fee", "feeProof",
     "transparencyFile", "announcement", "auditLog",
   ] as const) {
     const delegate = prisma[model as keyof typeof prisma] as { count(): Promise<number> };

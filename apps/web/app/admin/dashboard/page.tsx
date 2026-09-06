@@ -15,7 +15,7 @@ export default async function AdminDashboardPage() {
   const isSuperAdmin =
     user?.roles.some((r) => r.role.name === "Super Admin") ?? false;
 
-  if (!isSuperAdmin) redirect("/dashboard");
+  if (!isSuperAdmin && !user) redirect("/login/officers");
 
   return <DashboardView />;
 }

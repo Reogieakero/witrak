@@ -2,12 +2,16 @@ import Link from "next/link";
 import { QUICK_ACTIONS } from "@/lib/constants/dashboard";
 import styles from "./quick-actions.module.css";
 
-export function QuickActions() {
+export function QuickActions({ roleLabel }: { roleLabel: string }) {
+  const isSuperAdmin = roleLabel === "Supreme";
+  const visibleActions = QUICK_ACTIONS.filter(
+    (action) => !action.visibleRoles || action.visibleRoles.includes(roleLabel) || isSuperAdmin,
+  );
   return (
     <div className={styles.quickWrap}>
       <h3 className={styles.quickTitle}>Quick Actions</h3>
       <div className={styles.quickGrid}>
-        {QUICK_ACTIONS.map((action) => {
+        {visibleActions.map((action) => {
           const Icon = action.icon;
           return (
             <Link key={action.label} href={action.href} className={styles.quickTile}>

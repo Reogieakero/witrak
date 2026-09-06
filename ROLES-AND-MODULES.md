@@ -42,20 +42,20 @@ Legend: **✓** full access · **view** view-only · **own** own-scope only · *
 | Page / action | Super Admin | Secretary | Treasurer | Disc. Officer | Year Rep | VP | PIO | Auditor | Adviser |
 |---|---|---|---|---|---|---|---|---|---|
 | Dashboard (officer) | ✓ | — | — | — | — | — | — | — | — |
-| Events — view | ✓ | ✓ | — | — | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Events — create / edit / delete | ✓ | ✓ | — | — | ✓ own | ✓ | — | — | — |
+| Events — view | ✓ | — | — | — | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Events — create / edit / delete | ✓ | — | — | — | ✓ own | ✓ | — | — | — |
 | Attendance — scan | ✓ | ✓ | — | — | ✓ scoped | — | — | — | — |
 | Attendance — view | ✓ | ✓ | — | ✓ | ✓ scoped | ✓ | — | — | ✓ |
 | Attendance — edit / correct | ✓ | ✓ | — | — | — | — | — | — | — |
-| Transparency — view | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Transparency — upload / delete | ✓ | ✓ | ✓ (financial) | — | — | — | ✓ | — | — |
+| Transparency — view | ✓ | — | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Transparency — upload / delete | ✓ | — | ✓ (financial) | — | — | — | ✓ | — | — |
 | Sanctions — view | ✓ | — | — | ✓ scoped | — | — | — | — | — |
 | Sanctions — create / clear / edit rules | ✓ | — | — | — | — | — | — | — | — |
 | Fees — view | ✓ | — | ✓ | — | — | — | — | ✓ | — |
 | Fees — create / verify | ✓ | — | ✓ | — | — | — | — | — | — |
 | Announcements — view | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Announcements — create / edit / delete | ✓ | ✓ | — | — | — | ✓ | ✓ | — | — |
-| Members (student directory) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Members (student directory) | ✓ | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Students (account management) | SA | — | — | — | — | — | — | — | — |
 | Users & Roles (assign roles, approve requests) | SA | — | — | — | — | — | — | — | — |
 | Terms | SA | — | — | — | — | — | — | — | — |
@@ -64,6 +64,7 @@ Legend: **✓** full access · **view** view-only · **own** own-scope only · *
 | Audit Log | ✓ | — | — | — | — | — | ✓ | ✓ | ✓ |
 
 ### Role scope notes
+- **Secretary** is limited to attendance (scan, view, edit) + announcements (create, edit, delete, view). No events, transparency, members, or other modules.
 - **Super Admin** is the only role that holds `users_manage_roles` — it exclusively owns the **Users & Roles**, **Students**, **Terms**, **Programs**, and **Payment Methods** management screens, and the officer **Dashboard** (the `/admin/dashboard` landing).
 - **Year Rep** rows marked "scoped" are limited to their resolved section set (`WHERE student.section_id IN (:S)`).
 - **Discipline Officer** holds `attendance.view` (faculty-wide) **only** to inspect the attendance history behind a sanction flag — no other attendance surface. Sanctions access is **view-only** within scope; creation/clearing/editing rest with the **Super Admin**. Threshold-triggered sanctions are auto-issued and appear in the officer's view.
@@ -94,7 +95,7 @@ Students see **no** create/edit/delete/verify controls, no directory of other st
 | Role | Permission keys |
 |---|---|
 | Super Admin | all keys |
-| Secretary | `events.*`, `attendance.scan`, `attendance.view`, `attendance.edit`, `transparency.upload`, `transparency.delete`, `transparency.view`, `announcements.create`, `announcements.edit`, `announcements.delete`, `announcements.view`, `members.view` |
+| Secretary | `attendance.scan`, `attendance.view`, `attendance.edit`, `announcements.create`, `announcements.edit`, `announcements.delete`, `announcements.view` |
 | Treasurer | `fees.create`, `fees.verify_payment`, `fees.view`, `transparency.upload`, `transparency.delete`, `transparency.view`, `members.view` |
 | Discipline Officer | `sanctions.view`, `attendance.view` (evidence review), `members.view` |
 | Year/Program Rep | `events.create`, `events.edit`, `events.delete`, `events.view`, `attendance.scan`, `attendance.view`, `members.view` |

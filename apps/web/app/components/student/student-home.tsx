@@ -1,6 +1,7 @@
 import { prisma } from "@fhusocom/db";
 import { money } from "@/lib/constants/dashboard";
 import { getTermContext, eventInTerm } from "@/lib/terms";
+import { isFeesRecoveryNotice } from "@/lib/maintenance";
 import { StudentShell } from "@/app/components/student-shell";
 import { WelcomeBanner } from "@/app/components/student/student-welcome";
 import { StudentStats } from "@/app/components/student/student-stats";
@@ -12,6 +13,8 @@ import { StudentSanctions } from "@/app/components/student/student-sanctions";
 import { StudentFees } from "@/app/components/student/student-fees";
 import { StudentQuickLinks } from "@/app/components/student/student-quick-links";
 import { StudentKpiOverview } from "@/app/components/student/student-kpi-overview";
+import { CompleteProfilePrompt } from "@/app/components/student/complete-profile-prompt";
+import { FeeProofRecoveryBanner } from "@/app/components/student/fee-proof-recovery-banner";
 import type { StudentHomeData } from "@/app/components/student/types";
 import styles from "./student-home.module.css";
 
@@ -29,10 +32,14 @@ export default async function StudentHomeView({
   studentId,
   userName,
   forceWalkthrough,
+  needsSection,
+  needsPhoto,
 }: {
   studentId: string;
   userName: string;
   forceWalkthrough?: boolean;
+  needsSection?: boolean;
+  needsPhoto?: boolean;
 }) {
   const student = await prisma.student.findUnique({
     where: { id: studentId },
@@ -365,8 +372,17 @@ export default async function StudentHomeView({
     })),
   };
 
+  const showFeesRecovery = isFeesRecoveryNotice();
+
   return (
     <StudentShell userName={userName} roleLabel="Student" crumb="Home" forceWalkthrough={forceWalkthrough}>
+      {(needsSection || needsPhoto) && (
+        <CompleteProfilePrompt
+          needsSection={Boolean(needsSection)}
+          needsPhoto={Boolean(needsPhoto)}
+        />
+      )}
+      {showFeesRecovery && <FeeProofRecoveryBanner />}
       <WelcomeBanner
         firstName={data.firstName}
         sectionLabel={data.sectionLabel}

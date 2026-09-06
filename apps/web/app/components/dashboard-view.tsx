@@ -405,6 +405,20 @@ export default async function DashboardView() {
     : (userWithRoles?.roles[0]?.role.name ?? "Officer");
   const userName = userWithRoles?.name ?? "Officer";
 
+  const showStatCards = isSuperAdmin;
+  const showSanctionFlags = isSuperAdmin || roleLabel === "Discipline Officer";
+  const showRoleRequests = isSuperAdmin;
+  const showAnalytics =
+    isSuperAdmin ||
+    roleLabel === "Treasurer" ||
+    roleLabel === "Auditor" ||
+    roleLabel === "Vice President";
+  const showAuditActivity =
+    isSuperAdmin ||
+    roleLabel === "PIO" ||
+    roleLabel === "Auditor" ||
+    roleLabel === "Adviser";
+
   return (
     <AdminShell userName={userName} roleLabel={roleLabel}>
       <div className={styles.pageHeader}>
@@ -434,7 +448,7 @@ export default async function DashboardView() {
             sectionById={sectionById}
             yearById={yearById}
           />
-          <QuickActions />
+          <QuickActions roleLabel={roleLabel} />
         </div>
 
         <div className={styles.rightCol}>

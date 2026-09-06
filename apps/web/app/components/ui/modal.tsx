@@ -10,11 +10,13 @@ type ModalProps = {
   title?: React.ReactNode;
   footer?: React.ReactNode;
   children: React.ReactNode;
+  /** When false, overlay-click and Escape won't close the dialog. Defaults to true. */
+  dismissable?: boolean;
 };
 
-export function Modal({ open, onClose, title, footer, children }: ModalProps) {
+export function Modal({ open, onClose, title, footer, children, dismissable = true }: ModalProps) {
   useEffect(() => {
-    if (!open) return;
+    if (!open || !dismissable) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -24,12 +26,12 @@ export function Modal({ open, onClose, title, footer, children }: ModalProps) {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [open, onClose]);
+  }, [open, onClose, dismissable]);
 
   if (!open) return null;
 
   return createPortal(
-    <div className={styles.overlay} onClick={onClose} role="dialog" aria-modal="true">
+    <div className={styles.overlay} onClick={dismissable ? onClose : undefined} role="dialog" aria-modal="true">
       <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           {title && <h2 className={styles.title}>{title}</h2>}

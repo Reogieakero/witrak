@@ -15,7 +15,7 @@ export default async function StudentDashboardPage({
 
   const student = await prisma.student.findUnique({
     where: { userId: session.user.id },
-    select: { id: true, suspended: true },
+    select: { id: true, suspended: true, sectionId: true, imageUrl: true },
   });
 
   // Students land on /dashboard. Officers (no linked student record) go to the
@@ -33,11 +33,17 @@ export default async function StudentDashboardPage({
 
   const forceWalkthrough = searchParams.walkthrough === "1";
 
+  // Incomplete profiles (no section and/or no photo) must finish setup first.
+  const needsSection = !student.sectionId;
+  const needsPhoto = !student.imageUrl;
+
   return (
     <StudentHomeView
       studentId={student.id}
       userName={session.user.name ?? "Student"}
       forceWalkthrough={forceWalkthrough}
+      needsSection={needsSection}
+      needsPhoto={needsPhoto}
     />
   );
 }
