@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liberalis — Complete Student Profile Poster</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        ink: {
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                        },
+                        textStrong: '#111827',
+                        textSubtle: '#374151',
+                        textMuted: '#6b7280',
+                        textFaint: '#9ca3af',
+                    },
+                    backgroundImage: {
+                        'brand-gradient': 'linear-gradient(135deg, #2563eb, #1e40af)',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        soft: '0 20px 45px -20px rgba(30,64,175,0.35)',
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .card-surface { background-color: #ffffff; border: 1px solid #e5e7eb; }
+        .subtle-dot-grid {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+    </style>
+</head>
+<body class="bg-brand-900 flex items-center justify-center min-h-screen p-6">
+
+    <!-- Poster Container (1080x1080 Square Format for Facebook / Social Media) -->
+    <div class="relative w-[1080px] h-[1080px] bg-[#f9fafb] text-textStrong flex flex-col justify-start gap-8 p-14 overflow-hidden shadow-2xl border border-gray-200 subtle-dot-grid">
+
+        <!-- Premium linear gradient background (white -> blue shades) -->
+        <div class="absolute inset-0 pointer-events-none" style="background-image: linear-gradient(135deg, #ffffff 0%, #eff6ff 38%, #bfdbfe 72%, #93c5fd 100%);"></div>
+
+        <!-- Fading diagonal lines -->
+        <div class="absolute inset-0 pointer-events-none opacity-60" style="background-image: repeating-linear-gradient(135deg, rgba(37,99,235,0.10) 0px, rgba(37,99,235,0.10) 1px, transparent 1px, transparent 46px); -webkit-mask-image: radial-gradient(circle at 50% 40%, rgba(0,0,0,0.9), transparent 75%); mask-image: radial-gradient(circle at 50% 40%, rgba(0,0,0,0.9), transparent 75%);"></div>
+
+        <div class="absolute -top-40 -right-40 w-[420px] h-[420px] bg-brand-200/40 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute -bottom-48 -left-40 w-[420px] h-[420px] bg-brand-300/30 rounded-full blur-[130px] pointer-events-none"></div>
+
+        <!-- Top Header / Branding -->
+        <div class="relative z-10 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-14 h-14 rounded-2xl bg-brand-gradient flex items-center justify-center shadow-xl shadow-brand-600/25 border border-brand-400/30 overflow-hidden">
+                    <img src="poster-logo.png" alt="Liberalis logo" class="w-10 h-10 object-contain" />
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl font-black tracking-tight text-textStrong">LIBER<span class="text-brand-600">ALIS</span></span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-brand-50 text-brand-700 border border-brand-200">Official</span>
+                    </div>
+                    <span class="text-xs font-semibold text-textMuted tracking-widest uppercase">Student Government Management System</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="relative z-10 grid grid-cols-12 gap-10 items-start">
+
+            <!-- Left Column: Typography & Messaging -->
+            <div class="col-span-5 space-y-6">
+                <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold tracking-wide">
+                    <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <span>One Step From Done</span>
+                </div>
+
+                <h1 class="text-[46px] font-extrabold tracking-tight leading-[1.08] text-textStrong">
+                    Complete Your <span class="text-transparent bg-clip-text bg-brand-gradient">Student Profile.</span>
+                </h1>
+
+                <p class="text-base text-textSubtle leading-relaxed font-normal">
+                    Signed in with Google? Finish your profile once and unlock attendance, events, fees and sanctions — all in one verified portal.
+                </p>
+
+                <div class="space-y-3 pt-1">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        </span>
+                        <span class="text-sm font-medium text-textSubtle">Add your photo &amp; student number</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        </span>
+                        <span class="text-sm font-medium text-textSubtle">Pick program, year &amp; section</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6 rounded-full bg-brand-50 border border-brand-200 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        </span>
+                        <span class="text-sm font-medium text-textSubtle">You're in — no re-entry needed</span>
+                    </div>
+                </div>
+
+                <!-- How it works (reminder cards) -->
+                <div class="card-surface rounded-2xl shadow-sm p-4">
+                    <p class="text-[11px] font-bold uppercase tracking-widest text-textFaint mb-3">How it works</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-[#f9fafb] border border-gray-100">
+                            <span class="w-7 h-7 rounded-full bg-brand-gradient text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+                            <div>
+                                <p class="text-sm font-bold text-textStrong">Sign in</p>
+                                <p class="text-[11px] text-textMuted leading-snug mt-0.5">Use your school Google account to start.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-[#f9fafb] border border-gray-100">
+                            <span class="w-7 h-7 rounded-full bg-brand-gradient text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+                            <div>
+                                <p class="text-sm font-bold text-textStrong">Fill details</p>
+                                <p class="text-[11px] text-textMuted leading-snug mt-0.5">Add photo, name &amp; student number.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-[#f9fafb] border border-gray-100">
+                            <span class="w-7 h-7 rounded-full bg-brand-gradient text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+                            <div>
+                                <p class="text-sm font-bold text-textStrong">Confirm</p>
+                                <p class="text-[11px] text-textMuted leading-snug mt-0.5">Pick program, year &amp; section.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-3 rounded-xl bg-[#f9fafb] border border-gray-100">
+                            <span class="w-7 h-7 rounded-full bg-brand-gradient text-white text-[12px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
+                            <div>
+                                <p class="text-sm font-bold text-textStrong">Access portal</p>
+                                <p class="text-[11px] text-textMuted leading-snug mt-0.5">Everything unlocked — no re-entry.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Complete Profile Form Card -->
+            <div class="col-span-7">
+                <div class="rounded-[14px] bg-white shadow-soft border border-gray-200 overflow-hidden">
+                    <!-- macOS browser top bar -->
+                    <div class="flex items-center space-x-2 px-4 py-3 bg-[#f3f4f6] border-b border-gray-200">
+                        <span class="w-3 h-3 rounded-full bg-[#ff5f57]"></span>
+                        <span class="w-3 h-3 rounded-full bg-[#febc2e]"></span>
+                        <span class="w-3 h-3 rounded-full bg-[#28c840]"></span>
+                        <div class="ml-3 flex-1 truncate rounded-md bg-white/70 px-3 py-1 text-[11px] text-textMuted font-medium border border-gray-200">
+                            portal.liberalis.app/complete-profile
+                        </div>
+                    </div>
+
+                    <div class="card-surface p-6">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-bold text-textStrong">Complete your student profile</h3>
+                        <p class="text-xs text-textMuted mt-1">Your Google account (<strong>juan.delasalle@school.edu</strong>) is not registered yet. Fill in your details to continue.</p>
+                    </div>
+
+                    <!-- Avatar + Upload -->
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="w-16 h-16 rounded-full bg-brand-50 border border-dashed border-brand-300 flex items-center justify-center text-brand-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                        </div>
+                        <span class="text-xs font-medium text-textMuted">Upload your photo</span>
+                    </div>
+
+                    <!-- Email (disabled) -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-semibold text-textSubtle mb-1.5">Email</label>
+                        <input value="juan.delasalle@school.edu" disabled class="w-full rounded-lg bg-gray-50 border border-gray-200 px-3 py-2.5 text-sm text-textMuted" />
+                    </div>
+
+                    <!-- First / Last name -->
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-textSubtle mb-1.5">First name</label>
+                            <input placeholder="Juan" class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-textStrong focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-textSubtle mb-1.5">Last name</label>
+                            <input placeholder="Dela Cruz" class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-textStrong focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none" />
+                        </div>
+                    </div>
+
+                    <!-- Suffix -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-semibold text-textSubtle mb-1.5">Name suffix (optional)</label>
+                        <div class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-textFaint bg-white flex items-center justify-between">
+                            <span>None</span>
+                            <svg class="w-4 h-4 text-textMuted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Student number -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-semibold text-textSubtle mb-1.5">Student number</label>
+                        <input placeholder="e.g. 2025-0001" class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-textStrong focus:border-brand-400 focus:ring-2 focus:ring-brand-100 outline-none" />
+                    </div>
+
+                    <!-- Program + Year -->
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-textSubtle mb-1.5">Program</label>
+                            <div class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-textFaint bg-white flex items-center justify-between">
+                                <span>Select program…</span>
+                                <svg class="w-4 h-4 text-textMuted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-textSubtle mb-1.5">Year level</label>
+                            <div class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-textFaint bg-white flex items-center justify-between">
+                                <span>Select program first</span>
+                                <svg class="w-4 h-4 text-textMuted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section -->
+                    <div class="mb-5">
+                        <label class="block text-xs font-semibold text-textSubtle mb-1.5">Section</label>
+                        <div class="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-textFaint bg-white flex items-center justify-between">
+                            <span>Select year first</span>
+                            <svg class="w-4 h-4 text-textMuted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button class="w-full rounded-lg bg-brand-gradient text-white font-bold py-3 text-sm shadow-md shadow-brand-600/25 hover:opacity-95 transition">
+                        Complete profile
+                    </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Footer Info -->
+        <div class="relative z-10 flex items-center justify-between text-xs text-textMuted pt-5 border-t border-gray-200">
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-brand-600"></span>
+                <span class="font-medium text-textSubtle">Official Student Portal Gateway</span>
+            </div>
+            <div class="flex space-x-6 text-textMuted">
+                <span>portal.liberalis.app/complete-profile</span>
+                <span>&bull;</span>
+                <span>Need Assistance? Contact Support</span>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

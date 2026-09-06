@@ -1,0 +1,169 @@
+LIBERALIS — STUDENT ONBOARDING & PORTAL FLOW
+Student Government Management System
+============================================================
+
+This document summarizes the three student-facing posters in one place:
+  1) Student Sign-In
+  2) Complete Student Profile
+  3) Portal Overview Dashboard
+
+Brand palette (from the system design):
+  Brand blue : #2563eb -> #1e40af (gradient)
+  Neutral     : #111827 / #374151 / #6b7280 / #9ca3af
+  Status      : green #16a34a | amber #d97706 | red #dc2626
+  Logo        : Liberalis (poster-logo.png)
+
+
+------------------------------------------------------------
+1) STUDENT SIGN-IN  (poster: student-signin-workflow-poster.html)
+------------------------------------------------------------
+Tagline : "Check-In Starts with a Single Scan."
+
+How to sign in (workflow):
+  1. Go to portal.liberalis.app
+  2. Click "Sign in with Google"
+  3. Select your account
+  4. You're checked in
+
+Poster highlights:
+  - Badge        : Fast Attendance Experience
+  - Headline     : Check-In Starts with a Single Scan.
+  - Copy         : Mark your attendance in seconds. Officers publish the
+                   event, you sign in with your school Google account, and
+                   presence is verified instantly — no paper, no lost rows,
+                   no queues.
+  - Feature pills: 1-Tap Google Sign-In | Instant Verified Presence | 100% Audit Logged
+  - Trust row    : Secure OAuth | No password needed
+  - Browser card : portal.liberalis.app/sign-in  (macOS 3-dot window)
+                   Card "Student Sign-In"
+                   Button "Sign in with Google" (only option, Google logo)
+                   Footer : Secured by OAuth -> Complete Profile
+                   Note   : By continuing you agree to the student conduct
+                            policy. Your attendance is recorded privately and
+                            visible only to scoped officers.
+
+
+------------------------------------------------------------
+2) COMPLETE STUDENT PROFILE  (poster: student-complete-profile-poster.html)
+------------------------------------------------------------
+Tagline : "Complete Your Student Profile."
+
+Context (from auth/complete-profile):
+  Your Google account (juan.delasalle@school.edu) is not registered to the
+  system yet. Fill in your student details to continue.
+
+Form fields (exact, same as the website):
+  - Upload photo        (avatar + "Upload your photo", required)
+  - Email               (disabled, prefilled from Google)
+  - First name          (required, e.g. Juan)
+  - Last name           (required, e.g. Dela Cruz)
+  - Name suffix         (optional select: None / Jr. / Sr. / II / III / IV / V)
+  - Student number      (required, format 20XX-XXXX, e.g. 2025-0001)
+  - Program             (select, filtered)
+  - Year level          (select, enabled after program)
+  - Section             (select, enabled after year level)
+  - Submit button       : "Complete profile"
+
+How it works (reminder cards):
+  1. Sign in        — Use your school Google account to start.
+  2. Fill details   — Add photo, name & student number.
+  3. Confirm        — Pick program, year & section.
+  4. Access portal  — Everything unlocked — no re-entry needed.
+
+Browser card : portal.liberalis.app/complete-profile  (macOS 3-dot window)
+
+
+------------------------------------------------------------
+3) PORTAL OVERVIEW DASHBOARD  (poster: student-portal-overview-poster.html)
+------------------------------------------------------------
+Tagline : "One Dashboard. Everything You Need."
+
+After sign-in, the student home (apps/web student-home) shows:
+
+MY OVERVIEW (KPI tiles):
+  - Attendance : 12 attended | 2 absences
+  - Fees       : ₱0 balance   | no pending
+  - Events     : 3 upcoming   | 1 live now
+  - Records    : 0 sanctions  | 9 files
+
+WHAT STUDENTS CAN SEE (sections):
+  - Announcements : latest org notices, dated & authored
+  - Events        : upcoming & live events, time/venue + QR check-in
+  - Attendance    : own scan status per event (present / late / absent)
+  - Transparency  : financial, minutes & reports — open officer files
+  - Sanctions     : ONLY own flags (private) with reason & status
+  - Fees          : view dues, upload proof, track paid vs pending
+
+Scope note (DESIGN.md): A Student role sees read-only own records —
+  attendance.view (self), sanctions.view_own, fees.view (own proofs),
+  transparency.view. No officer data is exposed.
+
+Footer : portal.liberalis.app/dashboard
+
+
+------------------------------------------------------------
+END-TO-END STUDENT JOURNEY
+------------------------------------------------------------
+  Sign in (Google)
+        |
+        v
+  Complete profile (photo, name, suffix, student no, program/year/section)
+        |
+        v
+  Portal dashboard (overview + announcements, events, attendance,
+                    transparency, sanctions, fees)
+
+
+Files in this set:
+  - student-signin-workflow-poster.html
+  - student-complete-profile-poster.html
+  - student-portal-overview-poster.html
+  - poster-logo.png  (shared Liberalis logo)
+
+
+------------------------------------------------------------
+DESIGNING  (shared poster design system — for the student user manual)
+------------------------------------------------------------
+All three posters share one high-end design language so the student manual
+reads as a single, consistent set.
+
+Canvas:
+  - Format : 1080 x 1080 px square (Facebook / social post)
+  - Font   : Plus Jakarta Sans (400-800 weights)
+  - Tool   : Tailwind CSS via Play CDN, self-contained HTML
+
+Background:
+  - Base   : linear-gradient(135deg, #ffffff -> #eff6ff -> #bfdbfe -> #93c5fd)
+  - Glows  : soft brand-blue radial blurs (top-right, bottom-left)
+  - Lines  : faint diagonal line grid (repeating-linear-gradient) faded with a
+             radial mask so it dissolves toward the edges
+  - Texture: subtle dot grid (radial-gradient #cbd5e1, 32px)
+
+Header (every poster):
+  - Logo   : rounded-2xl brand-gradient chip with Liberalis logo (poster-logo.png)
+  - Wordmark: LIBER + ALIS (brand-600) + "Official" pill
+  - Subline : "Student Government Management System" (uppercase, tracking-wide)
+
+Color tokens (from apps/web globals.css):
+  brand.50-900  : #eff6ff ... #1e3a8a   (primary blue scale)
+  brand-gradient: linear-gradient(135deg, #2563eb, #1e40af)
+  textStrong #111827 | textSubtle #374151 | textMuted #6b7280 | textFaint #9ca3af
+  status green #16a34a | amber #d97706 | red #dc2626
+
+Reusable components:
+  - Badge pill      : brand-50 bg, brand-200 border, brand-700 text
+  - Card surface     : white bg, #e5e7eb border, soft shadow
+  - Step / reminder cards: number in brand-gradient circle + bold title + sub text
+  - macOS browser frame : 14px radius, 3 traffic-light dots
+                      (#ff5f57 / #febc2e / #28c840) + address bar
+  - Buttons         : brand-gradient, white text, brand-600 shadow
+  - Footer          : brand-600 dot + "Official Student Portal Gateway" +
+                     portal URL + support line, separated by top border
+
+Consistency rules for new posters:
+  - Keep the 1080x1080 canvas and the white->blue gradient base.
+  - Always show the Liberalis logo + wordmark in the header.
+  - Use only brand / neutral / status tokens above — never off-palette colors.
+  - Reuse the card, badge, step-card and macOS-frame components as-is.
+  - End every poster with the same footer (URL = the page the poster describes).
+

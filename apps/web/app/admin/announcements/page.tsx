@@ -29,7 +29,7 @@ export default async function AdminAnnouncementsPage() {
   if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
-  if (!hasPermission(access, "announcements_view")) redirect("/dashboard");
+  if (!hasPermission(access, "announcements_view")) redirect("/admin/dashboard");
 
   const { term } = await getTermContext();
   const range = termRange(term);

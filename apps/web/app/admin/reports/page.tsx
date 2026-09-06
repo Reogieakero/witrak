@@ -22,7 +22,7 @@ export default async function AdminReportsPage() {
   if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
-  if (!hasPermission(access, "reports_view")) redirect("/dashboard");
+  if (!hasPermission(access, "reports_view")) redirect("/admin/dashboard");
 
   const scope = access?.scopeSectionIds ?? null;
   const { term } = await getTermContext();

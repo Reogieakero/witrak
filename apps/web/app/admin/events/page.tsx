@@ -64,7 +64,7 @@ export default async function AdminEventsPage() {
   const userId = session.user.id;
 
   const access = session.access;
-  if (!hasPermission(access, "events_view")) redirect("/dashboard");
+  if (!hasPermission(access, "events_view")) redirect("/admin/dashboard");
 
   const now = new Date();
 

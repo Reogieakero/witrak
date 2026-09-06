@@ -159,7 +159,7 @@ export default async function AdminAuditLogPage() {
   if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
-  if (!hasPermission(access, "audit_view")) redirect("/dashboard");
+  if (!hasPermission(access, "audit_view")) redirect("/admin/dashboard");
 
   const { term } = await getTermContext();
   const range = termRange(term);

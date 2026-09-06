@@ -49,7 +49,7 @@ export default async function AdminSanctionsPage() {
   if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
-  if (!hasPermission(access, "sanctions_view")) redirect("/dashboard");
+  if (!hasPermission(access, "sanctions_view")) redirect("/admin/dashboard");
 
   const scope = access?.scopeSectionIds ?? null;
   const studentWhere = scope ? { sectionId: { in: scope } } : undefined;

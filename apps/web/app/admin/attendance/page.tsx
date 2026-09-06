@@ -47,7 +47,7 @@ export default async function AdminAttendancePage() {
   const userId = session.user.id;
 
   const access = session.access;
-  if (!hasPermission(access, "attendance_view")) redirect("/dashboard");
+  if (!hasPermission(access, "attendance_view")) redirect("/admin/dashboard");
 
   const now = new Date();
 

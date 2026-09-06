@@ -8,6 +8,7 @@ import {
   CalendarDays,
   UserCheck,
   FileText,
+  Flag,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -30,6 +31,7 @@ const ITEMS: NavItem[] = [
   { key: "attendance", label: "Attendance", icon: UserCheck, target: "section-attendance" },
   { key: "transparency", label: "Docs", icon: FileText, target: "section-transparency" },
   { key: "fees", label: "Fees", icon: Wallet, href: "/dashboard/fees" },
+  { key: "report", label: "Report", icon: Flag, href: "/dashboard/report" },
 ];
 
 export function StudentMobileNav() {

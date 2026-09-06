@@ -5,33 +5,10 @@ import { AlertTriangle, Upload, X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import styles from "./fee-proof-recovery-banner.module.css";
 
-const DISMISS_KEY = "lt:feesRecoveryDismissed";
-
-function isDismissed(): boolean {
-  try {
-    return localStorage.getItem(DISMISS_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function dismissLocally(): void {
-  try {
-    localStorage.setItem(DISMISS_KEY, "1");
-  } catch {
-    /* ignore storage failures */
-  }
-}
-
 export function FeeProofRecoveryBanner() {
-  const [visible, setVisible] = useState(() => !isDismissed());
+  const [visible, setVisible] = useState(true);
 
   if (!visible) return null;
-
-  function dismiss() {
-    dismissLocally();
-    setVisible(false);
-  }
 
   return (
     <div className={styles.banner} role="status" aria-live="polite">
@@ -43,7 +20,7 @@ export function FeeProofRecoveryBanner() {
         <button
           type="button"
           className={styles.dismissBtn}
-          onClick={dismiss}
+          onClick={() => setVisible(false)}
           aria-label="Dismiss this notice"
           title="Dismiss this notice"
         >

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rescue Report Workflow</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1420;
+    --panel:#111F30;
+    --panel-2:#0E1A29;
+    --line:#22334A;
+    --text:#E7EDF6;
+    --muted:#7E93AC;
+    --resident:#5BA8FF;
+    --admin:#F5A623;
+    --rescuer:#2DD4BF;
+    --danger:#F0554B;
+  }
+  body{ background:
+      radial-gradient(1200px 500px at 10% -10%, rgba(91,168,255,0.08), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, rgba(45,212,191,0.07), transparent 55%),
+      var(--bg);
+    font-family:'Inter',sans-serif; color:var(--text);
+  }
+  .display{ font-family:'Rajdhani',sans-serif; letter-spacing:0.02em; }
+  .mono{ font-family:'JetBrains Mono',monospace; }
+  .lane-rail{ position:absolute; left:23px; top:0; bottom:0; width:2px; background:linear-gradient(to bottom, var(--line), var(--line) 92%, transparent); }
+  @media (min-width:768px){ .lane-rail{ left:31px; } }
+  .node-dot{ box-shadow:0 0 0 4px var(--bg), 0 0 0 5px var(--line); }
+  .card{ background:linear-gradient(180deg, var(--panel), var(--panel-2)); border:1px solid var(--line); }
+  .tag{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.08em; padding:2px 8px; border-radius:3px; }
+  .branch-line{ border-left:2px dashed var(--danger); }
+  .pulse-dot{ animation:pulse 2s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.35; } }
+  .step-in{ opacity:0; transform:translateY(10px); animation:stepIn 0.6s ease forwards; }
+  @keyframes stepIn{ to{ opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- HEADER -->
+<header class="border-b border-[var(--line)] bg-[var(--panel-2)]/60 backdrop-blur sticky top-0 z-30">
+  <div class="max-w-5xl mx-auto px-5 md:px-10 py-5 flex items-center justify-between">
+    <div>
+      <p class="mono text-[10px] tracking-[0.25em] text-[var(--muted)] uppercase">Ops Reference · Case Lifecycle</p>
+      <h1 class="display text-2xl md:text-3xl font-bold tracking-wide">RESCUE REPORT WORKFLOW</h1>
+    </div>
+    <div class="hidden sm:flex items-center gap-2 mono text-[10px] uppercase text-[var(--muted)]">
+      <span class="w-2 h-2 rounded-full bg-[var(--rescuer)] pulse-dot"></span> Live Process
+    </div>
+  </div>
+</header>
+
+<!-- LEGEND -->
+<div class="max-w-5xl mx-auto px-5 md:px-10 pt-8">
+  <div class="flex flex-wrap gap-3">
+    <span class="tag" style="background:rgba(91,168,255,0.12); color:var(--resident); border:1px solid rgba(91,168,255,0.35);">RESIDENT</span>
+    <span class="tag" style="background:rgba(245,166,35,0.12); color:var(--admin); border:1px solid rgba(245,166,35,0.35);">ADMIN</span>
+    <span class="tag" style="background:rgba(45,212,191,0.12); color:var(--rescuer); border:1px solid rgba(45,212,191,0.35);">RESCUER</span>
+    <span class="tag" style="background:rgba(240,85,75,0.12); color:var(--danger); border:1px solid rgba(240,85,75,0.35);">REASSIGN PATH</span>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<main class="max-w-5xl mx-auto px-5 md:px-10 py-10">
+  <div class="relative pl-12 md:pl-20">
+    <div class="lane-rail"></div>
+
+    <!-- STEP 01 -->
+    <div class="relative mb-10 step-in" style="animation-delay:.05s">
+      <span class="absolute -left-[38px] md:-left-[46px] top-1 w-4 h-4 rounded-full node-dot" style="background:var(--resident);"></span>
+      <div class="card rounded-lg p-5">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h2 class="display text-lg font-semibold">01 · Submit Report</h2>
+          <span class="tag shrink-0" style="background:rgba(91,168,255,0.12); color:var(--resident); border:1px solid rgba(91,168,255,0.35);">RESIDENT</span>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">Resident files an incident report describing the emergency and location. Case enters the queue with status <span class="mono text-[var(--text)]">PENDING</span>.</p>
+      </div>
+    </div>
+
+    <!-- STEP 02 -->
+    <div class="relative mb-10 step-in" style="animation-delay:.15s">
+      <span class="absolute -left-[38px] md:-left-[46px] top-1 w-4 h-4 rounded-full node-dot" style="background:var(--admin);"></span>
+      <div class="card rounded-lg p-5">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h2 class="display text-lg font-semibold">02 · Verify Report</h2>
+          <span class="tag shrink-0" style="background:rgba(245,166,35,0.12); color:var(--admin); border:1px solid rgba(245,166,35,0.35);">ADMIN</span>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">Admin reviews the submitted case for legitimacy and completeness before it can move forward. Status set to <span class="mono text-[var(--text)]">VERIFIED</span>.</p>
+      </div>
+    </div>
+
+    <!-- STEP 03 -->
+    <div class="relative mb-10 step-in" style="animation-delay:.25s">
+      <span class="absolute -left-[38px] md:-left-[46px] top-1 w-4 h-4 rounded-full node-dot" style="background:var(--admin);"></span>
+      <div class="card rounded-lg p-5">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h2 class="display text-lg font-semibold">03 · Assign Rescuer</h2>
+          <span class="tag shrink-0" style="background:rgba(245,166,35,0.12); color:var(--admin); border:1px solid rgba(245,166,35,0.35);">ADMIN</span>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">Admin dispatches the case to an available rescuer. Status set to <span class="mono text-[var(--text)]">ASSIGNED</span>, awaiting rescuer response.</p>
+      </div>
+    </div>
+
+    <!-- STEP 04 — DECISION -->
+    <div class="relative mb-10 step-in" style="animation-delay:.35s">
+      <span class="absolute -left-[38px] md:-left-[46px] top-1 w-4 h-4 rounded-full node-dot" style="background:var(--rescuer);"></span>
+      <div class="card rounded-lg p-5">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h2 class="display text-lg font-semibold">04 · Rescuer Response</h2>
+          <span class="tag shrink-0" style="background:rgba(45,212,191,0.12); color:var(--rescuer); border:1px solid rgba(45,212,191,0.35);">RESCUER</span>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed mb-4">Rescuer must accept or decline the assigned case.</p>
+
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div class="rounded-md p-4 border" style="background:rgba(45,212,191,0.06); border-color:rgba(45,212,191,0.3);">
+            <p class="mono text-[11px] uppercase tracking-wider mb-1" style="color:var(--rescuer);">✓ Accepted</p>
+            <p class="text-xs text-[var(--muted)]">Proceeds to Step 05 — case goes in progress.</p>
+          </div>
+          <div class="rounded-md p-4 border" style="background:rgba(240,85,75,0.06); border-color:rgba(240,85,75,0.3);">
+            <p class="mono text-[11px] uppercase tracking-wider mb-1" style="color:var(--danger);">✕ Not Accepted</p>
+            <p class="text-xs text-[var(--muted)]">Returns to Admin to reassign a different rescuer — loops back to Step 03.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- reassign loop callout -->
+      <div class="ml-4 mt-3 pl-4 branch-line">
+        <p class="mono text-[10px] uppercase tracking-widest" style="color:var(--danger);">↺ loop to Step 03 · Assign Rescuer</p>
+      </div>
+    </div>
+
+    <!-- STEP 05 -->
+    <div class="relative mb-10 step-in" style="animation-delay:.45s">
+      <span class="absolute -left-[38px] md:-left-[46px] top-1 w-4 h-4 rounded-full node-dot" style="background:var(--rescuer);"></span>
+      <div class="card rounded-lg p-5">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h2 class="display text-lg font-semibold">05 · Rescue In Progress</h2>
+          <span class="tag shrink-0" style="background:rgba(45,212,191,0.12); color:var(--rescuer); border:1px solid rgba(45,212,191,0.35);">RESCUER</span>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">Once accepted, case status changes to <span class="mono text-[var(--text)]">IN PROGRESS</span> and the rescuer proceeds to the site.</p>
+      </div>
+    </div>
+
+    <!-- STEP 06 -->
+    <div class="relative mb-10 step-in" style="animation-delay:.55s">
+      <span class="absolute -left-[38px] md:-left-[46px] top-1 w-4 h-4 rounded-full node-dot" style="background:var(--rescuer);"></span>
+      <div class="card rounded-lg p-5">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h2 class="display text-lg font-semibold">06 · Attach Proof of Rescue</h2>
+          <span class="tag shrink-0" style="background:rgba(45,212,191,0.12); color:var(--rescuer); border:1px solid rgba(45,212,191,0.35);">RESCUER</span>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">Rescuer uploads photo/file evidence of the rescue, which notifies Admin that the operation is underway or done.</p>
+      </div>
+    </div>
+
+    <!-- STEP 07 -->
+    <div class="relative step-in" style="animation-delay:.65s">
+      <span class="absolute -left-[38px] md:-left-[46px] top-1 w-4 h-4 rounded-full node-dot" style="background:var(--admin);"></span>
+      <div class="card rounded-lg p-5" style="box-shadow:0 0 0 1px rgba(245,166,35,0.15) inset;">
+        <div class="flex items-start justify-between gap-4 mb-2">
+          <h2 class="display text-lg font-semibold">07 · Resolve Case</h2>
+          <span class="tag shrink-0" style="background:rgba(245,166,35,0.12); color:var(--admin); border:1px solid rgba(245,166,35,0.35);">ADMIN</span>
+        </div>
+        <p class="text-sm text-[var(--muted)] leading-relaxed">Admin reviews the attached evidence and marks the case <span class="mono text-[var(--text)]">RESOLVED</span>, closing the report.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="max-w-5xl mx-auto px-5 md:px-10 pb-10">
+  <div class="border-t border-[var(--line)] pt-5 flex flex-wrap gap-x-6 gap-y-2 mono text-[10px] uppercase tracking-widest text-[var(--muted)]">
+    <span>PENDING → VERIFIED → ASSIGNED → IN PROGRESS → RESOLVED</span>
+  </div>
+</footer>
+
+</body>
+</html>

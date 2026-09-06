@@ -39,7 +39,7 @@ export default async function AdminFeesPage() {
   if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
-  if (!hasPermission(access, "fees_view")) redirect("/dashboard");
+  if (!hasPermission(access, "fees_view")) redirect("/admin/dashboard");
   const { term } = await getTermContext();
   const range = termRange(term);
   const termKey = term?.id ?? "none";

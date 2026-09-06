@@ -30,7 +30,7 @@ export default async function AdminTransparencyPage() {
   if (!session?.user?.id) redirect("/login/officers");
 
   const access = session.access;
-  if (!hasPermission(access, "transparency_view")) redirect("/dashboard");
+  if (!hasPermission(access, "transparency_view")) redirect("/admin/dashboard");
 
   const { term } = await getTermContext();
   const range = termRange(term);
