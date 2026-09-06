@@ -55,19 +55,21 @@ enum RequestStatus {
 }
 
 enum AuditAction {
-  ROLE_ASSIGNED
-  ROLE_REVOKED
-  SCOPE_CHANGED
-  ROLE_REQUEST_REJECTED
-  SANCTION_CREATED
-  SANCTION_RESOLVED
-  FLAG_DISMISSED
-  FLAG_AUTO_DISMISSED
-  PAYMENT_VERIFIED
-  PAYMENT_REJECTED
-  MEMBER_SUSPENDED
-  MEMBER_REINSTATED
-  MEMBER_AUTHORIZATION_REMOVED
+   ROLE_ASSIGNED
+   ROLE_REVOKED
+   SCOPE_CHANGED
+   ROLE_REQUEST_REJECTED
+   SANCTION_CREATED
+   SANCTION_RESOLVED
+   FLAG_DISMISSED
+   FLAG_AUTO_DISMISSED
+   PAYMENT_VERIFIED
+   PAYMENT_REJECTED
+   REPORT_SUBMITTED
+   REPORT_RESOLVED
+   MEMBER_SUSPENDED
+   MEMBER_REINSTATED
+   MEMBER_AUTHORIZATION_REMOVED
 }
 
 enum PermissionKey {
@@ -89,6 +91,8 @@ enum PermissionKey {
   fees_create
   fees_verify_payment
   fees_view
+  reports_view
+  reports_manage
   announcements_create
   announcements_edit
   announcements_delete
@@ -151,6 +155,7 @@ model Student {
   sanctions   Sanction[]
   flags       SanctionFlag[]
   feeProofs   FeeProof[]
+  reports     Report[]
 
   @@index([sectionId])
   @@index([lastName, firstName])
@@ -279,6 +284,7 @@ model Event {
   createdById        String
   createdBy          User         @relation("EventCreatedBy", fields: [createdById], references: [id])
   attendances        Attendance[]
+  reports            Report[]
 
   @@index([startsAt])
   @@index([createdById])
@@ -376,6 +382,7 @@ model Fee {
   createdById String
   createdBy   User       @relation("FeeCreatedBy", fields: [createdById], references: [id])
   proofs      FeeProof[]
+  reports     Report[]
 
   @@index([dueDate])
   @@index([createdAt])
@@ -460,4 +467,37 @@ model AuditLog {
   @@index([action])
   @@index([action, timestamp])
   @@index([timestamp])
+}
+
+enum ReportCategory {
+  ATTENDANCE
+  FEES
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
+}
+
+model Report {
+  id          String        @id @default(cuid())
+  studentId   String
+  category    ReportCategory
+  feeId       String?
+  eventId     String?
+  subject     String
+  description String
+  status      ReportStatus  @default(PENDING)
+  resolutionNote String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  student     Student       @relation(fields: [studentId], references: [id])
+  fee         Fee?          @relation(fields: [feeId], references: [id])
+  event       Event?        @relation(fields: [eventId], references: [id])
+
+  @@index([studentId])
+  @@index([category])
+  @@index([status])
+  @@index([createdAt])
 }

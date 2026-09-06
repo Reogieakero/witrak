@@ -90,6 +90,7 @@ export function AdminShell({
     "/admin/dashboard": "Dashboard",
     "/admin/events": "Events",
     "/admin/attendance": "Attendance",
+    "/admin/reports": "Reports",
     "/admin/transparency": "Transparency",
     "/admin/sanctions": "Sanctions",
     "/admin/fees": "Fees",

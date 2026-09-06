@@ -11,6 +11,8 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   FLAG_AUTO_DISMISSED: "Flag auto-dismissed",
   PAYMENT_VERIFIED: "Fee verified",
   PAYMENT_REJECTED: "Payment rejected",
+  REPORT_SUBMITTED: "Report submitted",
+  REPORT_RESOLVED: "Report resolved",
   MEMBER_SUSPENDED: "Member suspended",
   MEMBER_REINSTATED: "Member reinstated",
   MEMBER_AUTHORIZATION_REMOVED: "Authorization removed",
@@ -21,5 +23,6 @@ export const AUDIT_MODULE_FILTERS: { value: AuditModuleKey; label: string }[] = 
   { value: "roles", label: "Roles" },
   { value: "sanctions", label: "Sanctions" },
   { value: "fees", label: "Fees" },
+  { value: "reports", label: "Reports" },
   { value: "members", label: "Members" },
 ];

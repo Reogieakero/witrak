@@ -1,0 +1,96 @@
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-strong);
+}
+
+.pageSubtitle {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.form {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ink-700);
+}
+
+.input,
+.textarea {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.15s ease, background 0.15s ease;
+  font-family: var(--font-nunito), sans-serif;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: #2563eb;
+  background: var(--surface-card);
+}
+
+.textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.fieldHint {
+  margin: 0;
+  font-size: 0.625rem;
+  color: var(--text-muted);
+}
+
+.submit {
+  width: 100%;
+}
+
+.note {
+  margin: 0;
+  padding: 0.625rem;
+  border-radius: 8px;
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
+  font-size: 0.625rem;
+  line-height: 1.5;
+  color: var(--ink-500);
+}

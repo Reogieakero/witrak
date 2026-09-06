@@ -1,4 +1,4 @@
-export type AuditModuleKey = "all" | "roles" | "sanctions" | "fees" | "members";
+export type AuditModuleKey = "all" | "roles" | "sanctions" | "fees" | "reports" | "members";
 
 export interface AuditEntry {
   id: number;

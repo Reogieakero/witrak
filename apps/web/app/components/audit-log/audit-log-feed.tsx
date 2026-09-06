@@ -10,7 +10,7 @@ import styles from "./audit-log-feed.module.css";
 
 const PAGE_SIZE = 12;
 
-function moduleTone(action: string): "violet" | "red" | "green" | "amber" {
+function moduleTone(action: string): "violet" | "red" | "green" | "amber" | "brand" {
   switch (action) {
     case "ROLE_ASSIGNED":
     case "ROLE_REVOKED":
@@ -24,7 +24,10 @@ function moduleTone(action: string): "violet" | "red" | "green" | "amber" {
     case "PAYMENT_REJECTED":
       return "red";
     case "PAYMENT_VERIFIED":
+    case "REPORT_RESOLVED":
       return "green";
+    case "REPORT_SUBMITTED":
+      return "amber";
     case "MEMBER_SUSPENDED":
       return "amber";
     case "MEMBER_REINSTATED":
@@ -49,6 +52,10 @@ function moduleIcon(action: string): React.ReactNode {
     case "PAYMENT_VERIFIED":
     case "PAYMENT_REJECTED":
       return <span className={styles.actionBadge} data-tone="green">F</span>;
+    case "REPORT_SUBMITTED":
+      return <span className={styles.actionBadge} data-tone="amber">R</span>;
+    case "REPORT_RESOLVED":
+      return <span className={styles.actionBadge} data-tone="green">R</span>;
     case "MEMBER_SUSPENDED":
     case "MEMBER_REINSTATED":
     case "MEMBER_AUTHORIZATION_REMOVED":

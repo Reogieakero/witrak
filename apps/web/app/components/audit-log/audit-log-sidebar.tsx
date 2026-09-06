@@ -4,10 +4,12 @@ import { Download, Info, ShieldCheck } from "lucide-react";
 import type { AuditLogSidebarProps } from "./types";
 import styles from "./audit-log-sidebar.module.css";
 
-const MODULE_ORDER: { key: string; label: string; tone: string }[] = [
-  { key: "roles", label: "Roles & Access", tone: "violet" },
-  { key: "sanctions", label: "Sanctions", tone: "rose" },
-  { key: "fees", label: "Fees", tone: "green" },
+  const MODULE_ORDER: { key: string; label: string; tone: string }[] = [
+    { key: "roles", label: "Roles & Access", tone: "violet" },
+    { key: "sanctions", label: "Sanctions", tone: "rose" },
+    { key: "fees", label: "Fees", tone: "green" },
+    { key: "reports", label: "Reports", tone: "brand" },
+    { key: "members", label: "Members", tone: "amber" },
   { key: "members", label: "Members", tone: "amber" },
 ];
 

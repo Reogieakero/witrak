@@ -151,6 +151,12 @@
   border: 1px solid var(--amber-100);
 }
 
+.actionBadge[data-tone="brand"] {
+  background: var(--brand-50);
+  color: var(--brand-600);
+  border: 1px solid var(--brand-100);
+}
+
 .actionText {
   display: flex;
   flex-direction: column;

@@ -60,6 +60,9 @@ function moduleForAction(action: string): Exclude<AuditModuleKey, "all"> {
     case "PAYMENT_VERIFIED":
     case "PAYMENT_REJECTED":
       return "fees";
+    case "REPORT_SUBMITTED":
+    case "REPORT_RESOLVED":
+      return "reports";
     case "MEMBER_SUSPENDED":
     case "MEMBER_REINSTATED":
     case "MEMBER_AUTHORIZATION_REMOVED":
@@ -101,6 +104,12 @@ function summaryFor(action: string, details: Record<string, unknown>): string {
       return "flag dismissed";
     case "FLAG_AUTO_DISMISSED":
       return "auto-dismissed";
+    case "REPORT_SUBMITTED":
+      return "submitted";
+    case "REPORT_RESOLVED":
+      return typeof details.resolution === "string"
+        ? String(details.resolution)
+        : "resolved";
     default:
       return "—";
   }
@@ -135,6 +144,11 @@ function targetDetailFor(
     case "FLAG_DISMISSED":
     case "FLAG_AUTO_DISMISSED":
       return "Attendance evidence";
+    case "REPORT_SUBMITTED":
+    case "REPORT_RESOLVED":
+      return typeof details.category === "string"
+        ? String(details.category).toLowerCase()
+        : "Report";
     default:
       return "—";
   }
@@ -199,7 +213,7 @@ export default async function AdminAuditLogPage() {
         thisWeek: auditLogs.filter((l) => isWithinLastWeek(l.timestamp)).length,
         actors: new Set(auditLogs.map((l) => l.actorId ?? "system")).size,
         systemIssued: auditLogs.filter((l) => !l.actorId).length,
-        byModule: (["roles", "sanctions", "fees", "members"] as AuditModuleKey[]).map(
+        byModule: (["roles", "sanctions", "fees", "reports", "members"] as AuditModuleKey[]).map(
           (m) => ({
             module: m,
             label: m === "roles" ? "Roles & Access" : m === "members" ? "Members" : m[0].toUpperCase() + m.slice(1),

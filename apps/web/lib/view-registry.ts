@@ -25,6 +25,10 @@ export const VIEW_REGISTRY: Record<string, ViewLoader> = {
     ((await import("@/app/components/attendance/attendance-view")) as unknown as {
       AttendanceView: ComponentType<Record<string, unknown>>;
     }).AttendanceView,
+  "/admin/reports": async () =>
+    ((await import("@/app/components/reports/reports-view")) as unknown as {
+      ReportsView: ComponentType<Record<string, unknown>>;
+    }).ReportsView,
   "/admin/students": async () =>
     ((await import("@/app/components/students/students-view")) as unknown as {
       StudentsView: ComponentType<Record<string, unknown>>;

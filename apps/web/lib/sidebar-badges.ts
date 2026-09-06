@@ -51,11 +51,12 @@ export async function getSidebarBadges(userId: string): Promise<SidebarBadges> {
   const { term } = await getTermContext();
   const range = term ? { gte: term.startsOn, lte: term.endsOn } : null;
 
-  const [seenEvents, seenSanctions, seenFees, seenAnnouncements, seenTransparency] =
+  const [seenEvents, seenSanctions, seenFees, seenReports, seenAnnouncements, seenTransparency] =
     await Promise.all([
       getOrCreateSeenAt(userId, "events"),
       getOrCreateSeenAt(userId, "sanctions"),
       getOrCreateSeenAt(userId, "fees"),
+      getOrCreateSeenAt(userId, "reports"),
       getOrCreateSeenAt(userId, "announcements"),
       getOrCreateSeenAt(userId, "transparency"),
     ]);
@@ -65,7 +66,7 @@ export async function getSidebarBadges(userId: string): Promise<SidebarBadges> {
     ...(seenSanctions ? { gt: seenSanctions } : {}),
   };
 
-  const [events, sanctions, fees, announcements, transparency, members] =
+  const [events, sanctions, fees, reports, announcements, transparency, members] =
     await Promise.all([
       prisma.event.count({
         where: {
@@ -85,6 +86,12 @@ export async function getSidebarBadges(userId: string): Promise<SidebarBadges> {
           ...(seenFees ? { createdAt: { gt: seenFees } } : {}),
         },
       }),
+      prisma.report.count({
+        where: {
+          status: "PENDING",
+          ...(seenReports ? { createdAt: { gt: seenReports } } : {}),
+        },
+      }),
       prisma.announcement.count({
         where: seenAnnouncements ? { createdAt: { gt: seenAnnouncements } } : {},
       }),
@@ -94,5 +101,5 @@ export async function getSidebarBadges(userId: string): Promise<SidebarBadges> {
       prisma.roleRequest.count({ where: { status: "PENDING" } }),
     ]);
 
-  return { events, sanctions, fees, announcements, transparency, members };
+  return { events, sanctions, fees, reports, announcements, transparency, members };
 }

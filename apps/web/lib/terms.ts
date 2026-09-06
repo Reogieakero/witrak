@@ -26,6 +26,7 @@ export const TERM_REVALIDATE_PATHS = [
   "/admin/dashboard",
   "/admin/events",
   "/admin/attendance",
+  "/admin/reports",
   "/admin/sanctions",
   "/admin/fees",
   "/admin/announcements",

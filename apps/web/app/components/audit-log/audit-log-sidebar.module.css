@@ -206,6 +206,12 @@
   border: 1px solid var(--amber-100);
 }
 
+.moduleCount[data-tone="brand"] {
+  color: var(--brand-600);
+  background: var(--brand-50);
+  border: 1px solid var(--brand-100);
+}
+
 @media (min-width: 1024px) {
   .sidebar {
     width: 18.75rem;

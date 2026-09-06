@@ -3,6 +3,7 @@ import {
   CalendarCheck2,
   CalendarPlus,
   CheckCheck,
+  ClipboardList,
   Download,
   FolderOpen,
   GraduationCap,
@@ -34,6 +35,8 @@ export const ACTION_LABELS: Record<string, string> = {
   FLAG_AUTO_DISMISSED: "Flag auto-dismissed",
   PAYMENT_VERIFIED: "Fee verified",
   PAYMENT_REJECTED: "Payment rejected",
+  REPORT_SUBMITTED: "Report submitted",
+  REPORT_RESOLVED: "Report resolved",
 };
 
 export type NavItem = {
@@ -48,6 +51,7 @@ export const MAIN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { label: "Events", href: "/admin/events", icon: CalendarCheck2, visibleRoles: ["Supreme", "Year/Program Rep", "Vice President", "PIO", "Auditor", "Adviser"] },
   { label: "Attendance", href: "/admin/attendance", icon: QrCode, visibleRoles: ["Supreme", "Secretary", "Discipline Officer", "Year/Program Rep", "Vice President", "Adviser"] },
+  { label: "Reports", href: "/admin/reports", icon: ClipboardList, visibleRoles: ["Supreme", "Secretary", "Discipline Officer", "Year/Program Rep", "Vice President", "Adviser"] },
   { label: "Transparency", href: "/admin/transparency", icon: FolderOpen, visibleRoles: ["Supreme", "Treasurer", "Year/Program Rep", "Vice President", "PIO", "Auditor", "Adviser"] },
   { label: "Sanctions", href: "/admin/sanctions", icon: ShieldAlert, visibleRoles: ["Supreme", "Discipline Officer"] },
   { label: "Fees", href: "/admin/fees", icon: HandCoins, visibleRoles: ["Supreme", "Treasurer", "Auditor"] },
