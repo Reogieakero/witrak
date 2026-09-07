@@ -107,14 +107,20 @@ export function StudentEvents({ events }: StudentEventsProps) {
             <p className={base.subtitle}>Events you can attend this term</p>
           </div>
         </div>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={() => openModal()}
-        >
-          View all
-        </Button>
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <Button href="/dashboard/report" variant="secondary" size="sm">
+            <FileText size={14} />
+            Report
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => openModal()}
+          >
+            View all
+          </Button>
+        </div>
       </header>
 
       <div className={styles.grid}>
@@ -512,6 +518,11 @@ function EventDetails({
           </div>
         </div>
       )}
+
+      <Button href="/dashboard/report" variant="secondary" size="sm">
+        <FileText size={14} />
+        Report
+      </Button>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { CheckCircle, Clock, HandCoins, Upload } from "lucide-react";
+import { CheckCircle, Clock, FileText, HandCoins, Upload } from "lucide-react";
 import type { StudentFeeItem } from "./types";
 import { Button } from "@/app/components/ui/button";
 import styles from "./student-card.module.css";
@@ -68,6 +68,10 @@ export function StudentFees({ fees }: StudentFeesProps) {
       <Button href="/dashboard/fees" className={styles.uploadBtn}>
         <Upload size={16} />
         Upload Proof of Payment
+      </Button>
+      <Button href="/dashboard/report" variant="secondary" className={styles.uploadBtn}>
+        <FileText size={16} />
+        Report
       </Button>
     </section>
   );

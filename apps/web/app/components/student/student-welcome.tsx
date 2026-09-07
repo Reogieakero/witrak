@@ -1,4 +1,4 @@
-import { CalendarPlus, Upload } from "lucide-react";
+import { CalendarPlus, FileText, Upload } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import styles from "./student-welcome.module.css";
 
@@ -26,6 +26,10 @@ export function WelcomeBanner({ firstName, sectionLabel, termName }: WelcomeBann
         <Button href="/dashboard#events" size="md" className={styles.bannerBtn}>
           <CalendarPlus size={16} />
           View Events
+        </Button>
+        <Button href="/dashboard/report" variant="outline" size="md" className={styles.bannerBtn}>
+          <FileText size={16} />
+          Report
         </Button>
       </div>
     </section>

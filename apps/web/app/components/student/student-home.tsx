@@ -15,7 +15,7 @@ import { StudentQuickLinks } from "@/app/components/student/student-quick-links"
 import { StudentKpiOverview } from "@/app/components/student/student-kpi-overview";
 import { CompleteProfilePrompt } from "@/app/components/student/complete-profile-prompt";
 import { FeeProofRecoveryBanner } from "@/app/components/student/fee-proof-recovery-banner";
-import { ReportVerdictModal } from "@/app/components/student/report-verdict-modal";
+import { MyReportsModal } from "@/app/components/student/my-reports-modal";
 import type { StudentHomeData } from "@/app/components/student/types";
 import styles from "./student-home.module.css";
 
@@ -309,14 +309,15 @@ export default async function StudentHomeView({
     };
   });
 
-  const verdictRows = await prisma.report.findMany({
-    where: { studentId, status: { in: ["RESOLVED", "REVIEWED"] } },
+  const reportRows = await prisma.report.findMany({
+    where: { studentId },
     orderBy: { createdAt: "desc" },
-    take: 5,
+    take: 8,
     select: {
       id: true,
       category: true,
       subject: true,
+      description: true,
       status: true,
       resolutionNote: true,
       createdAt: true,
@@ -325,10 +326,11 @@ export default async function StudentHomeView({
     },
   });
 
-  const verdicts = verdictRows.map((r) => ({
+  const myReports = reportRows.map((r) => ({
     id: r.id,
     category: r.category,
     subject: r.subject,
+    description: r.description,
     status: r.status,
     resolutionNote: r.resolutionNote,
     eventTitle: r.event?.title ?? null,
@@ -411,7 +413,7 @@ export default async function StudentHomeView({
         />
       )}
       {showFeesRecovery && <FeeProofRecoveryBanner />}
-      <ReportVerdictModal verdicts={verdicts} />
+      <MyReportsModal reports={myReports} />
       <WelcomeBanner
         firstName={data.firstName}
         sectionLabel={data.sectionLabel}
