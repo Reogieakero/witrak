@@ -68,23 +68,43 @@ export function AdminShell({
       isSuperAdmin,
     });
     if (isValidElement(children) && typeof children.props === "object" && children.props !== null) {
-      savePersistedView(pathname, {
-        props: children.props as Record<string, unknown>,
-        userName,
-        roleLabel,
-        isSuperAdmin,
-      });
+      // Large pages (e.g. sanctions with evidence arrays) serialize to MBs of
+      // JSON. Persisting those blocks navigation on quota writes + slow parses,
+      // so skip persistence above ~100KB and rely on the in-memory snapshot.
+      try {
+        const props = children.props as Record<string, unknown>;
+        const size = JSON.stringify(props).length;
+        if (size < 100_000) {
+          savePersistedView(pathname, {
+            props,
+            userName,
+            roleLabel,
+            isSuperAdmin,
+          });
+        }
+      } catch {
+        // Non-serializable props — skip persistence.
+      }
     }
   }, [pathname, children, userName, roleLabel, isSuperAdmin, snapshot]);
 
   const canManagePrograms = isSuperAdmin || roleLabel === "Supreme";
+  // During route transitions loading.tsx renders this shell with a placeholder
+  // role ("…" / "Loading"). Filtering then would collapse the sidebar to only
+  // the Dashboard link (the sole item without visibleRoles) — a visible glitch.
+  // Show the full nav instead so the sidebar stays stable while loading.
+  const isNavLoading = roleLabel === "…" || roleLabel === "Loading";
 
-  const visibleMainNav = MAIN_NAV.filter(
-    (item) => !item.visibleRoles || item.visibleRoles.includes(roleLabel) || canManagePrograms,
-  );
-  const visibleSystemNav = SYSTEM_NAV.filter(
-    (item) => !item.visibleRoles || item.visibleRoles.includes(roleLabel) || canManagePrograms,
-  );
+  const visibleMainNav = isNavLoading
+    ? MAIN_NAV
+    : MAIN_NAV.filter(
+        (item) => !item.visibleRoles || item.visibleRoles.includes(roleLabel) || canManagePrograms,
+      );
+  const visibleSystemNav = isNavLoading
+    ? SYSTEM_NAV
+    : SYSTEM_NAV.filter(
+        (item) => !item.visibleRoles || item.visibleRoles.includes(roleLabel) || canManagePrograms,
+      );
 
   const PAGE_TITLES: Record<string, string> = {
     "/admin/dashboard": "Dashboard",
@@ -150,16 +170,21 @@ export function AdminShell({
              );
            })}
 
-           <div className={styles.navSection}>System</div>
-           {visibleSystemNav.map((item) => {
-             const Icon = item.icon;
-             return (
-               <Link key={item.label} href={item.href} className={styles.navLink}>
-                 <Icon size={16} />
-                 <span>{item.label}</span>
-               </Link>
-             );
-           })}
+            <div className={styles.navSection}>System</div>
+            {visibleSystemNav.map((item) => {
+              const Icon = item.icon;
+              const active = item.active ?? isActive(item.href);
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={active ? styles.navLinkActive : styles.navLink}
+                >
+                  <Icon size={16} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
         </nav>
       </aside>
 

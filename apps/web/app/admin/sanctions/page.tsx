@@ -79,6 +79,10 @@ export default async function AdminSanctionsPage() {
         prisma.sanction.findMany({
           where: { ...studentWhere, ...sanctionsInTerm(term) },
           orderBy: { issuedAt: "desc" },
+          // Unbounded sanctions + evidence joins balloon the payload (and the
+          // serialized snapshot), making the page feel "too long to display".
+          // The table paginates client-side at 10/page, so cap the fetch.
+          take: 200,
           include: {
             student: {
               select: {

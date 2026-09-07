@@ -1,42 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { ComponentType } from "react";
 import { usePathname } from "next/navigation";
 import { AdminShell } from "@/app/components/admin-shell";
 import { PageSkeleton } from "@/app/components/ui/page-skeleton";
-import {
-  getPersistedView,
-  getViewSnapshot,
-  type PersistedViewData,
-} from "@/lib/view-store";
-import { VIEW_REGISTRY } from "@/lib/view-registry";
-
-type RestoredView = {
-  Component: ComponentType<Record<string, unknown>>;
-  data: PersistedViewData;
-};
+import { getViewSnapshot } from "@/lib/view-store";
 
 export default function Loading() {
   const pathname = usePathname();
-  const [restored, setRestored] = useState<RestoredView | null>(null);
 
-  useEffect(() => {
-    const persisted = getPersistedView(pathname);
-    const loader = persisted ? VIEW_REGISTRY[pathname] : undefined;
-    if (!persisted || !loader) return;
-
-    let cancelled = false;
-    loader()
-      .then((Component) => {
-        if (!cancelled) setRestored({ Component, data: persisted });
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [pathname]);
-
+  // Show the previous in-memory snapshot of THIS page for instant back-nav.
+  // Deliberately no sessionStorage restore here: rehydrating stale serialized
+  // props flashes outdated data (often the wrong page's content) and parsing
+  // large payloads (e.g. sanctions) janks navigation. Unknown pages fall
+  // through to a neutral skeleton with the full sidebar (see AdminShell
+  // isNavLoading) instead of a Dashboard-only glitch.
   const memory = getViewSnapshot(pathname);
 
   if (memory) {
@@ -48,20 +25,6 @@ export default function Loading() {
         snapshot={false}
       >
         {memory.view}
-      </AdminShell>
-    );
-  }
-
-  if (restored) {
-    const { Component, data } = restored;
-    return (
-      <AdminShell
-        userName={data.userName}
-        roleLabel={data.roleLabel}
-        isSuperAdmin={data.isSuperAdmin}
-        snapshot={false}
-      >
-        <Component {...data.props} />
       </AdminShell>
     );
   }

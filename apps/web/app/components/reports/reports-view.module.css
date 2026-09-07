@@ -1,14 +1,13 @@
-:root {
-  --text-strong: #111827;
-  --text-muted: #6b7280;
-  --text-faint: #9ca3af;
-  --surface: #f9fafb;
-  --surface-card: #ffffff;
+.container {
   --surface-hover: #f3f4f6;
-  --border-subtle: #e5e7eb;
-  --line: #e5e7eb;
   --brand: #2563eb;
   --brand-dark: #1d4ed8;
+}
+
+:global([data-theme="dark"]) .container {
+  --surface-hover: #282828;
+  --brand: #5b82d6;
+  --brand-dark: #93c5fd;
 }
 
 .container {

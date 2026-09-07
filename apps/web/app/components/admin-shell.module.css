@@ -79,7 +79,7 @@
   border-radius: 0.375rem;
   border: 0;
   background: transparent;
-  color: #2563eb;
+  color: var(--brand-600);
   cursor: pointer;
 }
 
@@ -122,19 +122,19 @@
 }
 
 .navLink:hover {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--brand-50);
+  color: var(--brand-600);
 }
 
 .navLinkActive {
-  background: #eff6ff;
-  color: #2563eb;
+  background: var(--brand-50);
+  color: var(--brand-600);
   font-weight: 600;
 }
 
 .navLink svg,
 .navLinkActive svg {
-  color: #2563eb;
+  color: var(--brand-600);
   flex: none;
 }
 
@@ -153,7 +153,7 @@
   height: 1.125rem;
   padding: 0 0.3125rem;
   border-radius: 9999px;
-  background: #2563eb;
+  background: var(--brand-600);
   color: #fff;
   font-size: 0.625rem;
   font-weight: 700;
@@ -161,10 +161,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-:global([data-theme="dark"]) .navBadge {
-  background: var(--brand-600);
 }
 
 .sidebarFooter {
@@ -268,12 +264,12 @@
   border-radius: 0.5rem;
   border: 0;
   background: transparent;
-  color: #2563eb;
+  color: var(--brand-600);
   cursor: pointer;
 }
 
 .menuBtn:hover {
-  background: #eff6ff;
+  background: var(--brand-50);
 }
 
 @media (min-width: 1024px) {
@@ -291,7 +287,7 @@
 
 .crumbSep {
   font-size: 0.75rem;
-  color: #d1d5db;
+  color: var(--border-strong);
 }
 
 .crumbCurrent {
