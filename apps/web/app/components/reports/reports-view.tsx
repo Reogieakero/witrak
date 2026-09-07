@@ -14,6 +14,7 @@ import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
 import { Badge } from "@/app/components/ui/badge";
 import { Modal } from "@/app/components/ui/modal";
+import { Select } from "@/app/components/ui/select";
 import {
   resolveAttendanceReport,
   reviewFeesReport,
@@ -223,17 +224,18 @@ export function ReportsView({
         </div>
 
         <div className={styles.filterGroup}>
-          <select
-            value={categoryFilter}
-            onChange={(e) =>
-              setCategoryFilter(e.target.value as CategoryFilter)
-            }
-            className={styles.filterSelect}
-          >
-            <option value="all">All categories</option>
-            <option value="ATTENDANCE">Attendance</option>
-            <option value="FEES">Fees</option>
-          </select>
+          <div className={styles.categorySelect}>
+            <Select
+              name="category"
+              value={categoryFilter}
+              options={[
+                { value: "all", label: "All categories" },
+                { value: "ATTENDANCE", label: "Attendance" },
+                { value: "FEES", label: "Fees" },
+              ]}
+              onChange={(v) => setCategoryFilter(v as CategoryFilter)}
+            />
+          </div>
           <input
             type="search"
             placeholder="Search reports…"

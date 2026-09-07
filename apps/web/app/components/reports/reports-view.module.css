@@ -114,14 +114,8 @@
   gap: 0.5rem;
 }
 
-.filterSelect {
-  font-size: 0.75rem;
-  padding: 0.3rem 0.625rem;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--surface-card);
-  color: var(--text-strong);
-  cursor: pointer;
+.categorySelect {
+  min-width: 11rem;
 }
 
 .searchInput {
