@@ -17,6 +17,8 @@ export const PERMISSION_KEYS = [
   "fees_create",
   "fees_verify_payment",
   "fees_view",
+  "reports_view",
+  "reports_manage",
   "announcements_create",
   "announcements_edit",
   "announcements_delete",
