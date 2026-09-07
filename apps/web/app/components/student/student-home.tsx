@@ -15,6 +15,7 @@ import { StudentQuickLinks } from "@/app/components/student/student-quick-links"
 import { StudentKpiOverview } from "@/app/components/student/student-kpi-overview";
 import { CompleteProfilePrompt } from "@/app/components/student/complete-profile-prompt";
 import { FeeProofRecoveryBanner } from "@/app/components/student/fee-proof-recovery-banner";
+import { ReportVerdictModal } from "@/app/components/student/report-verdict-modal";
 import type { StudentHomeData } from "@/app/components/student/types";
 import styles from "./student-home.module.css";
 
@@ -308,6 +309,33 @@ export default async function StudentHomeView({
     };
   });
 
+  const verdictRows = await prisma.report.findMany({
+    where: { studentId, status: { in: ["RESOLVED", "REVIEWED"] } },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      category: true,
+      subject: true,
+      status: true,
+      resolutionNote: true,
+      createdAt: true,
+      event: { select: { title: true } },
+      fee: { select: { title: true } },
+    },
+  });
+
+  const verdicts = verdictRows.map((r) => ({
+    id: r.id,
+    category: r.category,
+    subject: r.subject,
+    status: r.status,
+    resolutionNote: r.resolutionNote,
+    eventTitle: r.event?.title ?? null,
+    feeTitle: r.fee?.title ?? null,
+    createdAt: fmtDate(r.createdAt),
+  }));
+
   const sectionLabel = student.section
     ? `${student.section.programYear.program.code} ${student.section.programYear.level}-${student.section.name}`
     : "Unassigned";
@@ -383,6 +411,7 @@ export default async function StudentHomeView({
         />
       )}
       {showFeesRecovery && <FeeProofRecoveryBanner />}
+      <ReportVerdictModal verdicts={verdicts} />
       <WelcomeBanner
         firstName={data.firstName}
         sectionLabel={data.sectionLabel}

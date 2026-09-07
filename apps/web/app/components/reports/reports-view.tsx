@@ -9,11 +9,15 @@ import {
   User,
   Calendar,
   AlertCircle,
+  Eye,
+  HandCoins,
 } from "lucide-react";
 import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
 import { Badge } from "@/app/components/ui/badge";
 import { Modal } from "@/app/components/ui/modal";
+import { Drawer } from "@/app/components/ui/drawer";
+import { LoadingOverlay } from "@/app/components/ui/loading-overlay";
 import { Select } from "@/app/components/ui/select";
 import {
   resolveAttendanceReport,
@@ -48,8 +52,11 @@ export function ReportsView({
 
   const [absentReport, setAbsentReport] = useState<ReportItem | null>(null);
   const [resolveFeesReport, setResolveFeesReport] = useState<ReportItem | null>(null);
+  const [viewReport, setViewReport] = useState<ReportItem | null>(null);
   const [absentReason, setAbsentReason] = useState("");
   const [feesNote, setFeesNote] = useState("");
+  // Logo overlay label matching the verdict being recorded.
+  const [busyLabel, setBusyLabel] = useState<string | null>(null);
 
   const filtered = reports.filter(
     (r) =>
@@ -69,6 +76,7 @@ export function ReportsView({
     status: "PRESENT" | "LATE" | "EXCUSED",
   ) => {
     if (!canManage) return;
+    setBusyLabel(`Marking ${status.toLowerCase()}…`);
     startTransition(async () => {
       try {
         await sileo.promise(
@@ -95,12 +103,15 @@ export function ReportsView({
         await router.refresh();
       } catch {
         /* sileo handles errors */
+      } finally {
+        setBusyLabel(null);
       }
     });
   };
 
   const handleAbsentSubmit = () => {
     if (!absentReport || !absentReason.trim()) return;
+    setBusyLabel("Marking absent…");
     startTransition(async () => {
       try {
         await sileo.promise(
@@ -134,12 +145,15 @@ export function ReportsView({
         await router.refresh();
       } catch {
         /* sileo handles errors */
+      } finally {
+        setBusyLabel(null);
       }
     });
   };
 
   const handleFeesSubmit = () => {
     if (!resolveFeesReport || !feesNote.trim()) return;
+    setBusyLabel("Resolving fees report…");
     startTransition(async () => {
       try {
         await sileo.promise(
@@ -168,6 +182,8 @@ export function ReportsView({
         await router.refresh();
       } catch {
         /* sileo handles errors */
+      } finally {
+        setBusyLabel(null);
       }
     });
   };
@@ -260,7 +276,6 @@ export function ReportsView({
                 <th>Section</th>
                 <th>Category</th>
                 <th>Subject</th>
-                <th>Details</th>
                 <th>Status</th>
                 <th>Submitted</th>
                 <th>Actions</th>
@@ -290,40 +305,31 @@ export function ReportsView({
                   </td>
                   <td>{r.subject}</td>
                   <td>
-                    <div className={styles.descriptionCell}>
-                      {r.description}
-                    </div>
-                    {r.eventTitle && (
-                      <div className={styles.eventRef}>
-                        <Calendar size={12} /> Event: {r.eventTitle}
-                      </div>
-                    )}
-                    {r.feeTitle && (
-                      <div className={styles.eventRef}>
-                        <span className={styles.dot} /> Fee: {r.feeTitle}
-                      </div>
-                    )}
-                  </td>
-                  <td>
                     <Badge tone={STATUS_TONES[r.status] ?? "gray"}>
                       {r.status}
                     </Badge>
-                    {r.resolutionNote && (
-                      <div className={styles.resolutionNote}>
-                        {r.resolutionNote}
-                      </div>
-                    )}
                   </td>
                   <td className={styles.muted}>{r.createdAt}</td>
                   <td>
-                    {r.status === "PENDING" && canManage && (
-                      <ReportActions
-                        report={r}
-                        onAttendanceResolve={handleAttendanceResolve}
-                        onAbsentClick={() => setAbsentReport(r)}
-                        onFeesClick={() => setResolveFeesReport(r)}
-                      />
-                    )}
+                    <div className={styles.actionGroup}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setViewReport(r)}
+                        className={styles.actionBtn}
+                      >
+                        <Eye size={13} />
+                        View all
+                      </Button>
+                      {r.status === "PENDING" && canManage && (
+                        <ReportActions
+                          report={r}
+                          onAttendanceResolve={handleAttendanceResolve}
+                          onAbsentClick={() => setAbsentReport(r)}
+                          onFeesClick={() => setResolveFeesReport(r)}
+                        />
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -331,6 +337,93 @@ export function ReportsView({
           </table>
         </div>
       )}
+
+      <Drawer
+        open={!!viewReport}
+        onClose={() => setViewReport(null)}
+        title={viewReport ? `Report · ${viewReport.subject}` : "Report details"}
+      >
+        {viewReport && (
+          <div className={styles.drawerBody}>
+            <div className={styles.detailSection}>
+              <span className={styles.sectionLabel}>Student</span>
+              <div className={styles.studentCell}>
+                <User size={16} />
+                <div>
+                  <div className={styles.studentName}>
+                    {viewReport.studentName}
+                  </div>
+                  <div className={styles.studentNo}>
+                    {viewReport.studentNo} · {viewReport.sectionName} ·{" "}
+                    {viewReport.programCode} Y{viewReport.yearLevel}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.detailSection}>
+              <span className={styles.sectionLabel}>Category</span>
+              <div>
+                <Badge
+                  tone={viewReport.category === "ATTENDANCE" ? "brand" : "violet"}
+                >
+                  {viewReport.category === "ATTENDANCE" ? "Attendance" : "Fees"}
+                </Badge>
+              </div>
+            </div>
+
+            <div className={styles.detailSection}>
+              <span className={styles.sectionLabel}>Subject</span>
+              <p className={styles.par}>{viewReport.subject}</p>
+            </div>
+
+            <div className={styles.detailSection}>
+              <span className={styles.sectionLabel}>Details</span>
+              <p className={styles.par}>{viewReport.description}</p>
+            </div>
+
+            {viewReport.eventTitle && (
+              <div className={styles.detailSection}>
+                <span className={styles.sectionLabel}>Event</span>
+                <div className={styles.eventRef}>
+                  <Calendar size={12} />
+                  {viewReport.eventTitle}
+                  {viewReport.eventDate ? ` · ${viewReport.eventDate}` : ""}
+                </div>
+              </div>
+            )}
+
+            {viewReport.feeTitle && (
+              <div className={styles.detailSection}>
+                <span className={styles.sectionLabel}>Fee</span>
+                <div className={styles.eventRef}>
+                  <HandCoins size={12} />
+                  {viewReport.feeTitle}
+                </div>
+              </div>
+            )}
+
+            <div className={styles.detailSection}>
+              <span className={styles.sectionLabel}>Status</span>
+              <div>
+                <Badge tone={STATUS_TONES[viewReport.status] ?? "gray"}>
+                  {viewReport.status}
+                </Badge>
+              </div>
+              {viewReport.resolutionNote && (
+                <div className={styles.resolutionNote}>
+                  {viewReport.resolutionNote}
+                </div>
+              )}
+            </div>
+
+            <div className={styles.detailSection}>
+              <span className={styles.sectionLabel}>Submitted</span>
+              <p className={styles.par}>{viewReport.createdAt}</p>
+            </div>
+          </div>
+        )}
+      </Drawer>
 
       <Modal
         open={!!absentReport}
@@ -411,6 +504,8 @@ export function ReportsView({
           rows={4}
         />
       </Modal>
+
+      <LoadingOverlay open={isMutating || busyLabel !== null} label={busyLabel ?? "Working…"} />
     </div>
   );
 }

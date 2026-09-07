@@ -24,7 +24,7 @@
   gap: 0.25rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #2563eb;
+  color: var(--brand-600);
   text-decoration: none;
 }
 
@@ -48,13 +48,15 @@
 .label {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--ink-700);
+  color: var(--text-subtle);
 }
 
 .input,
 .textarea {
   padding: 0.625rem 0.75rem;
   font-size: 0.75rem;
+  color: var(--text-strong);
+  color-scheme: light dark;
   background: var(--surface);
   border: 1px solid var(--border-default);
   border-radius: 8px;
@@ -63,9 +65,14 @@
   font-family: var(--font-nunito), sans-serif;
 }
 
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--text-faint);
+}
+
 .input:focus,
 .textarea:focus {
-  border-color: #2563eb;
+  border-color: var(--brand-600);
   background: var(--surface-card);
 }
 
@@ -92,5 +99,5 @@
   border: 1px solid var(--brand-100);
   font-size: 0.625rem;
   line-height: 1.5;
-  color: var(--ink-500);
+  color: var(--text-muted);
 }

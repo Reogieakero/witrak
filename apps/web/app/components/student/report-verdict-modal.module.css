@@ -1,0 +1,95 @@
+.modalTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.modalTitleIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  background: var(--brand-50);
+  color: var(--brand-600);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modalSub {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.card {
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.cardSubject {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.cardRef {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  color: var(--text-faint);
+}
+
+.cardNote {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-subtle);
+  padding: 0.375rem 0.5rem;
+  background: var(--surface-muted);
+  border-radius: 0.375rem;
+  overflow-wrap: anywhere;
+}
+
+.cardNoteMuted {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+}
+
+.cardDate {
+  margin: 0;
+  font-size: 0.625rem;
+  color: var(--text-faint);
+}

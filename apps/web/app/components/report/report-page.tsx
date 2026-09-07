@@ -7,9 +7,28 @@ import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
 import { Select } from "@/app/components/ui/select";
 import type { SelectOption } from "@/app/components/ui/select";
+import { LoadingOverlay } from "@/app/components/ui/loading-overlay";
 import { submitReportAction } from "@/app/dashboard/report/actions";
 import type { ReportPageProps } from "./types";
 import styles from "./report-page.module.css";
+
+const ATTENDANCE_SUBJECTS: SelectOption[] = [
+  { value: "Wrong attendance status", label: "Wrong attendance status" },
+  { value: "Missing attendance record", label: "Missing attendance record" },
+  { value: "Late arrival issue", label: "Late arrival issue" },
+  { value: "Excuse request", label: "Excuse request" },
+  { value: "Event check-in problem", label: "Event check-in problem" },
+  { value: "Other attendance concern", label: "Other attendance concern" },
+];
+
+const FEES_SUBJECTS: SelectOption[] = [
+  { value: "Payment not reflected", label: "Payment not reflected" },
+  { value: "Wrong fee amount", label: "Wrong fee amount" },
+  { value: "Duplicate payment", label: "Duplicate payment" },
+  { value: "Proof rejected", label: "Proof rejected" },
+  { value: "Due date concern", label: "Due date concern" },
+  { value: "Other fees concern", label: "Other fees concern" },
+];
 
 export function ReportPage({ fees, events }: ReportPageProps) {
   const [category, setCategory] = useState("ATTENDANCE");
@@ -33,6 +52,16 @@ export function ReportPage({ fees, events }: ReportPageProps) {
     value: f.id,
     label: `${f.title} · ${f.amount} (Due ${f.dueDate})`,
   }));
+
+  const subjectOptions = category === "ATTENDANCE" ? ATTENDANCE_SUBJECTS : FEES_SUBJECTS;
+
+  function handleCategory(next: string) {
+    setCategory(next);
+    // Keep subject in sync with the category so options always match.
+    setSubject("");
+    setEventId("");
+    setFeeId("");
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -93,7 +122,7 @@ export function ReportPage({ fees, events }: ReportPageProps) {
             name="category"
             value={category}
             options={categoryOptions}
-            onChange={setCategory}
+            onChange={handleCategory}
           />
         </div>
 
@@ -147,14 +176,16 @@ export function ReportPage({ fees, events }: ReportPageProps) {
           <label className={styles.label} htmlFor="reportSubject">
             Subject
           </label>
-          <input
-            id="reportSubject"
+          <Select
             name="subject"
             value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            className={styles.input}
-            placeholder="Brief summary of the issue"
-            maxLength={200}
+            placeholder={
+              category === "ATTENDANCE"
+                ? "Choose an attendance subject…"
+                : "Choose a fees subject…"
+            }
+            options={subjectOptions}
+            onChange={setSubject}
           />
         </div>
 
@@ -188,6 +219,8 @@ export function ReportPage({ fees, events }: ReportPageProps) {
           once it is resolved.
         </p>
       </form>
+
+      <LoadingOverlay open={isMutating} label="Submitting report…" />
     </>
   );
 }
