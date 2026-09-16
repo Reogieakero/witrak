@@ -120,6 +120,30 @@ export async function uploadFeeProof(
   return { publicUrl: data.publicUrl };
 }
 
+export function feeProofPathFromUrl(fileUrl: string): string | null {
+  const url = String(fileUrl ?? "").trim();
+  if (!url) return null;
+  const marker = `/${FEE_PROOFS_BUCKET}/`;
+  const idx = url.indexOf(marker);
+  if (idx >= 0) {
+    const path = url.slice(idx + marker.length).split("?")[0];
+    return path ? decodeURIComponent(path) : null;
+  }
+  // Fallback for legacy / non-Supabase URLs: use last segment as filename.
+  const last = url.split("?")[0].split("/").pop();
+  return last ? decodeURIComponent(last) : null;
+}
+
+export async function deleteFeeProofFile(path: string): Promise<void> {
+  const key = String(path ?? "").trim();
+  if (!key) return;
+  const supabase = getSupabaseStorage();
+  const { error } = await supabase.storage.from(FEE_PROOFS_BUCKET).remove([key]);
+  if (error) {
+    throw new Error(`Supabase delete failed: ${error.message}`);
+  }
+}
+
 async function ensureBucket(supabase: SupabaseClient, bucket: string) {
   const { error } = await supabase.storage.createBucket(bucket, {
     public: true,

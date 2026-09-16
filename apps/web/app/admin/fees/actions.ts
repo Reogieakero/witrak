@@ -5,6 +5,10 @@ import { prisma, AuditAction } from "@fhusocom/db";
 import { auth } from "@/auth";
 import { hasPermission, type UserAccess } from "@/lib/permissions";
 import { invalidateByPrefix } from "@/lib/cache";
+import {
+  deleteFeeProofFile,
+  feeProofPathFromUrl,
+} from "@/lib/supabase-storage";
 
 type SessionWithUser = {
   user: { id: string };
@@ -314,6 +318,7 @@ export async function verifyFeeProof(
       where: { id: proof.id },
       data: {
         status,
+        fileUrl: "",
         rejectionReason:
           input.decision === "reject"
             ? String(input.rejectionReason ?? "").trim()
@@ -337,6 +342,21 @@ export async function verifyFeeProof(
       },
     });
   });
+
+  // Delete the uploaded proof image from storage on both approve and reject.
+  // Best-effort only: verdict already succeeded, never block on storage errors.
+  // Existing PAID/REJECTED rows are untouched — this applies to new verdicts only.
+  const storagePath = feeProofPathFromUrl(proof.fileUrl);
+  if (storagePath) {
+    try {
+      await deleteFeeProofFile(storagePath);
+    } catch (e) {
+      console.warn(
+        `verifyFeeProof: storage cleanup failed for proof ${proof.id} (${storagePath}):`,
+        e instanceof Error ? e.message : e,
+      );
+    }
+  }
 
   await invalidateByPrefix("fees:");
   revalidatePath("/admin/fees");
