@@ -34,7 +34,6 @@ export default async function StudentHomeView({
   userName,
   forceWalkthrough,
   needsSection,
-  needsPhoto,
 }: {
   studentId: string;
   userName: string;
@@ -406,10 +405,9 @@ export default async function StudentHomeView({
 
   return (
     <StudentShell userName={userName} roleLabel="Student" crumb="Home" forceWalkthrough={forceWalkthrough}>
-      {(needsSection || needsPhoto) && (
+      {needsSection && (
         <CompleteProfilePrompt
           needsSection={Boolean(needsSection)}
-          needsPhoto={Boolean(needsPhoto)}
         />
       )}
       {showFeesRecovery && <FeeProofRecoveryBanner />}

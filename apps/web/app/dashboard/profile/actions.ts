@@ -1,15 +1,13 @@
 "use server";
 
-import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import ExcelJS from "exceljs";
 import { prisma } from "@fhusocom/db";
 import { auth } from "@/auth";
-import { uploadStudentImage } from "@/lib/supabase-storage";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-const MAX_FILE_BYTES = 5 * 1024 * 1024;
-const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+// All student avatars use the shared brand logo — no per-student uploads.
+const STUDENT_AVATAR_URL = "/logo-favicon.png";
 
 export type StudentProfile = {
   id: string;
@@ -89,7 +87,7 @@ export async function getStudentProfile(): Promise<StudentProfile | null> {
     lastName: student.lastName,
     suffix: student.suffix,
     email: user?.email ?? "",
-    imageUrl: student.imageUrl,
+    imageUrl: STUDENT_AVATAR_URL,
     sectionLabel,
     programId: student.section?.programYear.program.id ?? null,
     yearLevelId: student.section?.programYear.id ?? null,
@@ -135,8 +133,7 @@ export async function getStudentPlacementOptions(): Promise<StudentPlacementOpti
 }
 
 export async function getStudentAvatar(): Promise<{ imageUrl: string | null }> {
-  const student = await getCurrentStudent();
-  return { imageUrl: student?.imageUrl ?? null };
+  return { imageUrl: STUDENT_AVATAR_URL };
 }
 
 export async function updateStudentProfile(input: {
@@ -228,41 +225,11 @@ export async function updateStudentProfile(input: {
   return { ok: true };
 }
 
-export async function uploadStudentAvatar(
-  formData: FormData,
-): Promise<ProfileActionResult & { imageUrl?: string }> {
-  const student = await getCurrentStudent();
-  if (!student) return { ok: false, error: "Student record not found." };
-  if (student.suspended) return { ok: false, error: "Account suspended." };
-
-  const file = formData.get("file") as File | null;
-  if (!file || file.size === 0) return { ok: false, error: "Please choose an image." };
-  if (file.size > MAX_FILE_BYTES) {
-    return { ok: false, error: "Image must be under 5 MB." };
-  }
-  if (!ALLOWED_TYPES.has(file.type)) {
-    return { ok: false, error: "Only JPG, PNG, or WebP images are allowed." };
-  }
-
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-  const storedName = `${student.id}-${randomUUID()}.${ext}`;
-  const buffer = await file.arrayBuffer();
-
-  let publicUrl: string;
-  try {
-    const res = await uploadStudentImage(storedName, buffer, file.type);
-    publicUrl = res.publicUrl;
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Upload failed." };
-  }
-
-  await prisma.student.update({
-    where: { id: student.id },
-    data: { imageUrl: publicUrl, imagePath: storedName },
-  });
-
-  revalidatePath("/dashboard");
-  return { ok: true, imageUrl: publicUrl };
+export async function uploadStudentAvatar(): Promise<
+  ProfileActionResult & { imageUrl?: string }
+> {
+  // Profile photos are disabled — all students share the brand logo avatar.
+  return { ok: false, error: "Profile photos are disabled." };
 }
 
 export type ExportDataResult =
@@ -369,7 +336,7 @@ export async function exportStudentData(): Promise<ExportDataResult> {
       ["Suffix", student.suffix ?? ""],
       ["Email", user?.email ?? ""],
       ["Section", sectionLabel],
-      ["Profile photo", student.imageUrl ?? ""],
+      ["Profile photo", STUDENT_AVATAR_URL],
     ],
   });
 

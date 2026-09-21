@@ -1,12 +1,11 @@
 "use server";
 
-import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
 import { prisma, ScopeType } from "@fhusocom/db";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { uploadStudentImage } from "@/lib/supabase-storage";
 
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+// All student avatars use the shared brand logo — no per-student uploads.
+const STUDENT_AVATAR_URL = "/logo-favicon.png";
 
 export type CompleteProfileResult = { ok: boolean; error?: string };
 
@@ -65,27 +64,8 @@ export async function completeStudentProfile(
     }
   }
 
-  let imageUrl: string | null = null;
-  let imagePath: string | null = null;
-  const file = formData.get("image") as File | null;
-  if (!file || file.size === 0) {
-    return { ok: false, error: "Please upload your profile photo." };
-  }
-  if (file.size > MAX_IMAGE_BYTES) {
-    return { ok: false, error: "Image must be under 5 MB." };
-  }
-  if (!file.type.startsWith("image/")) {
-    return { ok: false, error: "Only image files are allowed." };
-  }
-  const ext = file.name.split(".").pop() ?? "png";
-  imagePath = `${randomUUID()}.${ext}`;
-  const buffer = await file.arrayBuffer();
-  try {
-    const res = await uploadStudentImage(imagePath, buffer, file.type || "image/png");
-    imageUrl = res.publicUrl;
-  } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Image upload failed." };
-  }
+  const imageUrl: string | null = STUDENT_AVATAR_URL;
+  const imagePath: string | null = null;
 
   try {
     const role = await prisma.role.findUnique({ where: { name: "Student" } });

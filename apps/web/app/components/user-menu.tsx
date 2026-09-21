@@ -103,12 +103,12 @@ export function UserMenu({
         aria-expanded={open}
       >
         <span className={styles.avatarIcon}>
-          {avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatarUrl} alt="" className={styles.avatarImg} />
-          ) : (
-            <User size={16} />
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={avatarUrl ?? "/logo-favicon.png"}
+            alt=""
+            className={styles.avatarImg}
+          />
         </span>
       </button>
 

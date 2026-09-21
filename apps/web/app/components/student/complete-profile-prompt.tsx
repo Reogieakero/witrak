@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Camera, Check, CheckCircle2, Circle, User } from "lucide-react";
+import { AlertCircle, Check, CheckCircle2, Circle, User } from "lucide-react";
 import { sileo } from "sileo";
 import { Modal } from "@/app/components/ui/modal";
 import { Select } from "@/app/components/ui/select";
@@ -12,7 +12,6 @@ import {
   getStudentPlacementOptions,
   getStudentProfile,
   updateStudentProfile,
-  uploadStudentAvatar,
   type StudentPlacementOptions,
   type StudentProfile,
 } from "@/app/dashboard/profile/actions";
@@ -20,7 +19,7 @@ import styles from "./complete-profile-prompt.module.css";
 
 type CompleteProfilePromptProps = {
   needsSection: boolean;
-  needsPhoto: boolean;
+  needsPhoto?: boolean;
 };
 
 /**
@@ -28,7 +27,7 @@ type CompleteProfilePromptProps = {
  * have no profile photo cannot use the dashboard until both are provided.
  * Rendered only when the server detects an incomplete profile.
  */
-export function CompleteProfilePrompt({ needsSection, needsPhoto }: CompleteProfilePromptProps) {
+export function CompleteProfilePrompt({ needsSection }: CompleteProfilePromptProps) {
   const [open, setOpen] = useState(true);
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [options, setOptions] = useState<StudentPlacementOptions | null>(null);
@@ -39,11 +38,8 @@ export function CompleteProfilePrompt({ needsSection, needsPhoto }: CompleteProf
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [studentNo, setStudentNo] = useState("");
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -72,30 +68,20 @@ export function CompleteProfilePrompt({ needsSection, needsPhoto }: CompleteProf
   }, []);
 
   // Already complete (e.g. finished in another tab) — don't block.
+  // Student avatars are fixed to the brand logo, so only the section matters.
   const alreadyComplete =
-    !loading && Boolean(profile?.sectionId && profile?.imageUrl);
+    !loading && Boolean(profile?.sectionId);
 
   const filteredYears =
     options?.years.filter((y) => y.programId === programId) ?? [];
   const filteredSections =
     options?.sections.filter((s) => s.programYearId === yearLevelId) ?? [];
 
-  function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPhotoFile(file);
-    setError(null);
-    const url = URL.createObjectURL(file);
-    setPhotoPreview(url);
-  }
-
-  const photoDone = Boolean(profile?.imageUrl || photoFile);
   const sectionDone = Boolean(sectionId);
   const namesDone = Boolean(firstName.trim() && lastName.trim() && studentNo.trim());
   const canSave =
     namesDone &&
     (!needsSection || sectionDone) &&
-    (!needsPhoto || photoDone) &&
     !isPending;
 
   async function handleSave() {
@@ -112,25 +98,12 @@ export function CompleteProfilePrompt({ needsSection, needsPhoto }: CompleteProf
       setError("Please select your program, year level, and section.");
       return;
     }
-    if (needsPhoto && !photoFile && !profile?.imageUrl) {
-      setError("Please upload your profile photo.");
-      return;
-    }
     if (!profile) {
       setError("Profile is still loading. Please try again.");
       return;
     }
     startTransition(async () => {
       try {
-        if (photoFile) {
-          const formData = new FormData();
-          formData.set("file", photoFile);
-          const up = await uploadStudentAvatar(formData);
-          if (!up.ok) {
-            setError(up.error ?? "Photo upload failed.");
-            return;
-          }
-        }
         const result = await updateStudentProfile({
           firstName,
           lastName,
@@ -146,7 +119,7 @@ export function CompleteProfilePrompt({ needsSection, needsPhoto }: CompleteProf
         }
         sileo.success({
           title: "Profile complete",
-          description: "Your section and photo have been saved.",
+          description: "Your section has been saved.",
           icon: <Check />,
         });
         setOpen(false);
@@ -188,10 +161,6 @@ export function CompleteProfilePrompt({ needsSection, needsPhoto }: CompleteProf
           <ChecklistItem
             done={!needsSection || sectionDone}
             label={sectionDone ? "Section assigned" : "Section not assigned"}
-          />
-          <ChecklistItem
-            done={!needsPhoto || photoDone}
-            label={photoDone ? "Profile photo uploaded" : "Profile photo missing"}
           />
         </ul>
 
@@ -284,42 +253,6 @@ export function CompleteProfilePrompt({ needsSection, needsPhoto }: CompleteProf
                     onChange={setSectionId}
                   />
                 </div>
-              </div>
-            )}
-
-            {needsPhoto && (
-              <div className={styles.block}>
-                <span className={styles.label}>Profile photo</span>
-                <div className={styles.photoRow}>
-                  <span className={styles.photoThumb}>
-                    {photoPreview || profile.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={photoPreview ?? profile.imageUrl ?? ""}
-                        alt="Profile preview"
-                        className={styles.photoImg}
-                      />
-                    ) : (
-                      <Camera size={22} />
-                    )}
-                  </span>
-                  <button
-                    type="button"
-                    className={styles.photoBtn}
-                    onClick={() => fileRef.current?.click()}
-                  >
-                    <Camera size={14} />
-                    {photoFile || profile.imageUrl ? "Change photo" : "Upload photo"}
-                  </button>
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept=".jpg,.jpeg,.png,.webp"
-                    className={styles.hiddenInput}
-                    onChange={handlePhoto}
-                  />
-                </div>
-                <p className={styles.hint}>JPG, PNG, or WebP, max 5 MB.</p>
               </div>
             )}
 

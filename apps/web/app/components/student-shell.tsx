@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { UserMenu } from "./user-menu";
 import { StudentProfileModal } from "./student/student-profile-modal";
 import { QrWalkthroughModal } from "./student/qr-walkthrough-modal";
 import { StudentMobileNav } from "./student/student-mobile-nav";
 import { EventsModalProvider } from "./student/events-modal-context";
-import { getStudentAvatar } from "@/app/dashboard/profile/actions";
 import styles from "./student-shell.module.css";
+
+// All student avatars use the shared brand logo — no per-student photos.
+const STUDENT_AVATAR_URL = "/logo-favicon.png";
 
 type StudentShellProps = {
   userName: string;
@@ -29,22 +31,11 @@ function shouldShowWalkthrough(force: boolean): boolean {
 }
 
 export function StudentShell({ userName, roleLabel, crumb, children, forceWalkthrough }: StudentShellProps) {
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileTab, setProfileTab] = useState<"profile" | "qr">("profile");
   const [walkthroughOpen, setWalkthroughOpen] = useState(() =>
     shouldShowWalkthrough(forceWalkthrough ?? false),
   );
-
-  useEffect(() => {
-    let active = true;
-    getStudentAvatar().then((res) => {
-      if (active) setAvatarUrl(res.imageUrl);
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
 
   function openProfileQr() {
     setWalkthroughOpen(false);
@@ -82,7 +73,7 @@ export function StudentShell({ userName, roleLabel, crumb, children, forceWalkth
               userName={userName}
               roleLabel={roleLabel}
               logoutHref="/login/students"
-              avatarUrl={avatarUrl}
+              avatarUrl={STUDENT_AVATAR_URL}
               onProfile={() => {
                 setProfileTab("profile");
                 setProfileOpen(true);
@@ -97,7 +88,6 @@ export function StudentShell({ userName, roleLabel, crumb, children, forceWalkth
       <StudentProfileModal
         open={profileOpen}
         onClose={() => setProfileOpen(false)}
-        onAvatarChange={setAvatarUrl}
         initialTab={profileTab}
       />
 

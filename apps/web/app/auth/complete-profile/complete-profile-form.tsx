@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
-import { ImagePlus, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { sileo } from "sileo";
 import { Button } from "@/app/components/ui/button";
 import { Select } from "@/app/components/ui/select";
@@ -28,7 +28,6 @@ export function CompleteProfileForm({
   const next = searchParams.get("next") ?? "/dashboard";
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
-  const [preview, setPreview] = useState<string | null>(null);
   const [programId, setProgramId] = useState("");
   const [yearId, setYearId] = useState("");
   const [sectionId, setSectionId] = useState("");
@@ -45,12 +44,6 @@ export function CompleteProfileForm({
     const form = new FormData(e.currentTarget);
     form.set("next", next);
 
-    const file = form.get("image") as File | null;
-    if (!file || file.size === 0) {
-      setError("Please upload your profile photo.");
-      return;
-    }
-
     startTransition(async () => {
       const result = await completeStudentProfile(form);
       if (!result?.ok && result?.error) {
@@ -63,28 +56,9 @@ export function CompleteProfileForm({
   return (
     <form onSubmit={onSubmit} className={styles.form} noValidate>
       <div className={styles.avatarField}>
-        <label className={styles.avatarLabel}>
-          {preview ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={preview} alt="Profile preview" className={styles.avatarPreview} />
-          ) : (
-            <span className={styles.avatarPlaceholder}>
-              <ImagePlus size={22} />
-            </span>
-          )}
-          <input
-            name="image"
-            type="file"
-            accept="image/*"
-            required
-            className={styles.fileInput}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) setPreview(URL.createObjectURL(file));
-            }}
-          />
-        </label>
-        <span className={styles.avatarHint}>Upload your photo</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo-favicon.png" alt="Student avatar" className={styles.avatarPreview} />
+        <span className={styles.avatarHint}>Default student avatar</span>
       </div>
 
       <label className={styles.field}>

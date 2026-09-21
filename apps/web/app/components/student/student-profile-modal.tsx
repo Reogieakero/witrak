@@ -1,16 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
-  Camera,
   Check,
   Download,
   Pencil,
   QrCode,
   Trash2,
-  Upload,
   User,
 } from "lucide-react";
 import QRCode from "react-qr-code";
@@ -27,11 +25,13 @@ import {
   getStudentProfile,
   getStudentPlacementOptions,
   updateStudentProfile,
-  uploadStudentAvatar,
   type StudentPlacementOptions,
   type StudentProfile,
 } from "@/app/dashboard/profile/actions";
 import styles from "./student-profile-modal.module.css";
+
+// Shared brand avatar for all students — profile photos are disabled.
+const STUDENT_AVATAR_URL = "/logo-favicon.png";
 
 function downloadXlsx(name: string, base64: string) {
   const bin = atob(base64);
@@ -62,7 +62,6 @@ type Tab = "profile" | "qr";
 export function StudentProfileModal({
   open,
   onClose,
-  onAvatarChange,
   initialTab,
 }: StudentProfileModalProps) {
   const [tab, setTab] = useState<Tab>(initialTab ?? "profile");
@@ -81,7 +80,6 @@ export function StudentProfileModal({
   const [deleteView, setDeleteView] = useState<"closed" | "confirm">("closed");
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -145,7 +143,7 @@ export function StudentProfileModal({
         {
           loading: { title: "Saving", description: "Updating your profile…", icon: <Pencil /> },
           success: { title: "Profile updated", description: "Your changes have been saved.", icon: <Check /> },
-          error: (err) => ({ title: "Could not save", description: err instanceof Error ? err.message : "Please try again.", icon: <Upload /> }),
+          error: (err) => ({ title: "Could not save", description: err instanceof Error ? err.message : "Please try again.", icon: <Pencil /> }),
         },
       );
       if (result.ok) {
@@ -167,28 +165,6 @@ export function StudentProfileModal({
       setYearLevelId(profile.yearLevelId ?? "");
       setSectionId(profile.sectionId ?? "");
     }
-  }
-
-  async function handleAvatar(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.set("file", file);
-    startTransition(async () => {
-      const result = await sileo.promise(
-        () => uploadStudentAvatar(formData),
-        {
-          loading: { title: "Uploading photo", description: "Updating your avatar…", icon: <Upload /> },
-          success: { title: "Photo updated", description: "Your avatar has been changed.", icon: <Check /> },
-          error: (err) => ({ title: "Could not upload", description: err instanceof Error ? err.message : "Please try again.", icon: <Camera /> }),
-        },
-      );
-      if (result.ok && result.imageUrl) {
-        setProfile((prev) => (prev ? { ...prev, imageUrl: result.imageUrl! } : prev));
-        onAvatarChange?.(result.imageUrl!);
-      }
-      if (fileRef.current) fileRef.current.value = "";
-    });
   }
 
   async function handleExport() {
@@ -348,28 +324,9 @@ export function StudentProfileModal({
         <div className={styles.profileBody}>
           <div className={styles.avatarWrap}>
             <span className={styles.avatarLarge}>
-              {profile.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={profile.imageUrl} alt="Profile" className={styles.avatarImg} />
-              ) : (
-                <User size={28} />
-              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={STUDENT_AVATAR_URL} alt="Student avatar" className={styles.avatarImg} />
             </span>
-            <button
-              type="button"
-              className={styles.cameraBtn}
-              title="Change photo"
-              onClick={() => fileRef.current?.click()}
-            >
-              <Camera size={13} />
-            </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".jpg,.jpeg,.png,.webp"
-              className={styles.hiddenInput}
-              onChange={handleAvatar}
-            />
           </div>
 
           {!editing ? (
